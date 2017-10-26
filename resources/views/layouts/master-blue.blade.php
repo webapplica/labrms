@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>@yield('title')</title>
+    <title> {{ isset($title) ? $title : config("app.name") }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Bootstrap -->
@@ -41,10 +41,10 @@
     {{ HTML::script(asset('js/sweetalert.min.js')) }}
     {{ HTML::script(asset('js/jquery.dataTables.min.js')) }}
     {{ HTML::script(asset('js/dataTables.bootstrap.min.js')) }}
+    {{ HTML::script(asset('js/moment.min.js')) }}
     @yield('script-include')
   </head>
   <body>
-    @yield('navbar')
     @yield('content')
     @yield('footer')
     @yield('script')

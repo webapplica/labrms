@@ -148,10 +148,18 @@
               </ul> <!-- end of dropdown items -->
             </li> <!-- end of reservation dropdown tab -->
 
-            <!-- ticket dropdown tab -->
-            <li>
-              <a href="{{ url('ticket') }}">Ticketing</a>
-            </li> <!-- end of ticket dropdown tab -->
+            <!-- inventory dropdown tab -->
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Ticketing
+              </a>
+              <!-- dropdown items -->
+              <ul class="dropdown-menu">
+                <!-- tenant inventory tab -->
+                <li>{{ link_to('ticket','Complaints') }}</li>
+                <li>{{ link_to('ticket/maintenance','Maintenance') }}</li>
+                <li>{{ HTML::link('ticket/incident','Incident') }}</li>
+              </ul> <!-- end of dropdown items -->
+            </li> <!-- end of inventory dropdown tab -->
 
             <!-- inventory dropdown tab -->
             <li class="dropdown-submenu">

@@ -238,12 +238,12 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	Route::prefix('reports')->group(function(){
 		Route::get("/",[
 			'as' => 'reports.index',
-			'uses' => 'ReportsController@index' 
+			'uses' => 'ReportsController@index'
 		]);
 
 		Route::get("{report}",[
 			'as' => 'reports.generate',
-			'uses' => 'ReportsController@generate' 
+			'uses' => 'ReportsController@generate'
 		]);
 	});
 
@@ -518,7 +518,18 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('ticket/maintenance',[
-		'uses'=>'TicketsController@maintenanceView'
+		'uses'=>'MaintenanceTicketsController@index'
+	]);
+
+	/*
+	|--------------------------------------------------------------------------
+	| maintenance ticket function
+	|--------------------------------------------------------------------------
+	|
+	*/
+	Route::get('ticket/maintenance/create',[
+		'as'=>'ticket.maintenance.create',
+		'uses'=>'MaintenanceTicketsController@create'
 	]);
 
 	/*
@@ -529,7 +540,18 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	*/
 	Route::post('ticket/maintenance',[
 		'as'=>'ticket.maintenance',
-		'uses'=>'TicketsController@maintenance'
+		'uses'=>'MaintenanceTicketsController@post'
+	]);
+
+	/*
+	|--------------------------------------------------------------------------
+	| ticket history
+	|--------------------------------------------------------------------------
+	|
+	*/
+	Route::get('ticket/maintenance/{id}',[
+		'as' => 'ticket.maintenance.view',
+		'uses' => 'MaintenanceTicketsController@show'
 	]);
 
 	/*
@@ -998,7 +1020,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::post('account/password/reset','AccountsController@resetPassword');
-	
+
 	/*
 	|--------------------------------------------------------------------------
 	| activate account

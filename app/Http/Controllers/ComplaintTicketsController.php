@@ -8,25 +8,34 @@ use Session;
 use Validator;
 use Auth;
 use App;
+use App\TicketView;
+use App\Ticket;
+use App\PcTicket;
+use App\RoomTicket;
+use App\Room;
+use App\ItemProfile;
+use App\MaintenanceActivity;
+use App\Pc;
 use DB;
+use App\User;
+use App\TicketType;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 
 class TicketsController extends Controller {
 
-	public $assigned = "";
-	public $author = null;
-	public $comments = "";
-	public $details = "";
-	public $id = "";
-	public $staff_id = null;
-	public $staffassigned = null;
-	public $status = "Open";
-	public $type = "";
-	public $ticketname = "";
-	public $tickettype = "";
-	public $ticket_id = null;
-	public $underrepair = null;
+	private $assigned = "";
+	private $author = "";
+	private $comments = "";
+	private $details = "";
+	private $id = "";
+	private $staff_id = null;
+	private $staffassigned = null;
+	private $status = "Open";
+	private $type = "";
+	private $ticketname = "";
+	private $tickettype = "";
+	private $ticket_id = "";
 
 	private $ticket_status = [
 		'Open',
@@ -35,7 +44,7 @@ class TicketsController extends Controller {
 
 	function __construct()
 	{
-		//init all contruct here ....
+		$this->author = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
 	}
 
 	/**
@@ -65,7 +74,7 @@ class TicketsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$query = App\TicketView::orderBy('date','desc');
+			$query = TicketView::orderBy('date','desc');
 			if( Auth::user()->accesslevel == 2 )
 			{
 				$query = $query->staff(Auth::user()->id);
@@ -146,8 +155,8 @@ class TicketsController extends Controller {
 	{
 		$last_generated_ticket = App\Ticket::count() + 1;
 
-		$staff = App\User::staff()
-						->whereNotIn('id',[ Auth::user()->id, App\User::admin()->first()->id ])
+		$staff = User::staff()
+						->whereNotIn('id',[ Auth::user()->id, User::admin()->first()->id ])
 						->select(
 							'id as id',
 							DB::raw('CONCAT( firstname , " " , middlename , " " , lastname ) as name')
@@ -219,7 +228,7 @@ class TicketsController extends Controller {
 			$this->author = $this->sanitizeString(Input::get('author'));
 		}
 
-		$this->details = $this->sanitizeString(Input::get('description'));
+		$details = $this->sanitizeString(Input::get('description'));
 
 		/*
 		|--------------------------------------------------------------------------
@@ -229,7 +238,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$user = App\User::where('accesslevel','=',0)->first();
+		$user = User::where('accesslevel','=',0)->first();
 
 		if(Auth::user()->accesslevel == 2)
 		{
@@ -247,7 +256,7 @@ class TicketsController extends Controller {
 				'Ticket Subject' => $this->ticketname,
 				'Details' => $this->details,
 				'Author' => $this->author,
-			],App\Ticket::$complaintRules);
+			],Ticket::$complaintRules);
 
 		if($validator->fails())
 		{
@@ -284,7 +293,7 @@ class TicketsController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$ticket = App\Ticket::find($id);
+		$ticket = Ticket::find($id);
 		return view('ticket.edit')
 				->with('ticket',$ticket);
 	}
@@ -307,7 +316,7 @@ class TicketsController extends Controller {
 		$staffassigned = Auth::user()->id;
 		$propertynumber;
 
-		$ticket = App\Ticket::find($id);
+		$ticket = Ticket::find($id);
 		$ticket->item_id = $propertynumber;
 		$ticket->ticketname = $category;
 		$ticket->tickettype = $type;
@@ -336,7 +345,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$id = $this->sanitizeString(Input::get('id'));
+		$this->id = $this->sanitizeString(Input::get('id'));
 		$this->staffassigned = $this->sanitizeString(Input::get('transferto'));
 		$this->comments = $this->sanitizeString(Input::get('comment'));
 
@@ -349,9 +358,9 @@ class TicketsController extends Controller {
 		|
 		*/
 		$validator = Validator::make([
-				'Ticket ID' => $id,
+				'Ticket ID' => $this->id,
 				'Staff Assigned' => $this->staffassigned
-			], App\Ticket::$transferRules );
+			],Ticket::$transferRules);
 
 		if($validator->fails())
 		{
@@ -367,7 +376,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$this->transferTicket($id);
+		$this->transferTicket();
 
 		Session::flash('success-message','Ticket Transferred');
 		return redirect()->back();
@@ -383,7 +392,7 @@ class TicketsController extends Controller {
 	{
 		if(Request::ajax())
 		{
-			$this->closeTicket($id);
+			Ticket::closeTicket($id);
 			return json_encode('success');
 		}
 	}
@@ -398,7 +407,7 @@ class TicketsController extends Controller {
 	{
 		if(Request::ajax())
 		{
-			$this->openTicket($id);
+			Ticket::reOpenTicket($id);
 			return json_encode('success');
 		}
 	}
@@ -435,7 +444,7 @@ class TicketsController extends Controller {
 					|--------------------------------------------------------------------------
 					|
 					*/
-					$ticket =  App\Ticket::where('ticket_id','=',$id)
+					$ticket =  Ticket::where('ticket_id','=',$id)
 								->orderBy('id','desc')
 								->with('user')
 								->whereNotIn('id',array_pluck($arraylist,'id'))
@@ -452,7 +461,7 @@ class TicketsController extends Controller {
 					|--------------------------------------------------------------------------
 					|
 					*/
-					$ticket =  App\Ticket::where('id','=',$id)
+					$ticket =  Ticket::where('id','=',$id)
 								->orderBy('id','desc')
 								->whereNotIn('id',array_pluck($arraylist,'id'))
 								->with('user')
@@ -536,10 +545,10 @@ class TicketsController extends Controller {
 		try
 		{
 
-			$ticket = App\TicketView::where('id','=',$id)
+			$ticket = TicketView::where('id','=',$id)
 								->first();
 
-			$lastticket = App\Ticket::orderBy('created_at', 'desc')->first();
+			$lastticket = Ticket::orderBy('created_at', 'desc')->first();
 
 			if (count($lastticket) == 0 )
 			{
@@ -586,37 +595,39 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$this->details = "";
+		$details = "";
 		$id = $this->sanitizeString(Input::get('id'));
-		$this->status = 'Open';
+		$status = 'Open';
 		$underrepair = false;
 
 		if(Input::has('contains'))
 		{
-			$this->details = $this->sanitizeString(Input::get('details'));
-		}
-		else
+			$details = $this->sanitizeString(Input::get('details'));
+		} else
 		{
+
 			/*
 			|--------------------------------------------------------------------------
 			|
-			| 	get the activity field
+			| 	use maintenance activity
 			|
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$activity = $this->sanitizeString(Input::get('activity'));
-			$maintenanceactivity = App\MaintenanceActivity::find($activity);
-			if( count($maintenanceactivity) > 0 )
+			try
 			{
-				$this->details = isset($maintenanceactivity->activity) ? $maintenanceactivity->activity : $activity;
-			}
-			else
-			{
-				Session::flash('error-message','Maintenance Activity not found');
-				return redirect()->back();
-			}
-
+				/*
+				|--------------------------------------------------------------------------
+				|
+				| 	get the activity field
+				|
+				|--------------------------------------------------------------------------
+				|
+				*/
+				$activity = $this->sanitizeString(Input::get('activity'));
+				$maintenanceactivity = MaintenanceActivity::find($activity);
+				$details = $maintenanceactivity->activity;
+			} catch (Exception $e) {}
 		}
 
 		/*
@@ -629,7 +640,7 @@ class TicketsController extends Controller {
 		*/
 		if(Input::has('underrepair'))
 		{
-			$this->underrepair = 'underrepair';
+			$underrepair = 'underrepair';
 		}
 
 		/*
@@ -642,7 +653,7 @@ class TicketsController extends Controller {
 		*/
 		if(Input::has('working'))
 		{
-			$this->underrepair = 'working';
+			$underrepair = 'working';
 		}
 
 		/*
@@ -655,7 +666,7 @@ class TicketsController extends Controller {
 		*/
 		if(Input::has('close'))
 		{
-			$this->status = "Closed";
+			$status = "Closed";
 		}
 
 		/*
@@ -667,8 +678,8 @@ class TicketsController extends Controller {
 		|
 		*/
 		$validator = Validator::make([
-				'Details' => $this->details
-		],App\Ticket::$maintenanceRules);
+				'Details' => $details
+		],Ticket::$maintenanceRules);
 
 		if($validator->fails())
 		{
@@ -684,7 +695,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$this->resolveTicket($id);
+		Ticket::resolveTicket($id,$details,$status,$underrepair);
 
 		/*
 		|--------------------------------------------------------------------------
@@ -719,9 +730,9 @@ class TicketsController extends Controller {
 		if(Request::ajax())
 		{
 			return json_encode([
-					'data' => App\Ticket::with('itemprofile')
+					'data' => Ticket::with('itemprofile')
 										->with('user')
-										->open()
+										->where('status','=','Open')
 										->get()
 				]);
 		}
@@ -742,15 +753,51 @@ class TicketsController extends Controller {
 			/*
 			|--------------------------------------------------------------------------
 			|
+			| 	get pc id
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			$pc = PcTicket::where('pc_id','=',$id)->pluck('id');
+
+			/*
+			|--------------------------------------------------------------------------
+			|
 			| 	return ticket with pc information
 			|
 			|--------------------------------------------------------------------------
 			|
 			*/
-			return json_encode([
-				'data' => App\Ticket::getPcTickets($id)
+			return json_encode(
+			[
+				'data' => Ticket::whereIn('id',function($query) use ($id)
+				{
+
+					/*
+					|--------------------------------------------------------------------------
+					|
+					| 	checks if pc is in ticket
+					|
+					|--------------------------------------------------------------------------
+					|
+					*/
+					$query->where('pc_id','=',$id)
+						->from('pc_ticket')
+						->select('ticket_id')
+						->pluck('ticket_id');
+				})->get()
 			]);
 		}
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	get pc id
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		$pc = PcTicket::where('pc_id','=',$id)->pluck('id');
 
 		/*
 		|--------------------------------------------------------------------------
@@ -760,8 +807,24 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		return json_encode([
-			'data' => App\Ticket::getPcTickets($id)
+		return json_encode(
+		[
+			'data' => Ticket::whereIn('id',function($query) use ($id)
+			{
+
+				/*
+				|--------------------------------------------------------------------------
+				|
+				| 	checks if pc is in ticket
+				|
+				|--------------------------------------------------------------------------
+				|
+				*/
+				$query->where('pc_id','=',$id)
+					->from('pc_ticket')
+					->select('ticket_id')
+					->pluck('ticket_id');
+			})->get()
 		]);
 	}
 
@@ -779,13 +842,39 @@ class TicketsController extends Controller {
 			/*
 			|--------------------------------------------------------------------------
 			|
+			| 	get room id
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			$pc = RoomTicket::where('room_id','=',$id)->pluck('id');
+
+			/*
+			|--------------------------------------------------------------------------
+			|
 			| 	return ticket with room information
 			|
 			|--------------------------------------------------------------------------
 			|
 			*/
-			return json_encode([
-				'data' => App\Ticket::getRoomTickets($id)
+			return json_encode(
+			[
+				'data' => Ticket::whereIn('id',function($query) use ($id)
+				{
+
+					/*
+					|--------------------------------------------------------------------------
+					|
+					| 	checks if room is in ticket
+					|
+					|--------------------------------------------------------------------------
+					|
+					*/
+					$query->where('room_id','=',$id)
+						->from('room_ticket')
+						->select('ticket_id')
+						->pluck('ticket_id');
+				})->get()
 			]);
 		}
 	}
@@ -812,6 +901,68 @@ class TicketsController extends Controller {
 		if(Request::ajax())
 		{
 			$tag = $this->sanitizeString(Input::get('id'));
+
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	Check if the equipment is connected to pc
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			$pc = Pc::isPc($tag);
+			if(count($pc) > 0)
+			{
+				$pc = Pc::with('systemunit')->with('monitor')->with('keyboard')->with('avr')->find($pc->id);
+				return json_encode($pc);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	Check if the tag is equipment
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			$itemprofile = ItemProfile::propertyNumber($tag)->first();
+			if( count($itemprofile) > 0)
+			{
+				/*
+				|--------------------------------------------------------------------------
+				|
+				| 	Create equipment ticket
+				|
+				|--------------------------------------------------------------------------
+				|
+				*/
+				return json_encode($itemprofile);
+
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	Check if the tag is room
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			$room = Room::location($tag)->first();
+			if( count($room) > 0 )
+			{
+				return json_encode($room);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	return false if no item found
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			return json_encode('error');
 		}
 
 		$tag = $this->sanitizeString(Input::get('tag'));
@@ -892,7 +1043,7 @@ class TicketsController extends Controller {
 	*/
 	public function maintenanceView()
 	{
-		$ticket = App\Ticket::orderBy('created_at', 'desc')->first();
+		$ticket = Ticket::orderBy('created_at', 'desc')->first();
 		$activity = MaintenanceActivity::pluck('activity','id');
 
 		if (count($ticket) == 0 )
@@ -1025,7 +1176,7 @@ class TicketsController extends Controller {
 		$status = 'Closed';
 		$item = Input::get('item');
 
-		App\Ticket::generateMaintenanceTicket($tag,$ticketname,$details,$underrepair,$workstation);
+		Ticket::generateMaintenanceTicket($tag,$ticketname,$details,$underrepair,$workstation);
 
 		if(count($item) > 0)
 		{
@@ -1053,7 +1204,7 @@ class TicketsController extends Controller {
 					|--------------------------------------------------------------------------
 					|
 					*/
-					App\Ticket::generateEquipmentTicket($itemprofile->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
+					Ticket::generateEquipmentTicket($itemprofile->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
 
 				}
 				else
@@ -1069,7 +1220,7 @@ class TicketsController extends Controller {
 					$pc = Pc::isPc($item);
 					if(count($pc) > 0)
 					{
-						App\Ticket::generatePcTicket($pc->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
+						Ticket::generatePcTicket($pc->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
 					}
 				}
 			}
@@ -1259,7 +1410,7 @@ class TicketsController extends Controller {
 
 	}
 
-	public function transferTicket($id)
+	public static function transferTicket($id)
 	{
 
 		/*
@@ -1270,7 +1421,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$ticket = $this->setTicketStatusAsTransferred($id);
+		$ticket = $this->updateTicketStatusToTransferred($id);
 
 		/*
 		|--------------------------------------------------------------------------
@@ -1295,343 +1446,12 @@ class TicketsController extends Controller {
 		$ticket->tickettype = $this->tickettype;
 		$ticket->ticketname = $this->ticketname;
 		$ticket->details = $this->details;
-
-		if( $this->author == null )
-		{
-			$this->author = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
-		}
 		$ticket->author = $this->author;
 		$ticket->staffassigned = $this->staffassigned;
 		$ticket->ticket_id = $this->ticket_id;
 		$ticket->status = $this->status;
 		$ticket->comments = $this->comments;
 		$ticket->save();
-	}
-
-	/**
-	*
-	*	@param $id accepts id
-	*	@return $ticket object generated
-	*
-	*/
-	public function closeTicket($id)
-	{
-		$ticket = App\Ticket::find($id);
-		$ticket->status = 'Closed';
-		$ticket->save();
-
-		return $ticket;
-	}
-
-	/**
-	*
-	*	@param $id accepts id
-	*	@return $ticket object generated
-	*
-	*/
-	public function openTicket($id)
-	{
-		DB::beginTransaction();
-
-		$ticket = App\Ticket::find($id);
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	call function generate ticket
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$this->tickettype = $ticket->tickettype;
-		$this->ticketname = $ticket->ticketname;
-		$this->details = $ticket->details;
-		$this->author = $ticket->author;
-		$this->staffassigned = $ticket->staffassigned;
-		$this->ticket_id = $ticket->id;
-		$ticket = $this->generateTicket();
-
-		DB::commit();
-
-		return $ticket;
-	}
-
-	/**
-	*
-	*	@param $id accepts id
-	*	@return $ticket object generated
-	*
-	*/
-	public function setTicketStatusAsTransferred($id)
-	{
-		$ticket = App\Ticket::find($id);
-		$ticket->status = 'Transferred';
-		$ticket->save();
-
-		return $ticket;
-	}/**
-	*
-	*	@param $id accepts ticket id
-	*	@param $details accepts details
-	*	@param $status receives either 'Closed' or 'Open'
-	*	@param $underrepair receives boolean value
-	*
-	*/
-	public function resolveTicket($id)
-	{
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	call function close ticket
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($this->status == 'Closed')
-		{
-			$ticket = $this->closeTicket($id);
-		}
-		else {
-			$ticket =  App\Ticket::find($id);
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	set the item status to underrepair
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($this->underrepair == 'undermaintenance' || $this->underrepair == 'working')
-		{
-			$this->setTaggedStatus($ticket->id,$underrepair);
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	call function generate ticket
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$this->tickettype = 'action taken';
-		$this->ticketname = 'Action Taken';
-		$this->ticket_id = $ticket->id;
-		$this->status = 'Closed';
-
-		$ticket = $this->generateTicket();
-	}
-
-	public function condemnTicket($tag)
-	{
-		$this->details = 'Item Condemned on ' . Carbon::now() . 'by ' . $this->author;
-		$this->staffassigned = Auth::user()->id;
-		$this->ticket_id = null;
-		$this->status = 'Closed';
-		$this->tickettype = 'condemn';
-		$this->ticketname = 'Item Condemn';
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the tag is equipment
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$itemprofile = ItemProfile::propertyNumber($tag)->first();
-		if(isset($itemprofile->id))
-		{
-			$this->generateEquipmentTicket($itemprofile->id);
-
-		}
-	}
-
-	public static function setTaggedStatus($tag,$status)
-	{
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the equipment is connected to pc
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$pc = App\PcTicket::ticket($tag)->first();
-		if(count($pc) > 0)
-		{
-			App\Pc::setItemStatus($pc->pc_id,$status);
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the tag is equipment
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$itemticket = App\ItemTicket::ticketID($tag)->first();
-		if( count($itemticket) > 0)
-		{
-			App\ItemProfile::setItemStatus($itemticket->item_id,$status);
-		}
-	}
-
-	/**
-	*
-	*	@param $tag accepts room name, property number of item
-	*	@param $ticketname accepts ticket title
-	*	@param $details accepts details
-	*
-	*/
-	public static function generateMaintenanceTicket($tag,$ticketname,$details,$underrepair)
-	{
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	init static values
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
-		$staffassigned = Auth::user()->id;
-		$status = 'Open';
-		$ticket_id = null;
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the tag is equipment
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$itemprofile = ItemProfile::propertyNumber($tag)->first();
-		if( count($itemprofile) > 0)
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Check if the equipment is connected to pc
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$pc = Pc::isPc($tag);
-			if(count($pc) > 0)
-			{
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	set the item status to underrepair
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				if($underrepair == true)
-				{
-					Pc::setItemStatus($pc->id,'undermaintenance');
-				}
-
-				App\Ticket::generatePcTicket($pc->id,'maintenance',$ticketname,$details,$author,$staffassigned,$ticket_id,$status);
-			}
-			else
-			{
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	set the item status to underrepair
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				if($underrepair == true)
-				{
-					ItemProfile::setItemStatus($itemprofile->id,'undermaintenance');
-				}
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	Create equipment ticket
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				App\Ticket::generateEquipmentTicket($itemprofile->id,'maintenance',$ticketname,$details,$author,$staffassigned,$ticket_id,$status);
-			}
-
-		}
-		else
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Check if the tag is room
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$room = Room::location($tag)->first();
-			if( count($room) > 0 )
-			{
-				App\Ticket::generateRoomTicket($room->id,'maintenance',$ticketname,$details,$author,$staffassigned,$ticket_id,$status);
-			}
-			else
-			{
-
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	Check if the equipment is connected to pc
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				$pc = Pc::isPc($tag);
-				if(count($pc) > 0)
-				{
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	set the item status to underrepair
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					if($underrepair == true)
-					{
-						Pc::setItemStatus($pc->id,'undermaintenance');
-					}
-
-					App\Ticket::generatePcTicket($pc->id,'maintenance',$ticketname,$details,$author,$staffassigned,$ticket_id,$status);
-				}
-				else
-				{
-
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Create general ticket
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					App\Ticket::generateTicket('maintenance',$ticketname,$details,$author,$staffassigned,$ticket_id,$status);
-				}
-
-			}
-		}
 	}
 
 }

@@ -28,22 +28,31 @@ Item Profile
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-offset-3 col-md-6 panel panel-body">
-      @if (count($errors) > 0)
-     	 <div class="alert alert-danger alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <ul style='margin-left: 10px;'>
-                  @foreach ($errors->all() as $error)
-                      <li>{{ $error }}</li>
-                  @endforeach
-              </ul>
-          </div>
-      @endif
 		{{ Form::open(['method'=>'post','route'=>'item.profile.store','class'=>'form-horizontal','id'=>'profilingForm']) }}
 		<legend><h3 class="text-muted">Item Profile</h3></legend>
 		<ol class="breadcrumb">
 		  <li><a href="{{ url('inventory/item') }}">Item Inventory</a></li>
 		  <li class="active">Create</li>
 		</ol>
+			@if( Session::has('success')  )
+			 <div class="alert alert-success alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<ul class="list-unstyled" style='margin-left: 10px;'>
+
+						<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
+					</ul>
+				</div>
+			@endif
+	    @if (count($errors) > 0)
+	   	 <div class="alert alert-danger alert-dismissible" role="alert">
+	        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	            <ul style='margin-left: 10px;'>
+	                @foreach ($errors->all() as $error)
+	                    <li>{{ $error }}</li>
+	                @endforeach
+	            </ul>
+	        </div>
+	    @endif
 		<div class="col-md-12">
 			<p class="text-muted">
 				<span class="">Last Profiled Item: {{ $lastprofiled }}</span>
@@ -406,12 +415,12 @@ Item Profile
 				$(object).val(date);
 		}
 
-		$.ajax({ 
+		$.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
 			type: 'get',
-            url: '{{ url("inventory/item/$inventory->id") }}' , 
+            url: '{{ url("inventory/item/$inventory->id") }}' ,
 			dataType: 'json',
 			success: function(response){
 				$('#total').text(parseInt(response.quantity) - parseInt(response.profileditems));

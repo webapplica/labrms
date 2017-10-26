@@ -1,13 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Inventory
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
 @section('style-include')
-{{ HTML::style(asset('css/jquery-ui.css')) }}
 {{ HTML::style(asset('css/jquery.sidr.light.min.css')) }}
 {{ HTML::style(asset('css/sidr-style.min.css')) }}
 @stop
@@ -21,7 +13,7 @@ Inventory
 <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
 <style>
 
-	#page-body,#profile,#view{
+	#profile,#view{
 		display: none;
 	}
 
@@ -41,6 +33,15 @@ Inventory
 	<div class="col-md-12">
 		<div class="panel panel-body table-responsive">
 			<legend><h3 class="text-muted">Inventory</h3></legend>
+				@if( Session::has('success')  )
+				 <div class="alert alert-success alert-dismissible" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<ul class="list-unstyled" style='margin-left: 10px;'>
+
+							<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
+						</ul>
+					</div>
+				@endif
 			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
 			<table class="table table-hover table-striped table-bordered table-condensed" id="inventoryTable">
 				<thead>
@@ -60,17 +61,9 @@ Inventory
 </div>
 @stop
 @section('script')
-{{ HTML::script(asset('js/jquery-ui.js')) }}
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 	    var table = $('#inventoryTable').DataTable({
 			"pageLength": 100,
@@ -120,7 +113,7 @@ Inventory
 				<a href="{{ url('inventory/item/search') }}" class="pull-right" style="font-size:10px;text-decoration:none;">Advance Search</a>
 			</div>
  		`)
- 
+
     table
         .on( 'select', function ( e, dt, type, indexes ) {
             // var rowData = table.rows( indexes ).data().toArray();
@@ -190,8 +183,6 @@ Inventory
 					swal('Oops..','You must choose atleast 1 row','error');
 				}
 	    })
-
-		$('#page-body').show();
 	} );
 </script>
 @stop

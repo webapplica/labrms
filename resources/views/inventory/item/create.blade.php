@@ -10,7 +10,7 @@ Inventory | Create
 {{ HTML::style(asset('css/style.css')) }}
 {{ HTML::style(asset('css/jquery-ui.min.css')) }}
 <style>
-	#inventory,#page-body{
+	#inventory{
 		display:none;
 	}
 
@@ -34,13 +34,13 @@ Inventory | Create
 				<li class="active">Create</li>
 			</ul>
 			@if (count($errors) > 0)
-				 <div class="alert alert-danger alert-dismissible" role="alert">
-			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			      <ul class="list-unstyled" style='margin-left: 10px;'>
-			          @foreach ($errors->all() as $error)
-			              <li class="text-capitalize">{{ $error }}</li>
-			          @endforeach
-			      </ul>
+			 <div class="alert alert-danger alert-dismissible" role="alert">
+			  	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		      <ul class="list-unstyled" style='margin-left: 10px;'>
+		          @foreach ($errors->all() as $error)
+		              <li class="text-capitalize">{{ $error }}</li>
+		          @endforeach
+		      </ul>
 			  </div>
 			@endif
 	 		<div id="receipt">
@@ -81,7 +81,7 @@ Inventory | Create
 					{{ Form::label('invoicenumber','Invoice Number') }}
 					{{ Form::number('invoicenumber',Input::old('invoicenumber'),[
 						'class' => 'form-control',
-						'placeholder' => 'P.O. Number',
+						'placeholder' => 'Invoice Number',
 						'id' => 'ponumber'
 					]) }}
 					</div>
@@ -120,7 +120,7 @@ Inventory | Create
 					<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('brand','Brand') }}
-						{{ Form::text('brand',Input::old('brand'),[
+						{{ Form::text('brand',isset($brand) ? $brand : Input::old('brand'),[
 							'class' => 'form-control',
 							'placeholder' => 'Brand',
 							'id' => 'brand'
@@ -130,7 +130,7 @@ Inventory | Create
 					<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('model','Model') }}
-						{{ Form::text('model',Input::old('model'),[
+						{{ Form::text('model',isset($model) ? $model : Input::old('model'),[
 							'class' => 'form-control',
 							'placeholder' => 'Model',
 							'id' => 'model'
@@ -140,9 +140,8 @@ Inventory | Create
 					<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('itemtype','Type') }}
-						{{ Form::select('itemtype',['Fetching all item types...'],Input::old('itemtype'),[
+						{{ Form::select('itemtype',$itemtypes,isset($itemtype) ? $itemtype : Input::old('itemtype'),[
 							'class' => 'form-control',
-							'placeholder' => 'Item type',
 							'id' => 'itemtype'
 						]) }}
 						</div>
@@ -217,7 +216,6 @@ Inventory | Create
 </div>
 @stop
 @section('script')
-{{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function(){
 
@@ -235,15 +233,10 @@ Inventory | Create
 			setValue(url)
 		});
 
-		@if(isset($brand))
-		$('#brand').val('{{ $brand }}')
-		$('#brand').trigger("change");
-		@endif
-
-		@if(isset($model))
-		$('#model').val('{{ $model }}')
-		$('#model').trigger("change");
-		@endif
+		setValue(function(){
+			url = "{{ url('get') }}" + '/' + $('#itemtype').val() + '/' + $('#brand').val() + '/' + $('#model').val()
+			return url
+		})
 
 		function setValue(_url)
 		{
@@ -322,43 +315,6 @@ Inventory | Create
 			  minAge: 15,
 		});
 
-		init();
-
-		function init(){
-			$.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-				type: "get",
-				url: "{{ url('get/inventory/item/type/equipment') }}",
-				dataType: 'json',
-				success: function(response){
-					var options = "";
-
-					for(var ctr = 0;ctr < response.length;ctr++)
-					{
-						options += `<option value="`+response[ctr].id+`">
-							`+response[ctr].name+`
-						</option>`;
-					}
-
-					$('#itemtype').html("");
-					$('#itemtype').append(options);
-					@if(Input::old('itemtype'))
-					$('#itemtype').val("{{ Input::old('itemtype') }}")
-					@endif
-
-					@if(isset($itemtype))
-					$('#itemtype').val('{{ $itemtype }}')
-					@endif
-				},
-				complete: function(){
-
-					$('#itemtype').trigger("change");
-				}
-			})
-		}
-
 		@if(Input::old('podate'))
 			$('#podate').val('{{ Input::old('podate') }}');
 			setDate("#podate");
@@ -388,16 +344,6 @@ Inventory | Create
 			var date = moment(object_val).format('MMM DD, YYYY');
 			$(object).val(date);
 		}
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-		$('#page-body').show();
 	})
 </script>
 @stop

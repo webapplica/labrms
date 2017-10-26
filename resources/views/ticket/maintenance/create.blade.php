@@ -23,7 +23,7 @@ Maintenance Ticket
 	}
 </style>
 <div class="container-fluid" id="page-body" style="margin-top: 40px;">
-	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>  
+	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>
 		<div class="panel panel-body panel-padding">
 			<legend><h3 style="color:#337ab7;">Maintenance Ticket</h3></legend>
 			<ul class="breadcrumb">
@@ -43,7 +43,7 @@ Maintenance Ticket
 			          @endforeach
 			      </ul>
 			  </div>
-			@endif    
+			@endif
 			{{ Form::open(['method'=>'post','route'=>'ticket.maintenance','class'=>'form-horizontal','id'=>'ticketForm']) }}
 				<div class="clearfix"></div>
 				<div class="form-group">
@@ -98,7 +98,7 @@ Maintenance Ticket
 							'id' => 'activity',
 							'class' => 'form-control'
 						]) }}
-							<div id="activity-description"></div>
+							<div id="activity-description" style="margin-top: 10px;"></div>
 						</div>
 						<div id="details-field" hidden>
 							{{ Form::textarea('description',Input::old('description'),[
@@ -117,11 +117,11 @@ Maintenance Ticket
 					<div class="col-sm-12">
 					</div>
 				</div>
-				{{-- 
+				{{--
 				<div class="form-group" id="undermaintenance-tag">
 					<div class="col-sm-12">
 						<input type="checkbox" name="underrepair" />
-						<label for="">Set as 'Undermaintenance'</label> 
+						<label for="">Set as 'Undermaintenance'</label>
 						<p class="text-muted">Clicking this checkbox will set the item/equipment/pc as 'undermaintenance' </p>
 					</div>
 				</div> --}}
@@ -200,14 +200,21 @@ Maintenance Ticket
 
 						if(response.name != null)
 						{
-							$('#tickettag').html(`
+							html = `
 								<ul class="list-group">
 								  <li class="list-group-item">Room Name:  `+response.name+`</li>
-								  <li class="list-group-item">Category:  `+response.description+`</li>
+							`
+							if(response.description != null && response.description != "" && response.description != 'null')
+							{
+								html += `<li class="list-group-item">Category:  `+response.description+`</li>`
+							}
+
+							html += `
 								</ul>
 
 								<div id="item-list"></div>
-							`);
+							`
+								$('#tickettag').html(html);
 
 							addItemsUnderTheRoom()
 

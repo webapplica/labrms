@@ -1,5 +1,5 @@
 <?php
- 
+
 namespace App;
 
 use Carbon\Carbon;
@@ -15,14 +15,14 @@ class Inventory extends \Eloquent
   *
   * table name
   *
-  */	
+  */
   protected $table = 'inventory';
 
   /**
   *
   * used for create method
   *
-  */  
+  */
   public $fillable = [
     'itemtype',
     'brand',
@@ -54,7 +54,7 @@ class Inventory extends \Eloquent
   *
   */
   public static $rules = array(
-  	'Item Type' => 'required|exists:Itemtype,id',
+  	'Item Type' => 'required|exists:Itemtype,name',
   	'Brand' => 'min:2|max:100',
   	'Model' => 'min:2|max:100',
   	'Details' => 'min:5|max:1000',
@@ -164,7 +164,7 @@ class Inventory extends \Eloquent
     |--------------------------------------------------------------------------
     |
     */
-    if($inventory) 
+    if($inventory)
     {
 
       /*
@@ -181,7 +181,7 @@ class Inventory extends \Eloquent
     else
     {
 
-      /*  
+      /*
       |--------------------------------------------------------------------------
       |
       |   Create new inventory
@@ -200,7 +200,7 @@ class Inventory extends \Eloquent
       $inventory->profileditems = 0;
       $inventory->save();
     }
-    
+
 
     /*
     |--------------------------------------------------------------------------

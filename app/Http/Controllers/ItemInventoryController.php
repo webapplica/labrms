@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Inventory;
-use App\Receipt;
 use App\ItemType;
 use App;
 use Session;
@@ -24,13 +23,14 @@ class ItemInventoryController extends Controller {
 		if(Request::ajax())
 		{
 			return json_encode([
-					'data' => Inventory::with('itemtype')
+					'data' => App\Inventory::with('itemtype')
 									->select('id','itemtype_id','brand','model','details','warranty','unit','quantity','profileditems')
 									->get()
 					]);
 		}
 
-		return view('inventory.item.index');
+		return view('inventory.item.index')
+						->with('title','Inventory');
 	}
 
 
@@ -49,22 +49,25 @@ class ItemInventoryController extends Controller {
 		{
 			$brand = $this->sanitizeString(Input::get('brand'));
 		}
-		
+
 		if(Input::has('model'))
 		{
 			$model = $this->sanitizeString(Input::get('model'));
 		}
-		
+
 		if(Input::has('itemtype'))
 		{
 			$itemtype = $this->sanitizeString(Input::get('itemtype'));
-			$itemtype = ItemType::type($itemtype)->pluck('id')->first();
 		}
 
+		$itemtypes = App\ItemType::category('equipment')->pluck('name','name');
+
 		return view('inventory.item.create')
+					->with('itemtypes',$itemtypes)
 					->with('brand',$brand)
 					->with('model',$model)
-					->with('itemtype',$itemtype);
+					->with('itemtype',$itemtype)
+						->with('title','Inventory::add');
 	}
 
 	/**
@@ -89,7 +92,7 @@ class ItemInventoryController extends Controller {
 				'Invoice Number' => $invoicenumber,
 				'Invoice Date' => $invoicedate,
 				'Fund Code' => $fundcode
-			],Receipt::$rules);
+			],App\Receipt::$rules);
 
 		if($validator->fails())
 		{
@@ -117,7 +120,7 @@ class ItemInventoryController extends Controller {
 				'Unit' => $unit,
 				'Quantity' => $quantity,
 				'Profiled Items' => 0
-			],Inventory::$rules);
+			],App\Inventory::$rules);
 
 		if($validator->fails())
 		{
@@ -126,7 +129,9 @@ class ItemInventoryController extends Controller {
 				->withErrors($validator);
 		}
 
-		$inventory = Inventory::createRecord([
+		$itemtype = App\ItemType::type($itemtype)->pluck('id')->first();
+
+		$inventory = App\Inventory::createRecord([
 			'brand' => $brand,
 			'itemtype' => $itemtype,
 			'model' => $model,
@@ -143,12 +148,13 @@ class ItemInventoryController extends Controller {
 			'fundcode' => $fundcode
 		]);
 
+		Session::flash('success','Items added to Inventory');
+
 		if(Input::has('redirect-profiling'))
 		{
 			return redirect("item/profile/create?id=$inventory->id");
 		}
 
-		Session::flash('success-message','Items added to Inventory');
 		return redirect('inventory/item');
 	}
 
@@ -171,11 +177,11 @@ class ItemInventoryController extends Controller {
 		if(Request::ajax())
 		{
 			return json_encode(
-				Inventory::where('id','=',$id)
+				App\Inventory::where('id','=',$id)
 								->with('itemtype')
 								->select('id','itemtype_id','brand','model','details','warranty','unit','quantity','profileditems')
 								->first()
-					);
+			);
 		}
 
 		return view('inventory.item.show');
@@ -185,7 +191,7 @@ class ItemInventoryController extends Controller {
 	{
 		try
 		{
-			$inventory = Inventory::find($id);
+			$inventory = App\Inventory::find($id);
 			return view('inventory.item.edit')
 					->with('inventory',$inventory);
 		} catch ( Exception $e ) {
@@ -215,7 +221,7 @@ class ItemInventoryController extends Controller {
 				'Unit' => $unit,
 				'Quantity' => 0,
 				'Profiled Items' => 0
-			],Inventory::$rules);
+			],App\Inventory::$rules);
 
 		if($validator->fails())
 		{
@@ -226,7 +232,7 @@ class ItemInventoryController extends Controller {
 
 		try {
 
-			$inventory = Inventory::find($id);
+			$inventory = App\Inventory::find($id);
 			$inventory->brand = $brand;
 			$inventory->model = $model;
 			$inventory->itemtype_id = $itemtype;
@@ -288,7 +294,7 @@ class ItemInventoryController extends Controller {
 		{
 			$model = $this->sanitizeString(Input::get('term'));
 			return json_encode(
-				Inventory::where('model','like','%'.$model.'%')->distinct()->pluck('model')
+				App\Inventory::where('model','like','%'.$model.'%')->distinct()->pluck('model')
 			);
 		}
 	}

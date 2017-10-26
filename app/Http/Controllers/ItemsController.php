@@ -3,17 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
+use Carbon;
 use Validator;
 use DB;
 use Session;
-use App\ItemType;
-use App\Inventory;
-use App\ItemProfile;
-use App\Pc;
-use App\Room;
-use App\RoomInventory;
-use App\Receipt;
+use App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -62,7 +56,7 @@ class ItemsController extends Controller {
 				/*
 				|--------------------------------------------------------------------------
 				|
-				| 	if id contains nothing or 'all', return all items 
+				| 	if id contains nothing or 'all', return all items
 				|
 				|--------------------------------------------------------------------------
 				|
@@ -70,13 +64,13 @@ class ItemsController extends Controller {
 				if($id == 'All' || $id == '')
 				{
 					return json_encode([
-						'data' => ItemProfile::where('status','=',$status)
+						'data' => App\ItemProfile::where('status','=',$status)
 												->with('inventory.itemtype')
 												->with('receipt')
 												->get()
-					]);			
+					]);
 				}
-				else 
+				else
 				{
 
 					/*
@@ -87,15 +81,15 @@ class ItemsController extends Controller {
 					|--------------------------------------------------------------------------
 					|
 					*/
-					$itemtype_id = ItemType::type($id)->pluck('id');
+					$itemtype_id = App\ItemType::type($id)->pluck('id');
 					return json_encode([
-						'data' => ItemProfile::whereIn('inventory_id',Inventory::type($itemtype_id)->pluck('id'))
+						'data' => App\ItemProfile::whereIn('inventory_id',App\Inventory::type($itemtype_id)->pluck('id'))
 												->where('status','=',$status)
 												->with('inventory.itemtype')
 												->with('receipt')
 												->withTrashed()
 												->get()
-					]);	
+					]);
 				}
 			}
 
@@ -108,10 +102,10 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode([
-				'data' => ItemProfile::with('inventory.itemtype')
+				'data' => App\ItemProfile::with('inventory.itemtype')
 										->with('receipt')
 										->get()
-			]);	
+			]);
 		}
 
 		/*
@@ -123,8 +117,8 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$itemtype = ItemType::whereIn('category',['equipment','fixtures','furniture'])->get();
-		$status = ItemProfile::distinct('status')->pluck('status');
+		$itemtype = App\ItemType::whereIn('category',['equipment','fixtures','furniture'])->get();
+		$status = App\ItemProfile::distinct('status')->pluck('status');
 		return view('item.profile')
 				->with('status',$status)
 				->with('itemtype',$itemtype);
@@ -138,15 +132,15 @@ class ItemsController extends Controller {
 	 */
 	public function create()
 	{
-		try 
+		try
 		{
 			$id = $this->sanitizeString(Input::get('id'));
-			$inventory = Inventory::find($id);
+			$inventory = App\Inventory::find($id);
 
 			/*
 			|--------------------------------------------------------------------------
 			|
-			| 	if existing, returns the form 
+			| 	if existing, returns the form
 			|	else redirect to inventory/item
 			|
 			|--------------------------------------------------------------------------
@@ -155,7 +149,7 @@ class ItemsController extends Controller {
 			if(count($inventory) > 0)
 			{
 
-				$lastprofiled = ItemProfile::where('inventory_id','=',$inventory->id)
+				$lastprofiled = App\ItemProfile::where('inventory_id','=',$inventory->id)
 											->orderBy('created_at','desc')
 											->pluck('propertynumber')
 											->first();
@@ -169,8 +163,8 @@ class ItemsController extends Controller {
 				return redirect('inventory/item');
 			}
 
-		} 
-		catch( Exception $e ) 
+		}
+		catch( Exception $e )
 		{
 			return redirect('inventory/item');
 		}
@@ -230,7 +224,7 @@ class ItemsController extends Controller {
 				'Location' => $location,
 				'Date Received' => $datereceived,
 				'Status' => 'working'
-			],Itemprofile::$rules,[ 'Property Number.unique' => "The :attribute $propertynumber already exists" ]);
+			],App\Itemprofile::$rules,[ 'Property Number.unique' => "The :attribute $propertynumber already exists" ]);
 
 			if($validator->fails())
 			{
@@ -240,7 +234,7 @@ class ItemsController extends Controller {
 					->withErrors($validator);
 			}
 
-			ItemProfile::createRecord($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id);
+			App\ItemProfile::createRecord($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id);
 		}
 		DB::commit();
 
@@ -278,7 +272,7 @@ class ItemsController extends Controller {
 			|
 			*/
 		 	return json_encode([
-				'data' => ItemProfile::with('inventory')
+				'data' => App\ItemProfile::with('inventory')
 									->where('inventory_id','=',$id)
 									->get()
 			]);
@@ -304,11 +298,11 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$inventory = Inventory::find($id);
+			$inventory = App\Inventory::find($id);
 			return view('inventory.item.profile.index')
 									->with('inventory',$inventory);
-		} 
-		catch (Exception $e) 
+		}
+		catch (Exception $e)
 		{
 
 			/*
@@ -332,7 +326,7 @@ class ItemsController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$item = ItemProfile::find($id);
+		$item = App\ItemProfile::find($id);
 		return view('inventory.item.profile.edit')
 			->with('itemprofile',$item);
 	}
@@ -360,7 +354,7 @@ class ItemsController extends Controller {
 				'Date Received' => $datereceived,
 				'Status' => 'working',
 				'Location' => 'Server'
-			],ItemProfile::$updateRules);
+			],App\ItemProfile::$updateRules);
 
 		if($validator->fails())
 		{
@@ -368,13 +362,13 @@ class ItemsController extends Controller {
 				->withInput()
 				->withErrors($validator);
 		}
-		
-		$itemprofile = ItemProfile::find($id);
+
+		$itemprofile = App\ItemProfile::find($id);
 		$itemprofile->propertynumber = $property_number;
 		$itemprofile->serialnumber = $serial_number;
 		$itemprofile->receipt_id = $receipt_id;
 		$itemprofile->location = $location;
-		$itemprofile->datereceived = Carbon::parse($datereceived);
+		$itemprofile->datereceived = Carbon\Carbon::parse($datereceived);
 		$itemprofile->save();
 
 		Session::flash('success-message','Item updated');
@@ -414,7 +408,7 @@ class ItemsController extends Controller {
 				*	@return collection
 				*
 				*/
-				$itemprofile = ItemProfile::find($id);
+				$itemprofile = App\ItemProfile::find($id);
 
 				/*
 				|--------------------------------------------------------------------------
@@ -425,7 +419,7 @@ class ItemsController extends Controller {
 				|--------------------------------------------------------------------------
 				|
 				*/
-				if(count(Pc::isPc($itemprofile->propertynumber)) > 0)
+				if(count(App\Pc::isPc($itemprofile->propertynumber)) > 0)
 				{
 					return json_encode('connected');
 
@@ -436,12 +430,12 @@ class ItemsController extends Controller {
 				*	Call function condemn
 				*
 				*/
-				Inventory::condemn($id);
+				App\Inventory::condemn($id);
 				return json_encode('success');
 			} catch ( Exception $e ) {}
 		}
 
-		Inventory::condemn($item->inventory_id);
+		App\Inventory::condemn($item->inventory_id);
 		Session::flash('success-message','Item removed from inventory');
 		return redirect('inventory/item');
 	}
@@ -464,23 +458,23 @@ class ItemsController extends Controller {
 		*	@return itemtype
 		*
 		*/
-		$itemprofile = ItemProfile::with('itemticket.ticket')->with('inventory.itemtype')->find($id);	
+		$itemprofile = App\ItemProfile::with('itemticket.ticket')->with('inventory.itemtype')->find($id);
 		return view('item.history')
-				->with('itemprofile',$itemprofile); 
+				->with('itemprofile',$itemprofile);
 	}
 
 	/**
 	*
 	*	uses get method
 	*	@param $item accepts item id
-	*	@param $room accepts room name	
+	*	@param $room accepts room name
 	*	@return error or page
 	*
 	*/
 	public function assign()
 	{
 		$item = $this->sanitizeString(Input::get('item'));
-		$room = Room::location($this->sanitizeString(Input::get('room')))->select('id','name')->first();
+		$room = App\Room::location($this->sanitizeString(Input::get('room')))->select('id','name')->first();
 
 		/*
 		|--------------------------------------------------------------------------
@@ -493,7 +487,7 @@ class ItemsController extends Controller {
 		$validator = Validator::make([
 			'Item' => $item,
 			'Room' => $room->id
-		],RoomInventory::$rules);
+		],App\RoomInventory::$rules);
 
 		if($validator->fails())
 		{
@@ -509,15 +503,15 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$itemprofile = Itemprofile::find($item);
-		if(count(Pc::isPc($itemprofile->propertynumber)) > 0)
+		$itemprofile = App\Itemprofile::find($item);
+		if(count(App\Pc::isPc($itemprofile->propertynumber)) > 0)
 		{
 			Session::flash('error-message','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation');
 			return redirect("item/profile/$id");
 
 		}
 
-		ItemProfile::assignToRoom($item,$room);
+		App\ItemProfile::assignToRoom($item,$room);
 
 		Session::flash('success-message',"Item assigned to room $room->name");
 		return redirect()->back();
@@ -559,7 +553,7 @@ class ItemsController extends Controller {
 			}
 			else
 			{
-				$receipt = Receipt::where('inventory_id','=',$id)->select('number','id')->get();
+				$receipt = App\Receipt::where('inventory_id','=',$id)->select('number','id')->get();
 				return $receipt;
 			}
 		}
@@ -588,11 +582,11 @@ class ItemsController extends Controller {
 			$itemtype = $this->sanitizeString(Input::get('itemtype'));
 			if(count($itemtype) > 0)
 			{
-				$brands = Inventory::where('itemtype_id',$itemtype)->select('brand')->get();
+				$brands = App\Inventory::where('itemtype_id',$itemtype)->select('brand')->get();
 			}
 			else
 			{
-				$brands = Inventory::select('brand')->get();
+				$brands = App\Inventory::select('brand')->get();
 			}
 
 
@@ -631,11 +625,11 @@ class ItemsController extends Controller {
 			$brand = $this->sanitizeString(Input::get('brand'));
 			if(count($brand) > 0)
 			{
-				$models = Inventory::where('brand',$brand)->select('model')->get();
+				$models = App\Inventory::where('brand',$brand)->select('model')->get();
 			}
 			else
 			{
-				$models = Inventory::select('model')->get();
+				$models = App\Inventory::select('model')->get();
 			}
 
 			/*
@@ -683,12 +677,12 @@ class ItemsController extends Controller {
 			/*
 			|--------------------------------------------------------------------------
 			|
-			| 	get inventory information	
+			| 	get inventory information
 			|
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$inventory = Inventory::where('model',$model)
+			$inventory = App\Inventory::where('model',$model)
 									->where('brand',$brand)
 									->where('itemtype_id',$itemtype)
 									->select('id')
@@ -702,7 +696,7 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$propertynumber = ItemProfile::where('inventory_id',$inventory->id)
+			$propertynumber = App\ItemProfile::where('inventory_id',$inventory->id)
 											->where('location','Server')
 											->select('propertynumber')
 											->get();
@@ -745,7 +739,7 @@ class ItemsController extends Controller {
 		*/
 		if(Request::ajax())
 		{
-			return ItemProfile::getUnassignedPropertyNumber('System Unit');
+			return App\ItemProfile::getUnassignedPropertyNumber('System Unit');
 		}
 	}
 
@@ -768,7 +762,7 @@ class ItemsController extends Controller {
 		*/
 		if(Request::ajax())
 		{
-			return ItemProfile::getUnassignedPropertyNumber('Display');
+			return App\ItemProfile::getUnassignedPropertyNumber('Display');
 		}
 	}
 
@@ -791,7 +785,7 @@ class ItemsController extends Controller {
 		*/
 		if(Request::ajax())
 		{
-			return ItemProfile::getUnassignedPropertyNumber('AVR');
+			return App\ItemProfile::getUnassignedPropertyNumber('AVR');
 		}
 	}
 
@@ -814,7 +808,7 @@ class ItemsController extends Controller {
 		*/
 		if(Request::ajax())
 		{
-			return ItemProfile::getUnassignedPropertyNumber('Keyboard');
+			return App\ItemProfile::getUnassignedPropertyNumber('Keyboard');
 		}
 	}
 
@@ -837,7 +831,7 @@ class ItemsController extends Controller {
 		*/
 		if(Request::ajax())
 		{
-			return json_encode(Itemprofile::pluck('propertynumber'));
+			return json_encode(App\Itemprofile::pluck('propertynumber'));
 		}
 	}
 
@@ -862,7 +856,7 @@ class ItemsController extends Controller {
 		if(Request::ajax())
 		{
 			try{
-				$item = ItemProfile::with('inventory.itemtype')
+				$item = App\ItemProfile::with('inventory.itemtype')
 										->propertyNumber($propertynumber)
 										->first();
 
@@ -874,17 +868,17 @@ class ItemsController extends Controller {
 				|--------------------------------------------------------------------------
 				|
 				*/
-				if(count($item) > 0) 
+				if(count($item) > 0)
 				{
 					return json_encode($item);
-				} 
-				else 
+				}
+				else
 				{
 					return json_encode('error');
 				}
 
-			} 
-			catch ( Exception $e ) 
+			}
+			catch ( Exception $e )
 			{
 				return json_encode('error');
 			}
@@ -923,7 +917,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				ItemProfile::unassembled()
+				App\ItemProfile::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','Display');
@@ -967,7 +961,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				ItemProfile::unassembled()
+				App\ItemProfile::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','Keyboard');
@@ -1011,7 +1005,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				ItemProfile::unassembled()
+				App\ItemProfile::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','AVR');
@@ -1055,7 +1049,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				Itemprofile::unassembled()
+				App\Itemprofile::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','System Unit');
@@ -1083,7 +1077,7 @@ class ItemsController extends Controller {
 		$brand = $this->sanitizeString($brand);
 		$model = $this->sanitizeString($model);
 
-
+		$itemtype = App\ItemType::type($itemtype)->pluck('id')->first();
 		/*
 		|--------------------------------------------------------------------------
 		|
@@ -1092,16 +1086,16 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$inventory = Inventory::brand($brand)
+		$inventory = App\Inventory::brand($brand)
 								->model($model)
 								->type($itemtype)
 								->first();
-								
+
 		if(count($inventory) > 0)
 		{
 			return json_encode($inventory);
-		} 
-		else 
+		}
+		else
 		{
 			return json_encode('error');
 		}
@@ -1129,7 +1123,7 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$item = Pc::isPc($propertynumber);
+			$item = App\Pc::isPc($propertynumber);
 
 			/*
 			|--------------------------------------------------------------------------
@@ -1141,11 +1135,11 @@ class ItemsController extends Controller {
 			*/
 			if(is_null($item) || $item == null)
 			{
-				$item = ItemProfile::propertyNumber($propertynumber)->first();
+				$item = App\ItemProfile::propertyNumber($propertynumber)->first();
 			}
 			else
 			{
-				$item = Pc::with('systemunit')
+				$item = App\Pc::with('systemunit')
 							->with('keyboard')
 							->with('avr')
 							->with('monitor')
@@ -1155,7 +1149,7 @@ class ItemsController extends Controller {
 			if(count($item) == 0)
 			{
 				return json_encode('error');
-			}	
+			}
 
 			return json_encode($item);
 		}

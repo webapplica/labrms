@@ -1,11 +1,4 @@
 @extends('layouts.master-blue')
-@section('title')
-Ticket | Update
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
 @section('content')
 <style>
 	#page-body,.transfer, .action-taken{

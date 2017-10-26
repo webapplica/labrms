@@ -2,7 +2,7 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-body">
-			
+
 			@if (count($errors) > 0)
 				<div class="alert alert-danger alert-dismissible" role="alert">
 					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -73,7 +73,7 @@
 								'id' => 'resolve-activity',
 								'class' => 'form-control'
 							]) }}
-							<div id="activity-description"></div>
+							<div id="activity-description" style="margin-top:20px;"></div>
 						</div>
 						<div id="details-field" hidden>
 							{{ Form::textarea('details',Input::old('details'),[
@@ -93,14 +93,14 @@
 					<div class="form-group" id="undermaintenance-form" hidden>
 						<div class="col-sm-12">
 							<input type="checkbox" name="underrepair" />
-							<label for="">Set as 'Undermaintenance'</label> 
+							<label for="">Set as 'Undermaintenance'</label>
 							<p class="text-muted">Clicking this checkbox will set the item/equipment/pc as 'undermaintenance' </p>
 						</div>
 					</div>
 					<div class="form-group" id="working-form" hidden>
 						<div class="col-sm-12">
 							<input type="checkbox" name="working" />
-							<label for="">Set as 'working'</label> 
+							<label for="">Set as 'working'</label>
 							<p class="text-muted">Clicking this checkbox will set the item/equipment/pc as 'working' </p>
 						</div>
 					</div>
@@ -108,10 +108,10 @@
 				<div class="form-group">
 					<div class="col-sm-12">
 						<input type="checkbox" name="close" />
-						<label for="">Close Ticket?</label> 
+						<label for="">Close Ticket?</label>
 						<p class="text-muted" style="font-size:12px;">This will close the ticket. The Administrator can reopen the ticket if he/she is not satisfied with the result</p>
 					</div>
-				</div>	
+				</div>
 				<div class="form-group">
 					<div class="col-sm-12">
 						{{ Form::submit('Okay',[
@@ -145,7 +145,7 @@ $('#resolveTicketModal').on('show.bs.modal',function(){
         url: "{{ url('get/maintenance/activity') }}",
         type: 'get',
         data: {
-      		type: 'corrective'  	
+      		type: 'corrective'
         },
         dataType: 'json',
         success: function(response){
@@ -184,7 +184,7 @@ $('#resolveTicketModal').on('show.bs.modal',function(){
 					{
 						$('#undermaintenance-form').show(400)
 						$('#working-form').hide()
-					} 
+					}
 
 					if(response.status == 'undermaintenance')
 					{
@@ -213,7 +213,7 @@ $('#resolveTicketModal').on('show.bs.modal',function(){
 					{
 						$('#undermaintenance-form').show(400)
 						$('#working-form').hide()
-					} 
+					}
 
 					if(response.systemunit.status == 'undermaintenance')
 					{
@@ -237,7 +237,7 @@ $('#resolveTicketModal').on('show.bs.modal',function(){
 							</ul>
 						</div>
 					`)
-					
+
 					$('#resolve-item-form').show()
 				}
 

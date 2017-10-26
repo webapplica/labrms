@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\ItemType;
+use App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -21,16 +21,24 @@ class ItemTypesController extends Controller {
 		if(Request::ajax())
 		{
 			return json_encode([
-					'data' => ItemType::select('id','name','description','category')->get()
+					'data' => App\ItemType::all()
 				]);
 		}
 
-		return view('item.type.index');
+		return view('item.type.index')
+			->with('category',App\ItemType::$category);
 	}
 
 	public function create()
 	{
-		return view('item.type.create');
+		return view('item.type.create')
+			->with('category',App\ItemType::$category)
+			->with('title',"Item Type::Create");
+	}
+
+	public function show($id)
+	{
+		return view('errors.404');
 	}
 
 	/**
@@ -64,9 +72,21 @@ class ItemTypesController extends Controller {
 
 	public function edit($id)
 	{
-		$itemtype = Itemtype::find($id);
+		$validator = Validator::make([
+			'id' => $id,
+		],App\ItemType::$existInTableRules);
+
+		if($validator->fails())
+		{
+			Session::flash("error-message","Item does not exist");
+			return view('errors.404');
+		}
+
+		$itemtype = App\Itemtype::find($id);
 		return view('item.type.edit')
-			->with('itemtype',$itemtype);
+			->with('itemtype',$itemtype)
+			->with('category',ItemType::$category)
+			->with('title',"Item Type::$itemtype->name");
 	}
 
 	public function update($id)
@@ -78,7 +98,7 @@ class ItemTypesController extends Controller {
 		$validator = Validator::make([
 			'name' => $name,
 			'description' => $description
-		],Itemtype::$updateRules);
+		],App\Itemtype::$updateRules);
 
 		if($validator->fails())
 		{
@@ -87,7 +107,7 @@ class ItemTypesController extends Controller {
 				->withErrors($validator);
 		}
 
-		$itemtype = Itemtype::find($id);
+		$itemtype = App\Itemtype::find($id);
 		$itemtype->name = $name;
 		$itemtype->description = $description;
 		$itemtype->category = $category;
@@ -99,43 +119,29 @@ class ItemTypesController extends Controller {
 
 	public function destroy($id)
 	{
+		$validator = Validator::make([
+			'id' => $id,
+		],App\ItemType::$existInTableRules);
 
-		if(Request::ajax()){
-			try{
+		if($validator->fails())
+		{
+			Session::flash("error-message","Item does not exist");
+			return view('errors.404');
+		}
 
-				$itemtype = Itemtype::find($id);
+		if(Request::ajax())
+		{
+				$itemtype = App\Itemtype::find($id);
 				$itemtype->delete();
 				return json_encode('success');
-			}catch( Exception $e ){}
 		}
 
-		try{
-
-			$itemtype = Itemtype::find($id);
-			$itemtype->delete();
-		}catch( Exception $e ){
-			Session::flash('error-message','Item type does not exists');
-		}
+		$itemtype = App\Itemtype::find($id);
+		$itemtype->delete();
 
 		Session::flash('success-message','Item type deleted');
 		return redirect('item/type/');
 
-	}
-
-	public function restoreView()
-	{
-		$itemtype = Itemtype::onlyTrashed()->get();
-		return view('item.type.restore-view')
-			->with('itemtype',$itemtype);
-	}
-
-	public function restore($id)
-	{
-		$itemtype = Itemtype::onlyTrashed()->where('id',$id)->first();
-		$itemtype->restore();
-
-		Session::flash('success-message','Item type restored');
-		return redirect('item/type/view/restore');
 	}
 
 	public function getAllItemTypes()
@@ -143,40 +149,23 @@ class ItemTypesController extends Controller {
 		if(Request::ajax())
 		{
 			$workstation = Input::get('workstation');
-			if($workstation === 'workstation'){
-				$itemtype = ItemType::where('name','!=','System Unit')
-									->where('name','!=','Display')
-									->where('name','!=','AVR')
-									->where('name','!=','Keyboard')
-									->get();
-			}else{
-				$itemtype = ItemType::all();
+			if($workstation === 'workstation')
+			{
+				$itemtype = App\ItemType::whereNotIn('name',['System Unit','Display','AVR','Keyboard'])->get();
+			}
+			else
+			{
+				$itemtype = App\ItemType::all();
 			}
 			return json_encode($itemtype);
 		}
-	}
-
-	public function getAllFieldsFromGivenID($id)
-	{
-		$ret_val = "";
-		if(Request::ajax())
-		{
-			try{
-				$itemtype = ItemType::find($id);
-				$ret_val = explode(',',$itemtype->field);
-			} catch (Exception $e) {
-				$ret_val = "error";
-			}
-
-		}
-			return json_encode($ret_val);
 	}
 
 	public function getItemTypesForEquipmentInventory()
 	{
 		if(Request::ajax())
 		{
-			$itemtype = ItemType::where('category','=','equipment')->get();
+			$itemtype = App\ItemType::category('equipment')->get();
 			return json_encode($itemtype);
 		}
 
@@ -186,7 +175,7 @@ class ItemTypesController extends Controller {
 	{
 		if(Request::ajax())
 		{
-			$itemtype = ItemType::where('category','=','supply')->get();
+			$itemtype = App\ItemType::category('supply')->get();
 			return json_encode($itemtype);
 		}
 

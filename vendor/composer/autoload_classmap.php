@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AddAttributesTicket' => $baseDir . '/database/migrations/2017_10_26_042913_add_attributes_ticket.php',
     'AddReservationStatus' => $baseDir . '/database/migrations/2017_09_12_093748_add_reservation_status.php',
     'AddStatusItemprofile' => $baseDir . '/database/migrations/2017_09_15_120046_add_status_itemprofile.php',
     'AddUserItemprofile' => $baseDir . '/database/migrations/2017_09_15_120116_add_user_itemprofile.php',
@@ -284,6 +285,7 @@ return array(
     'CreateSupplieslogTable' => $baseDir . '/database/migrations/2017_09_17_095102_create_supplieslog_table.php',
     'CreateSupplyTable' => $baseDir . '/database/migrations/2017_07_08_070808_create_supply_table.php',
     'CreateSupplyhistoryTable' => $baseDir . '/database/migrations/2017_07_08_071004_create_supplyhistory_table.php',
+    'CreateTicketAttachmentTable' => $baseDir . '/database/migrations/2017_10_26_043336_create_ticket_attachment_table.php',
     'CreateTicketTable' => $baseDir . '/database/migrations/2017_05_02_094457_create_ticket_table.php',
     'CreateTickettrigger' => $baseDir . '/database/migrations/2017_08_22_064333_create_tickettrigger.php',
     'CreateTickettypeTable' => $baseDir . '/database/migrations/2017_05_23_081235_create_tickettype_table.php',

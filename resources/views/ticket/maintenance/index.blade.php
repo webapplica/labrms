@@ -1,11 +1,4 @@
 @extends('layouts.master-blue')
-@section('title')
-Tickets
-@stop
-@section('navbar')
-@include('layouts.navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@stop
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 {{ HTML::style(asset('css/font-awesome.min.css')) }}
@@ -39,7 +32,7 @@ Tickets
 @endif
 	<div class="col-md-12" id="workstation-info">
 		<div class="panel panel-body table-responsive" style="padding: 25px 30px;">
-			<legend class="text-muted">Tickets</legend>
+			<legend class="text-muted">Maintenance Tickets</legend>
 			 <!--Counter Section-->
 	        <section id="counter_two" class="counter_two col-sm-12">
 	            <div class="overlay" style="border: none;">
@@ -107,17 +100,11 @@ Tickets
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-		url = `?type=Complaint&status=Open`
+		url = `?type=Maintenance`
 		@else
-		url = `?type=Complaint`
+		url = `?type=Maintenance`
 		@endif
 	  	var table = $('#ticketTable').DataTable({
   		    order: [[ 0, "desc" ]],
@@ -150,7 +137,7 @@ Tickets
 	          { data: "author" },
 	          { data: "status"},
 	          { data: function(callback){
-	          	return "<a href='{{ url("ticket/history") }}" + '/' +  callback.id + "' class='btn btn-sm btn-default btn-block'>View More</a>"
+	          	return "<a href='{{ url("ticket/maintenance") }}" + '/' +  callback.id + "' class='btn btn-sm btn-default btn-block'>View More</a>"
 	          } }
 	    	],
 	  	});
@@ -165,7 +152,7 @@ Tickets
 	            $('#resolve').show()
             	$('#close').show()
             }
-            if(table.row('.selected').data().status == 'Closed' && table.row('.selected').data().tickettype == 'Complaint')
+            if(table.row('.selected').data().status == 'Closed' && table.row('.selected').data().tickettype == 'Maintenance')
             {
             	$('#reopen').show()
             }
@@ -192,9 +179,8 @@ Tickets
 	    } );
 
 	 	$("div.toolbar").html(`
-			<button id="add" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-plus"></span>  Create</button>
 			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-			<button id="maintenance" class="btn btn-warning btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-wrench"></span>  Maintenance</button>
+			<button id="maintenance" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-wrench"></span>  Create Maintenance</button>
 			<button id="assign" class="btn btn-success btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
 			<button id="resolve" class="btn btn-default btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
 			@endif
@@ -205,59 +191,11 @@ Tickets
 		`);
 
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-		$('div.filter').html(`
-			<span class='text-muted'>Type:</span><div class="btn-group">
-			  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="tickettype-filter" style="padding: 7px 7px"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="tickettype-button"></span> <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" id="tickettype-button">
-		   		@foreach($tickettype as $tickettype)
-				<li role="presentation">
-					<a class="tickettype"  data-name='{{ $tickettype->type }}'>{{ $tickettype->type }}</a>
-				</li>
-			    @endforeach
-			  </ul>
-			</div>
-			<span class='text-muted'>Status:</span><div class="btn-group">
-			  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="ticketstatus-filter" style="padding: 7px 7px"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="ticketstatus-button"></span> <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" id="ticketstatus-button">
-			      @foreach($ticketstatus as $ticketstatus)
-					<li role="presentation">
-						<a class="ticketstatus"  data-name='{{ $ticketstatus }}'>{{ $ticketstatus }}</a>
-					</li>
-			    @endforeach
-			  </ul>
-			</div>
-		`);
-
-		$('#tickettype-button').text( $('.tickettype:first').text() )
-		$('#ticketstatus-button').text( 'Open' )
-
-		$('.tickettype').on('click',function(event)
-		{
-			$('#tickettype-button').text($(this).data('name'))
-			url = "{{ url('ticket') }}" + '?status=' + $('#ticketstatus-button').text() + '&type=' + $('#tickettype-button').text()
-			table.ajax.url(url).load();
-		})
-
-		$('.ticketstatus').on('click',function(event)
-		{
-			$('#ticketstatus-button').text($(this).data('name'))
-			url = "{{ url('ticket') }}" + '?status=' + $('#ticketstatus-button').text() + '&type=' + $('#tickettype-button').text()
-			table.ajax.url(url).load();
-		})
-		@endif
-
-		$('#add').on('click',function(){
-			window.location.href = '{{ url('ticket/create') }}';
-		});
-
-		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 		$('#maintenance').on('click',function(){
-			window.location.href = '{{ url('ticket/maintenance') }}';
+			window.location.href = '{{ url('ticket/maintenance/create') }}';
 		});
 
-	    $('#assign').click( function () {
+    $('#assign').click( function () {
 			try
 			{
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
@@ -277,7 +215,7 @@ Tickets
 			{
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
-	    } );
+    } );
 
 	    $('#resolve').click( function () {
 			try{

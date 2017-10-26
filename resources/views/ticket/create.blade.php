@@ -33,14 +33,14 @@ Create Ticket
 	}
 
 	.material-switch > input[type="checkbox"] {
-	    display: none;   
+	    display: none;
 	}
 
 	.material-switch > label {
 	    cursor: pointer;
 	    height: 0px;
-	    position: relative; 
-	    width: 40px;  
+	    position: relative;
+	    width: 40px;
 	}
 
 	.material-switch > label::before {
@@ -86,7 +86,7 @@ Create Ticket
 	}
 </style>
 <div class="container-fluid" id="page-body" style="margin-top: 40px;">
-	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>  
+	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>
 		<div class="panel panel-body panel-padding">
 			<h3 id="ticket-header" class="text-primary line-either-side"><span id="ticket-title-desc">Complaint</span> Ticket</h3>
 			<ul class="breadcrumb">
@@ -106,11 +106,11 @@ Create Ticket
 		                  @endforeach
 		              </ul>
 		          </div>
-		      @endif    
+		      @endif
 			{{ Form::open(['method'=>'post','route'=>'ticket.store','class'=>'form-horizontal','id'=>'ticketForm']) }}
 				<div class="form-group">
 					<div class="col-sm-3">
-							<label>Ticket Number:</label> 
+							<label>Ticket Number:</label>
                    </div>
 					<div class="col-sm-9">
 							<div class="text-muted pull-right form-control" style="border:none;"><span class="text-muted">{{ $lastticket }}</span></div>
@@ -118,7 +118,7 @@ Create Ticket
 				</div>
 				<div class="form-group">
 					<div class="col-sm-3">
-							<label>Date:</label>  
+							<label>Date:</label>
                    </div>
 					<div class="col-sm-9">
 							<div class="text-muted pull-right form-control" style="border:none;">
@@ -157,14 +157,14 @@ Create Ticket
 				</div>
 				<div class="form-group" id="author-form">
 					<div class="col-sm-3">
-						{{ Form::label('title','Title') }}
+						{{ Form::label('subject','Subject') }}
 					</div>
 					<div class="col-sm-9">
-						{{ Form::text('title',Input::old('title'),[
+						{{ Form::text('subject',Input::old('subject'),[
 						'class'=>'form-control',
-						'placeholder' => 'Unique Ticket Identifier'
+						'placeholder' => 'Input a unique label for ticket'
 						]) }}
-						<p class="text-muted" style="font-size:12px;">Note: Leaving this blank will label the title as 'Complaint'</p>
+						<p class="text-muted" style="font-size:12px;">Note: Leaving this blank will label the subject as '<span id="subject-label-info">Complaint</span>'</p>
 					</div>
 				</div>
 
@@ -178,7 +178,7 @@ Create Ticket
 						'class'=>'form-control',
 						'placeholder' => Auth::user()->firstname.' '.Auth::user()->lastname
 						]) }}
-						<p class="text-muted text-warning" style="font-size:12px;">Leave this field blank if you're the complainant.</p>
+						<p class="text-muted text-warning" style="font-size:12px;">Leave this field blank if you're the <span>author/complainant</span>.</p>
 					</div>
 				</div>
 				@endif
@@ -196,12 +196,12 @@ Create Ticket
 					</div>
 				</div>
 				@endif
-				
+
 				<div class="form-group">
 					<!-- description -->
 					<div class="col-sm-12">
 						{{ Form::label('description','Details') }}
-						<p class="text-muted" style="font-size:12px;">This field is required to further explain the details of the ticket</p>	
+						<p class="text-muted" style="font-size:12px;">This field is required to further explain the details of the ticket</p>
 						{{ Form::textarea('description',Input::old('description'),[
 							'class'=>'form-control',
 							'placeholder'=>'Enter ticket details here...'
@@ -243,7 +243,7 @@ Create Ticket
 					}
 					else
 					{
-									
+
 						if(response.propertynumber)
 						{
 
@@ -300,30 +300,33 @@ Create Ticket
 			})
 		})
 
+		setTicketTypeLabel()
+
 		$('#tickettype').on('click',function(){
+			setTicketTypeLabel()
+		})
+
+		function setTicketTypeLabel()
+		{
+
 			if($('#tickettype').is(':checked'))
 			{
 				$('#tickettype-name').text('Incident')
 				$('#ticket-title-desc').text('Incident')
+				$('#subject-label-info').text('Incident')
 				$('#ticket-header').addClass('text-danger')
 				$('#ticket-header').removeClass('text-primary')
 			}
 			else
 			{
-				$('#tickettype-name').text('Complaint')	
-				$('#ticket-title-desc').text('Complaint')	
+				$('#tickettype-name').text('Complaint')
+				$('#ticket-title-desc').text('Complaint')
+				$('#subject-label-info').text('Complaint')
 				$('#ticket-header').removeClass('text-danger')
 				$('#ticket-header').addClass('text-primary')
 			}
-		})
 
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
+		}
 
 		$('#page-body').show();
 	})

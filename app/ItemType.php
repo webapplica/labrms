@@ -13,7 +13,7 @@ class ItemType extends \Eloquent{
 	*
 	* table name
 	*
-	*/	
+	*/
 	protected $table = 'itemtype';
 
 	/**
@@ -41,7 +41,7 @@ class ItemType extends \Eloquent{
 	*
 	* used for create method
 	*
-	*/  
+	*/
 	public $fillable = [
 		'name',
 		'description',
@@ -68,6 +68,44 @@ class ItemType extends \Eloquent{
 		'description' => 'min:5|max:450'
 	);
 
+	/**
+	*
+	* exist in table rules
+	*
+	*/
+	public static $existInTableRules = array(
+		'id' => 'exists:itemtype,id'
+	);
+
+	/**
+	*
+	*	item types category
+	*
+	*/
+	public static $category = [
+		'equipment'=>'Equipment',
+		'supply' => 'Supply',
+		'fixture' => 'Fixture',
+		'furniture' => 'Furniture'
+	];
+
+	public function setCategoryAttribute($value)
+	{
+		$this->category = ucfirst($value);
+	}
+
+	public function getCategoryAttribute($value)
+	{
+		if( isset($value) || $value !== "" || $value !== null )
+		{
+			return ucfirst($value);
+		}
+		else
+		{
+			return "None";
+		}
+	}
+
 	public function itemprofile()
 	{
 		return $this->hasManyThrough('App\ItemProfile','App\Inventory','id','id');
@@ -79,30 +117,41 @@ class ItemType extends \Eloquent{
 	*	usage: ItemType::type('System Unit')->get();
 	*
 	*/
-    public function scopeType($query,$type)
-    {
-    	return $query->where('name','=',$type);
-    }
+  public function scopeType($query,$type)
+  {
+  	return $query->where('name','=',$type);
+  }
 
-    /**
-    *
-    *	saves record to database
-    *	@param $name
-    *	@param $description
-    *	@param $category
-    *	@return item type details
-    *
-    */
-    public static function createRecord($name,$description,$category)
-    {
-    	DB::transaction(function() use ($name,$description,$category)
-    	{
-			$itemtype = new ItemType;
-			$itemtype->name = $name;
-			$itemtype->description = $description;
-			$itemtype->category = $category;
-			$itemtype->save();
-			return $itemtype;
-    	});
-    }
+	/**
+	*
+	*	@param $type accepts category
+	*	usage: ItemType::category('System Unit')->get();
+	*
+	*/
+  public function scopeCategory($query,$category)
+  {
+  	return $query->where('category','=',$category);
+  }
+
+  /**
+  *
+  *	saves record to database
+  *	@param $name
+  *	@param $description
+  *	@param $category
+  *	@return item type details
+  *
+  */
+  public static function createRecord($name,$description,$category)
+  {
+  	DB::transaction(function() use ($name,$description,$category)
+  	{
+		$itemtype = new ItemType;
+		$itemtype->name = $name;
+		$itemtype->description = $description;
+		$itemtype->category = $category;
+		$itemtype->save();
+		return $itemtype;
+  	});
+  }
 }
