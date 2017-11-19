@@ -16,10 +16,10 @@ class CreateInventoryTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('itemtype_id')->unsigned();
+			$table->integer('itemsubtype_id')->unsigned();
 			$table->string('brand',100)->nullable();
 			$table->string('model',100)->nullable();
 			$table->string('details',1000)->nullable();
-			$table->string('warranty',100)->nullable();
 			$table->string('unit',20);
 			$table->integer('quantity');
 			$table->integer('profileditems');

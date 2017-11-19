@@ -27,6 +27,7 @@ class CreateItemprofileTable extends Migration {
 			$table->string('serialnumber',100)->nullable();
 			$table->string('location',100);
 			$table->date('datereceived')->nullable();
+			$table->string('warranty',100)->nullable();
 			$table->string('status')->nullable();
 			$table->timestamps();
 			$table->softDeletes();

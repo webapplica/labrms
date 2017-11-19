@@ -110,6 +110,7 @@
             <li>{{ link_to('event','Event') }}</li>
             @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
             <li>{{ link_to('item/type','Item Types') }}</li>
+            <li>{{ link_to('item/subtype','Item Sub Types') }}</li>
             <li>{{ link_to('room/category','Laboratory Room Category') }}</li>
             <li>{{ HTML::link('schedule','Laboratory Schedule') }}</li>
             <li>{{ link_to('room','Laboratory Room') }}</li>

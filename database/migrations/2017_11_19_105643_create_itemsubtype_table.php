@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomcategoryTable extends Migration
+class CreateItemsubtypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class CreateRoomcategoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('roomcategory', function (Blueprint $table) {
-            $table->string('category',100)->unique();
+        Schema::create('itemsubtype', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->timestamps();
         });
     }
 
@@ -25,6 +27,6 @@ class CreateRoomcategoryTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roomcategory');
+        Schema::dropIfExists('itemsubtype');
     }
 }

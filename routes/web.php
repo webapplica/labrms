@@ -855,6 +855,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::resource('item/type','ItemTypesController');
+	Route::resource('item/subtype','ItemSubTypesController');
 
 	/*
 	|--------------------------------------------------------------------------
