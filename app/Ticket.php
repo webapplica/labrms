@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends \Eloquent{
 
+	public $underrepair = "";
+	public $undermaintenance = false;
+
 	protected $table = 'ticket';
 	public $timestamps = true;
 
@@ -85,16 +88,6 @@ class Ticket extends \Eloquent{
 		return $query->where('staffassigned','=',$value);
 	}
 
-	public function setTickettypeAttribute($value)
-	{
-		$this->attributes['tickettype'] = ucwords($value);
-	}
-
-	public function getTickettypeAttribute($value)
-	{
-		return ucwords($value);
-	}
-
 	public function scopeOpen($query)
 	{
 		return $query->where('status','=','Open');
@@ -105,6 +98,11 @@ class Ticket extends \Eloquent{
 		return $query->where('status','=','Closed');
 	}
 
+	public function getTickettypeAttribute($value)
+	{
+		return ucwords($value);
+	}
+
 	public function getDetailsAttribute($value)
 	{
 		return ucwords($value);
@@ -113,6 +111,11 @@ class Ticket extends \Eloquent{
 	public function getTicketnameAttribute($value)
 	{
 		return ucwords($value);
+	}
+
+	public function setTickettypeAttribute($value)
+	{
+		$this->attributes['tickettype'] = ucwords($value);
 	}
 
 	public function getPcTickets($id)
@@ -158,7 +161,6 @@ class Ticket extends \Eloquent{
 	public function getTagDetails($tag)
 	{
 
-
 		/*
 		|--------------------------------------------------------------------------
 		|
@@ -167,12 +169,10 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$pc = Pc::isPc($tag);
-		if(count($pc) > 0)
+		if( ($pc = Pc::isPc($tag)) )
 		{
-			$pc = Pc::with('systemunit')->with('monitor')->with('keyboard')->with('avr')->find($pc->id);
 			return $pc;
-		}
+		} 
 
 		/*
 		|--------------------------------------------------------------------------
@@ -182,19 +182,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$itemprofile = ItemProfile::propertyNumber($tag)->first();
-		if( count($itemprofile) > 0)
+		else if(($itemprofile = ItemProfile::propertyNumber($tag))->count() > 0) 
 		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Create equipment ticket
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
 			return $itemprofile;
-
 		}
 
 		/*
@@ -205,8 +195,7 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$room = Room::location($tag)->first();
-		if( count($room) > 0 )
+		else if(($room = Room::location($tag))->count() > 0) 
 		{
 			return $room;
 		}
@@ -220,6 +209,251 @@ class Ticket extends \Eloquent{
 		|
 		*/
 		return null;
+	}
+
+	public function generate($tag = null)
+	{
+		
+		if( $this->author == null || !isset($this->author))
+		{
+			$user = Auth::user();
+			$author = $user->firstname . " " . $user->middlename . " " . $user->lastname;
+			$this->attributes['author'] = $author;
+		}
+
+		$this->save();
+		
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the equipment is connected to pc
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if( ($pc = Pc::isPc($tag)) )
+		{
+			if($this->undermaintenance) Pc::setItemStatus($pc->id,'undermaintenance');
+			$pc->ticket()->attach($this->id);
+		} 
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the tag is equipment
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		else if(($itemprofile = ItemProfile::propertyNumber($tag)->orWhere('id','=',$tag))->count() > 0) 
+		{
+			$itemprofile->first()->ticket()->attach($this->id);
+			if($this->undermaintenance) ItemProfile::setItemStatus($itemprofile->id,'undermaintenance');
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the tag is room
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		else if(($room = Room::location($tag))->count() > 0) 
+		{
+			$room->ticket()->attach($this->id);
+		}
+		
+	}
+
+	public function copyRecordFromExisting($ticket)
+	{
+		$this->tickettype = $ticket->tickettype;
+		$this->ticketname = $ticket->ticketname;
+		$this->details = $ticket->details;
+		$this->author = $ticket->author;
+		$this->staffassigned = $ticket->staffassigned;
+		$this->ticket_id = $ticket->id;
+		$this->status = $ticket->status;
+		$this->comments = $ticket->comments;
+		$this->closed_by = $ticket->closed_by;
+		$this->validated_by = $ticket->validated_by;
+		$this->deadline = $ticket->deadline;
+		$this->trashable = $ticket->trashable;
+		$this->severity = $ticket->severity;
+		$this->nature = $ticket->nature;
+		// $this-> = $ticket->;
+	}
+
+	/**
+	*
+	*	@return set the current ticket as transferred
+	*
+	*/
+	public function transfer()
+	{
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	call function close ticket
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		$ticket = Ticket::find($this->id);
+		$ticket->status = 'Transferred';
+		$ticket->save();
+
+		$_ticket = new Ticket;
+		$_ticket->copyRecordFromExisting($this);
+		$_ticket->generate();
+	}
+
+	/**
+	*
+	*	@param $id accepts id
+	*	@return $ticket object generated
+	*
+	*/
+	public function close()
+	{
+		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
+		$this->closed_by = $author;
+		$this->status = 'Closed';
+		$this->save();
+	}
+
+	/**
+	*
+	*	@param $id accepts ticket id
+	*	@param $details accepts details
+	*	@param $status receives either 'Closed' or 'Open'
+	*	@param $underrepair receives boolean value
+	*
+	*/
+	public function resolve()
+	{
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	call function close ticket
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if($this->status == 'Closed') $this->close();
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	set the item status to underrepair
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if($this->underrepair == 'undermaintenance' || $this->underrepair == 'working')
+		{
+			$this->setTaggedStatus($this->id,$underrepair);
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	call function generate ticket
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		$ticket = new Ticket;
+		$ticket->copyRecordFromExisting($this);
+		$ticket->comments = "";
+		$ticket->tickettype = 'action taken';
+		$ticket->ticketname = 'Action Taken';
+		$ticket->ticket_id = $this->id;
+		$ticket->status = 'Closed';
+		$ticket->generate();
+	}
+
+	public function reopen()
+	{
+		$this->status = "Closed";
+		$this->save();
+
+		$ticket = new Ticket;
+		$ticket->copyRecordFromExisting($this);
+		$ticket->status = "Open";
+		$ticket->author = null;
+		$ticket->generate();
+	}
+
+	public function condemn($tag)
+	{
+		$date = Carbon::now()->toFormattedDateTimeString();
+		$this->details = 'Item Condemned on ' . $date . 'by ' . $this->author;
+		$this->staffassigned = Auth::user()->id;
+		$this->ticket_id = null;
+		$this->status = 'Closed';
+		$this->tickettype = 'condemn';
+		$this->ticketname = 'Item Condemn';
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the tag is equipment
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if(($itemprofile = ItemProfile::propertyNumber($tag)->first())->count() > 0) $this->generate($itemprofile->id);
+	}
+
+	public static function setTaggedStatus($tag,$status)
+	{
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the equipment is connected to pc
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if(($pc = PcTicket::ticket($tag)->first())->count() > 0)
+		{
+			Pc::setItemStatus($pc->pc_id,$status);
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Check if the tag is equipment
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		else if( ($itemticket = ItemTicket::ticketID($tag)->first())->count() > 0)
+		{
+			ItemProfile::setItemStatus($itemticket->item_id,$status);
+		}
+	}
+
+	/**
+	*
+	*	@param $tag accepts room name, property number of item
+	*	@param $ticketname accepts ticket title
+	*	@param $details accepts details
+	*
+	*/
+	public function maintenance($tag,$ticketname,$details,$underrepair)
+	{
+
+		$this->staffassigned = Auth::user()->id;
+		$this->status = 'Open';
+		$this->ticket_id = null;
+		$this->tickettype = 'maintenance';
+		$this->generate();
 	}
 
 }

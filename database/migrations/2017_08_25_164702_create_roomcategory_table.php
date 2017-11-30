@@ -14,7 +14,9 @@ class CreateRoomcategoryTable extends Migration
     public function up()
     {
         Schema::create('roomcategory', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('category',100)->unique();
+            $table->timestamps();
         });
     }
 

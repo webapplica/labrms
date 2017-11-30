@@ -15,15 +15,21 @@ class CreateRoomSoftwareTable extends Migration {
 		Schema::create('room_software', function(Blueprint $table)
 		{
 			$table->integer('room_id')->unsigned();
-			$table->foreign('room_id')->references('id')->on('room');
-			$table->integer('software_id')->unsigned()
-										->onUpdate('cascade')
-										->onDelete('cascade');
-			$table->foreign('software_id')->references('id')->on('software')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('room_id')
+					->references('id')
+					->on('room');
+			$table->integer('software_id')->unsigned();
+			$table->foreign('software_id')
+					->references('id')
+					->on('software')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('softwarelicense_id')->unsigned()->nullable();
-			$table->foreign('softwarelicense_id')->references('id')->on('softwarelicense');
+			$table->foreign('softwarelicense_id')
+					->references('id')
+					->on('softwarelicense')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->primary(array('room_id','software_id'));
 			$table->timestamps();
 			$table->softDeletes();

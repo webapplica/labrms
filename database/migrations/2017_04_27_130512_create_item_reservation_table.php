@@ -16,9 +16,13 @@ class CreateItemReservationTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('reservation_id')->unsigned();
-			$table->foreign('reservation_id')->references('id')->on('reservation');
+			$table->foreign('reservation_id')
+					->references('id')
+					->on('reservation');
 			$table->integer('item_id')->unsigned();
-			$table->foreign('item_id')->references('id')->on('itemprofile');
+			$table->foreign('item_id')
+					->references('id')
+					->on('itemprofile');
 			$table->softDeletes();
 		});
 	}

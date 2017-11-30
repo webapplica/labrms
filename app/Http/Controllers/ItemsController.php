@@ -178,6 +178,7 @@ class ItemsController extends Controller {
 	 */
 	public function store()
 	{
+
 		/*
 		|--------------------------------------------------------------------------
 		|
@@ -190,9 +191,8 @@ class ItemsController extends Controller {
 		$receipt_id = $this->sanitizeString(Input::get('receipt_id'));
 		$location = $this->sanitizeString(Input::get('location'));
 		$datereceived = $this->sanitizeString(Input::get('datereceived'));
-		$propertynumber = "sample";
-		$serialnumber = "sample";
-
+		$propertynumber = "";
+		$serialnumber = "";
 
 		/*
 		|--------------------------------------------------------------------------
@@ -202,7 +202,6 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-
 		DB::beginTransaction();
 		foreach(Input::get('item') as $item)
 		{
@@ -234,7 +233,14 @@ class ItemsController extends Controller {
 					->withErrors($validator);
 			}
 
-			App\ItemProfile::createRecord($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id);
+			$itemprofile = new App\ItemProfile;
+			$itemprofile->propertynumber = $propertynumber;
+			$itemprofile->serialnumber = $serialnumber;
+			$itemprofile->location = $location;
+			$itemprofile->datereceived = Carbon\Carbon::parse($datereceived)->toDateString();
+			$itemprofile->inventory_id = $inventory_id;
+			$itemprofile->receipt_id = $receipt_id;
+			$itemprofile->profile();
 		}
 		DB::commit();
 
@@ -278,31 +284,16 @@ class ItemsController extends Controller {
 			]);
 		}
 
-
 		/*
 		|--------------------------------------------------------------------------
 		|
-		| 	to prevent sql injection, used a try catch
+		| 	return view for specific item profile
 		|
 		|--------------------------------------------------------------------------
 		|
 		*/
-		try
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	return view for specific item profile
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$inventory = App\Inventory::find($id);
-			return view('inventory.item.profile.index')
-									->with('inventory',$inventory);
-		}
-		catch (Exception $e)
+		$inventory = App\Inventory::find($id);
+		if($inventory == null || $inventory->count() == 0)
 		{
 
 			/*
@@ -313,8 +304,11 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			return redirect('inventory/item');
+			return view('errors.404');
 		}
+
+		return view('inventory.item.profile.index')
+								->with('inventory',$inventory);
 	}
 
 
@@ -449,7 +443,6 @@ class ItemsController extends Controller {
 	*/
 	public function history($id)
 	{
-
 		/**
 		*
 		*	@param id
@@ -459,6 +452,7 @@ class ItemsController extends Controller {
 		*
 		*/
 		$itemprofile = App\ItemProfile::with('itemticket.ticket')->with('inventory.itemtype')->find($id);
+		
 		return view('item.history')
 				->with('itemprofile',$itemprofile);
 	}

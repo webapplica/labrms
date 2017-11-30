@@ -15,9 +15,11 @@ class CreateSupplyhistoryTable extends Migration {
 		Schema::create('supplyhistory', function(Blueprint $table)
 		{
             $table->integer('supply_id')->unsigned();
-			$table->foreign('supply_id')->references('id')->on('supply')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('supply_id')
+					->references('id')
+					->on('supply')
+					->onUpdate('cascade')
+					->onDelete('cascade');
             $table->integer('quantity');
             $table->string('remark');
 			$table->string('personinvolve');

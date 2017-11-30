@@ -19,8 +19,8 @@ class CreateSoftwareTable extends Migration {
 			$table->string('softwaretype',100);
 			$table->string('licensetype',100);
 			$table->string('company',100);
-			$table->string('minsysreq',100)->nullable();//minimum system requirements
-			$table->string('maxsysreq',100)->nullable();//maxsystemrequirements
+			$table->string('minsysreq',100)->nullable();
+			$table->string('maxsysreq',100)->nullable();
 			$table->timestamps();
 		});
 	}

@@ -19,6 +19,7 @@ class CreateRoomReservationTable extends Migration
             $table->foreign('reservation_id')->references('id')->on('reservation');
             $table->integer('room_id')->unsigned();
             $table->foreign('room_id')->references('id')->on('room');
+            $table->timestamps();
             $table->softDeletes();
         });
     }

@@ -44,22 +44,23 @@ Inventory
 			<table class="table table-hover table-striped table-bordered table-condensed" id="itemProfileTable" cellspacing="0" width="100%">
 				<thead>
 		          <tr rowspan="2">
-		              <th class="text-left" colspan="4">Brand:  
+		              <th class="text-left" colspan="6">Brand:  
 		                <span style="font-weight:normal">{{ $inventory->brand }}</span> 
 		              </th>
-		              <th class="text-left" colspan="4">Model:  
+		              <th class="text-left" colspan="6">Model:  
 		                <span style="font-weight:normal">{{ $inventory->model }}</span> 
 		              </th>
 		          </tr>
 		          <tr rowspan="2">
-		              <th class="text-left" colspan="4">Item Type:  
+		              <th class="text-left" colspan="6">Item Type:  
 		                <span style="font-weight:normal">{{ $inventory->itemtype->name }}</span>  
 		              </th>
-		              <th class="text-left" colspan="4"> 
+		              <th class="text-left" colspan="6"> 
 		              </th>
 		          </tr>
 		          	<tr>
 						<th>ID</th>
+						<th>Local</th>
 						<th>Property Number</th>
 						<th>Serial Number</th>
 						<th>Location</th>
@@ -97,6 +98,7 @@ Inventory
 				ajax: "{{ url("item/profile/$inventory->id") }}",
 				columns: [
 						{ data: "id" },
+						{ data: "local_id" },
 						{ data: "propertynumber" },
 						{ data: "serialnumber" },
 						{ data: "location" },

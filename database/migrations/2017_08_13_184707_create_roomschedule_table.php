@@ -16,9 +16,11 @@ class CreateRoomscheduleTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('room_id')->unsigned();
-			$table->foreign('room_id')->references('id')->on('room')
-									->onUpdate('cascade')
-									->onDelete('cascade');
+			$table->foreign('room_id')
+					->references('id')
+					->on('room')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('faculty')->nullable();
 			$table->string('academicyear');
 			$table->string('semester');

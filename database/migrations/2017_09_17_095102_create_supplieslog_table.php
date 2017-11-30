@@ -24,8 +24,10 @@ class CreateSupplieslogTable extends Migration
             $table->datetime('timein');
             $table->datetime('timeout')->nullable();
             $table->integer('supply_id')->unsigned();
-            $table->foreign('supply_id')->references('id')->on('supply')
-                                    ->onUpdate('cascade');
+            $table->foreign('supply_id')
+                    ->references('id')
+                    ->on('supply')
+                    ->onUpdate('cascade');
             $table->integer('quantity')->nullable();
             $table->timestamps();
         });

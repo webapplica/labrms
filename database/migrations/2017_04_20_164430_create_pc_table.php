@@ -16,28 +16,40 @@ class CreatePcTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('systemunit_id')->unsigned();
-			$table->foreign('systemunit_id')->references('id')->on('itemprofile')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('systemunit_id')
+					->references('id')
+					->on('itemprofile')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('monitor_id')->unsigned()->nullable();
-			$table->foreign('monitor_id')->references('id')->on('itemprofile')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('monitor_id')
+					->references('id')
+					->on('itemprofile')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('keyboard_id')->unsigned()->nullable();
-			$table->foreign('keyboard_id')->references('id')->on('itemprofile')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('keyboard_id')
+					->references('id')
+					->on('itemprofile')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('avr_id')->unsigned()->nullable();
-			$table->foreign('avr_id')->references('id')->on('itemprofile')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('avr_id')
+					->references('id')
+					->on('itemprofile')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->string('oskey',50)->nullable();
-			$table->string('mouse',50)->nullable();
+			$table->integer('mouse_id')->unsigned()->nullable();
+			$table->foreign('mouse_id')
+					->references('id')
+					->on('itemprofile')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->string('name',50)->nullable();
-
-
-
-
+			$table->string('location')->nullable();
+			$table->string('created_by')->nullable();
+			$table->timestamps();
 		});
 	}
 

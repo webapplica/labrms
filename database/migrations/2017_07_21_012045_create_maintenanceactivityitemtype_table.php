@@ -15,12 +15,16 @@ class CreateMaintenanceactivityitemtypeTable extends Migration {
 		Schema::create('maintenanceactivity_itemtype', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('maintenanceactivity_id')->references('id')->on('maintenanceactivity')
-									->onUpdate('cascade')
-									->onDelete('cascade');
-			$table->string('itemtype_id')->references('id')->on('itemtype')
-									->onUpdate('cascade')
-									->onDelete('cascade');
+			$table->string('maintenanceactivity_id')
+					->references('id')
+					->on('maintenanceactivity')
+					->onUpdate('cascade')
+					->onDelete('cascade');
+			$table->string('itemtype_id')
+					->references('id')
+					->on('itemtype')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->timestamps();
 		});
 	}

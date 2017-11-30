@@ -16,11 +16,15 @@ class CreatePaymentTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('item_id')->unsigned();
-			$table->foreign('item_id')->references('id')->on('itemprofile');
-			$table->string('ORno',100);
-			$table->string('receivedby',100);
-			$table->string('details',100);//for now, only projector has payment so details contains the number of hours use or the timein and timeout of the item.
-			$table->integer('amount');
+			$table->foreign('item_id')
+					->references('id')
+					->on('itemprofile');
+			$table->string('receipt',100);
+			$table->string('received_by',100);
+			$table->string('details',100);
+			$table->float('balance');
+			$table->float('amount');
+			$table->string('status');
 			$table->timestamps();
 		});
 	}

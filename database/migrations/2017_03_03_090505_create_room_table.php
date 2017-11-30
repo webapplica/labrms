@@ -20,6 +20,7 @@ class CreateRoomTable extends Migration {
 			$table->string('description',100)->nullable();
 			$table->string('status',100)->nullable();
 			$table->softDeletes();
+			$table->timestamps();
 		});
 	}
 

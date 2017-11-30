@@ -116,6 +116,7 @@
             <li>{{ link_to('room','Laboratory Room') }}</li>
             <li>{{ link_to('purpose','Reservation Purpose') }}</li>
             <li>{{ link_to('semester','Semester') }}</li>
+            <li>{{ link_to('unit','Unit') }}</li>
             @endif
             <li>{{ link_to('software','Software') }}</li>
             <li>{{ link_to('software/type','Software Types') }}</li>

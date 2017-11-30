@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWorkstationview extends Migration
+class CreateWorkstationView extends Migration
 {
     /**
      * Run the migrations.
@@ -32,7 +32,8 @@ class CreateWorkstationview extends Migration
                 avr.propertynumber AS avr_propertynumber,
                 avr_inv.brand AS avr_brand,
                 avr_inv.model AS avr_model,
-                pc.mouse AS mouse,
+                mouse_inv.brand AS mouse_brand,
+                mouse_inv.model AS mouse_model,
                 pc.oskey AS oskey
             FROM pc          
                 JOIN itemprofile AS systemunit 
@@ -51,6 +52,10 @@ class CreateWorkstationview extends Migration
                     ON pc.avr_id = avr.id
                 JOIN inventory AS avr_inv 
                     ON avr_inv.id = avr.inventory_id
+                JOIN itemprofile AS mouse 
+                    ON pc.mouse_id = mouse.id
+                JOIN inventory AS mouse_inv 
+                    ON mouse_inv.id = mouse.inventory_id
                 ;
         ");
     }

@@ -11,6 +11,7 @@ use Session;
 use App\Ticket;
 use App\TicketView;
 use App\User;
+use App;
 use Mail;
 use App\Reservation;
 use Illuminate\Support\Facades\Request;
@@ -26,6 +27,27 @@ class DashboardController extends Controller {
 	public function index()
 	{
 
+
+        // if(($app = App\ItemType::all())->count() > 0)
+        //     return $app->first()->id;
+        //     else
+        //         return $app;
+        // $some = 0 ;
+        // switch($some){
+        //     case ($some > 0): {
+        //         $some = 'geretae';
+        //         break;
+        //     }
+        //     case ($some < 0):{
+
+        //         $some = 'less';
+        //     }
+        //     default:{
+        //         $some = 'equal';
+        //     }
+        // }
+
+        // return $some;
     	if(Request::ajax())
     	{
     		if(Input::has('reservation'))

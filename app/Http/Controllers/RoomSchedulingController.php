@@ -8,11 +8,6 @@ use Session;
 use DB;
 use Carbon\Carbon;
 use App;
-use App\RoomSchedule;
-use App\RoomReservation;
-use App\Reservation;
-use App\RoomScheduleView;
-use App\Room;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -31,30 +26,30 @@ class RoomSchedulingController extends Controller
             {
                 $room = $this->sanitizeString(Input::get('room'));
 
-                return json_encode([ 'data' => RoomScheduleView::current()->where('room_id','=',$room)->get() ]);
+                return json_encode([ 'data' => App\RoomScheduleView::current()->where('room_id','=',$room)->get() ]);
 
             }
 
-            return json_encode([ 'data' => RoomScheduleView::current()->where('room_id','=','1')->get() ]);   
+            return json_encode([ 'data' => App\RoomScheduleView::current()->where('room_id','=','1')->get() ]);   
         }
         
         if(Input::has('room'))
         {
             $room = $this->sanitizeString(Input::get('room'));
 
-            $roomschedule = RoomScheduleView::current()->where('room_id','=',$room)->get();
+            $roomschedule = App\RoomScheduleView::current()->where('room_id','=',$room)->get();
 
 
             return view('schedule.room.index')
                     ->with('roomschedule',$roomschedule)
-                    ->with('rooms',Room::all());
+                    ->with('rooms',App\Room::all());
         }
 
-        $roomschedule = RoomScheduleView::current()->where('room_id','=','1')->get();
+        $roomschedule = App\RoomScheduleView::current()->where('room_id','=','1')->get();
 
         return view('schedule.room.index')
                 ->with('roomschedule',$roomschedule)
-                ->with('rooms',Room::all());
+                ->with('rooms',App\Room::all());
     }
 
     /**
@@ -66,7 +61,7 @@ class RoomSchedulingController extends Controller
     {
         $purpose = App\Purpose::pluck('title','title');
         $room = App\Room::pluck('name','id');
-        $faculty = App\FacultyView::select(DB::raw("CONCAT(lastname,' ',firstname,' ',middlename) as name"),'id')->pluck('name','id');
+        $faculty = App\Faculty::select(DB::raw("CONCAT(lastname,' ',firstname,' ',middlename) as name"),'id')->pluck('name','id');
         return view('schedule.room.create')
                     ->with('purpose',$purpose)
                     ->with('room',$room)
@@ -94,7 +89,7 @@ class RoomSchedulingController extends Controller
 
         $room_name = App\Room::where('id','=',$room)->pluck('name')->first();
 
-        $faculty_name = App\FacultyView::where('id','=',$faculty)
+        $faculty_name = App\Faculty::where('id','=',$faculty)
                                             ->select(DB::raw("CONCAT(lastname,' ',firstname,' ',middlename) as name"))
                                             ->pluck('name')
                                             ->first();
@@ -172,7 +167,7 @@ class RoomSchedulingController extends Controller
             'Time end' => $time_end,
             'Purpose' => $purpose,
             'Faculty-in-charge' => $faculty_name
-        ],Reservation::$roomReservationRules);
+        ],App\Reservation::$roomReservationRules);
 
         if($validator->fails())
         {

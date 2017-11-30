@@ -15,8 +15,15 @@ class CreateItemsubtypeTable extends Migration
     {
         Schema::create('itemsubtype', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('itemtype_id')->unsigned();
+            $table->foreign('itemtype_id')
+                    ->references('id')
+                    ->on('itemtype')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
             $table->string('name')->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

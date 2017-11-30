@@ -44,69 +44,7 @@ Inventory | Create
 			  </div>
 			@endif
 	 		<div id="receipt">
-				<!-- item name -->
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('number','Property Acknowledgement Receipt') }}
-					{{ Form::text('number',Input::old('number'),[
-						'class' => 'form-control',
-						'placeholder' => 'Receipt',
-						'id' => 'number'
-					]) }}
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('ponumber','Purchase Order Number') }}
-					{{ Form::number('ponumber',Input::old('ponumber'),[
-						'class' => 'form-control',
-						'placeholder' => 'P.O. Number',
-						'id' => 'ponumber'
-					]) }}
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('podate','Purchase Order Date') }}
-					{{ Form::text('podate',Input::old('podate'),[
-						'class' => 'form-control',
-						'placeholder' => 'P.O. Date',
-						'id' => 'podate',
-						'readonly'
-					]) }}
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('invoicenumber','Invoice Number') }}
-					{{ Form::number('invoicenumber',Input::old('invoicenumber'),[
-						'class' => 'form-control',
-						'placeholder' => 'Invoice Number',
-						'id' => 'ponumber'
-					]) }}
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('invoicedate','Invoice Date') }}
-					{{ Form::text('invoicedate',Input::old('invoicedate'),[
-						'class' => 'form-control',
-						'placeholder' => 'Invoice Date',
-						'id' => 'invoicedate',
-						'readonly'
-					]) }}
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('fundcode','Fund Code') }}
-					{{ Form::text('fundcode',Input::old('fundcode'),[
-						'class' => 'form-control',
-						'placeholder' => 'Fund Code',
-						'id' => 'fundcode'
-					]) }}
-					</div>
-				</div>
+	 			@include('inventory.item.receipt-form')
 				<div class="form-group">
 					<div class="col-sm-offset-8 col-sm-4">
 						<button name="next" id="link-to-inventory" class="btn btn-primary btn-flat btn-block" type="button">Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button>
@@ -148,6 +86,16 @@ Inventory | Create
 					</div>
 					<div class="form-group">
 						<div class="col-sm-12">
+						{{ Form::label('itemsubtype','Sub Type') }}
+						{{ Form::select('itemsubtype',$itemsubtypes,isset($itemsubtype) ? $itemsubtype : Input::old('itemsubtype'),[
+							'class' => 'form-control',
+							'id' => 'itemsubtype',
+							'placeholder' => 'None'
+						]) }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-12">
 						{{ Form::label('details','Item Details') }}
 						{{ Form::textarea('details',Input::old('details'),[
 							'class' => 'form-control',
@@ -157,21 +105,10 @@ Inventory | Create
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-4">
-							<button name="previous" id="link-to-receipt" class="btn btn-default btn-flat btn-block" type="button"> <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous</button>
-						</div>
-						<div class="col-sm-4">
-							<button name="next" id="next" class="btn btn-primary btn-flat btn-block" type="button">Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button>
-						</div>
-					</div>
-				</div>
-				<div id="page-two">
-					<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('unit','Unit') }}
-						{{ Form::text('unit',Input::old('unit'),[
-							'class' => 'form-control',
-							'placeholder' => 'Unit'
+						{{ Form::select('unit',$units,Input::old('unit'),[
+							'class' => 'form-control'
 						]) }}
 						</div>
 					</div>
@@ -186,26 +123,13 @@ Inventory | Create
 					</div>
 					<div class="form-group">
 						<div class="col-sm-12">
-						{{ Form::label('warranty','Warranty Information') }}
-						{{ Form::textarea('warranty',Input::old('warranty'),[
-							'class' => 'form-control',
-							'placeholder' => 'Warranty Information',
-							'id' => 'warranty'
-						]) }}
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-sm-12">
 						<input type="checkbox" id="redirect-profiling" name="redirect-profiling" checked />
 						<span class="text-muted" style="font-size:12;">Profile items</span>
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-sm-offset-4 col-sm-4">
-							<button name="previous" id="previous" class="btn btn-default btn-flat btn-block" type="button"> <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous</button>
-						</div>
-						<div class="col-sm-4">
-							<button type="submit" value="create" name="action" id="submit" class="btn btn-primary btn-flat btn-block"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit </button>
+						<div class="col-sm-12">
+							<button type="submit" value="create" name="action" id="submit" class="btn btn-lg btn-primary btn-flat btn-block"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit </button>
 						</div>
 					</div>
 				</div>
@@ -219,16 +143,7 @@ Inventory | Create
 <script type="text/javascript">
 	$(document).ready(function(){
 
-		$('#brand').on('change',function(){
-			console.log('triggered');
-			url = "{{ url('get') }}" + '/' + $('#itemtype').val() + '/' + $('#brand').val() + '/' + $('#model').val()
-			setValue(url)
-		});
-		$('#itemtype').on('change',function(){
-			url = "{{ url('get') }}" + '/' + $('#itemtype').val() + '/' + $('#brand').val() + '/' + $('#model').val()
-			setValue(url)
-		});
-		$('#model').on('change',function(){
+		$('#brand #itemtype #model').on('change',function(){
 			url = "{{ url('get') }}" + '/' + $('#itemtype').val() + '/' + $('#brand').val() + '/' + $('#model').val()
 			setValue(url)
 		});
@@ -254,14 +169,14 @@ Inventory | Create
 						$('#details').val(response.details)
 						$('#unit').val(response.unit)
 						$('#warranty').val(response.warranty)
-						$('#details').prop("readonly","readonly")
-						$('#unit').prop("readonly","readonly")
-						$('#warranty').prop("readonly","readonly")
+						// $('#details').prop("readonly","readonly")
+						// $('#unit').prop("readonly","readonly")
+						// $('#warranty').prop("readonly","readonly")
 					} else {
 						$('#alert-existing').html("<div class='alert alert-warning'><strong>Warning!</strong> This will create a new inventory item</div>")
-						$('#details').removeProp("readonly")
-						$('#unit').removeProp("readonly")
-						$('#warranty').removeProp("readonly")
+						// $('#details').removeProp("readonly")
+						// $('#unit').removeProp("readonly")
+						// $('#warranty').removeProp("readonly")
 					}
 				}
 			})
@@ -287,18 +202,6 @@ Inventory | Create
 			$('#form-name').text('Receipt')
 			$('#inventory').hide(600);
 			$('#receipt').show(600);
-		});
-
-		$('#next').click(function(){
-			$('#form-name').text('Inventory')
-			$('#page-one').hide(600);
-			$('#page-two').show(600);
-		});
-
-		$('#previous').click(function(){
-			$('#form-name').text('Receipt')
-			$('#page-two').hide(600);
-			$('#page-one').show(600);
 		});
 
 		$( "#podate" ).datepicker({

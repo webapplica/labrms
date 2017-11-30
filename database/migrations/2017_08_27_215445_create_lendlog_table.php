@@ -24,8 +24,10 @@ class CreateLendlogTable extends Migration
             $table->datetime('timein');
             $table->datetime('timeout')->nullable();
             $table->integer('item_id')->unsigned();
-            $table->foreign('item_id')->references('id')->on('itemprofile')
-                                    ->onUpdate('cascade');
+            $table->foreign('item_id')
+                    ->references('id')
+                    ->on('itemprofile')
+                    ->onUpdate('cascade');
             $table->timestamps();
         });
     }

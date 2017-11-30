@@ -16,7 +16,11 @@ class CreateReservationTable extends Migration {
 		{	
 			$table->increments('id');
 			$table->integer('user_id')->unsigned();
-			$table->foreign('user_id')->references('id')->on('user');
+			$table->foreign('user_id')
+					->references('id')
+					->on('user')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->datetime('timein');
 			$table->datetime('timeout');
 			$table->string('purpose',100);
@@ -24,6 +28,8 @@ class CreateReservationTable extends Migration {
 			$table->boolean('approval');
 			$table->string('facultyincharge',100)->nullable();
 			$table->string('remark',100)->nullable();
+            $table->string('status')->nullable()->default('unclaimed');
+			$table->string('created_by')->nullable();
 			$table->timestamps();
 		});
 	}

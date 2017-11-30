@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\FacultyView;
+use App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -21,7 +21,7 @@ class FacultyController extends Controller
         if(Request::ajax())
         {
             return json_encode([
-                'data' => FacultyView::all()
+                'data' => Faculty::all()
             ]);
         }
     }

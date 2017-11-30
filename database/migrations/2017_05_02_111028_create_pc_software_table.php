@@ -15,14 +15,23 @@ class CreatePcSoftwareTable extends Migration {
 		Schema::create('pc_software', function(Blueprint $table)
 		{
 			$table->integer('pc_id')->unsigned();
-			$table->foreign('pc_id')->references('id')->on('pc')
-										->onDelete('cascade');
+			$table->foreign('pc_id')
+					->references('id')
+					->on('pc')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('software_id')->unsigned();
-			$table->foreign('software_id')->references('id')->on('software')
-										->onDelete('cascade');
+			$table->foreign('software_id')
+					->references('id')
+					->on('software')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->integer('softwarelicense_id')->unsigned()->nullable();
-			$table->foreign('softwarelicense_id')->references('id')->on('softwarelicense')
-										->onDelete('cascade');
+			$table->foreign('softwarelicense_id')
+					->references('id')
+					->on('softwarelicense')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->timestamps();
 			$table->softDeletes();
 		});

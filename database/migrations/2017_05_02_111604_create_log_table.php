@@ -15,15 +15,17 @@ class CreateLogTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id')->unsigned();//staff in charge
-			$table->foreign('user_id')->references('id')->on('user')
-									->onUpdate('cascade');
+			$table->foreign('user_id')
+					->references('id')
+					->on('user')
+					->onUpdate('cascade');
 			$table->datetime('time');
 			$table->boolean('inout');
 			$table->boolean('computers');
 			$table->boolean('peripherals');
 			$table->boolean('light');
 			$table->boolean('aircon');
-			$table->boolean('clean'); //cleanliness and orderliness
+			$table->boolean('clean');
 			$table->string('notes',100)->nullable();
 			$table->timestamps();
 		});

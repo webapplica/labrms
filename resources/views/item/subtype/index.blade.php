@@ -33,6 +33,7 @@ Item Sub Type
 				<thead>
 					<th>ID</th>
 					<th>Name</th>
+					<th>Type</th>
 					<th class="col-sm-2 no-sort"></th>
 				</thead>
 			</table>
@@ -59,6 +60,7 @@ Item Sub Type
 	        columns: [
 	            { data: "id" },
 	            { data: "name" },
+	            { data: "itemtype.name" },
 	            { data: function(callback){
 	            	return `
 	            		<button type="button" data-id="`+callback.id+`" data-name="`+callback.name+`" class="btn btn-sm btn-default edit">Edit</button>
@@ -76,6 +78,11 @@ Item Sub Type
 	 			'style' => 'display:none',
 	 			'placeholder' => 'Item Sub Type'
 	 		]) }}
+	 		{{ Form::select('itemtype',$itemtypes,Input::old('itemtype'),[
+	 			'class' => 'form-control',
+	 			'id' => 'itemtype',
+	 			'style' => 'display:none'
+	 		]) }}
  			<button type="button" id="new" class="btn btn-success" style="margin-right:5px;" ><span class="glyphicon glyphicon-plus"></span> Add</button>
  			<button type="button" id="hide" class="btn btn-default" style="margin-right:5px;display:none;"><span class="glyphicon glyphicon-eye-close"></span> Hide</button>
  			{{ Form::close() }}
@@ -85,6 +92,7 @@ Item Sub Type
 			if($('#subtype-name').is(':hidden'))
 			{		
 				$('#subtype-name').toggle(400)
+				$('#itemtype').toggle(400)
 				$('#hide').toggle(400)
 			}
 			else
@@ -95,53 +103,55 @@ Item Sub Type
 
 		$('#hide').on('click',function(){
 			$('#subtype-name').toggle(400)
+			$('#itemtype').toggle(400)
 			$('#hide').toggle(400)
 		})
 
 		$('#itemSubType').on('click','.edit',function(){
 	    	name = $(this).data('name')
 	    	id = $(this).data('id')
-	    	swal({
-			  title: "Input Sub Type!",
-			  text: "Input the new sub type you want to update it to",
-			  type: "input",
-			  showCancelButton: true,
-			  closeOnConfirm: false,
-			  animation: "slide-from-top",
-			  inputValue: name
-			},
-			function(inputValue){
-			  if (inputValue === false) return false;
+	    	window.location.href = "{{ url('item/subtype') }}" + "/" + id + "/edit"
+	  //   	swal({
+			//   title: "Input Sub Type!",
+			//   text: "Input the new sub type you want to update it to",
+			//   type: "input",
+			//   showCancelButton: true,
+			//   closeOnConfirm: false,
+			//   animation: "slide-from-top",
+			//   inputValue: name
+			// },
+			// function(inputValue){
+			//   if (inputValue === false) return false;
 			  
-			  if (inputValue === "") {
-			    swal.showInputError("You need to write something!");
-			    return false
-			  }
+			//   if (inputValue === "") {
+			//     swal.showInputError("You need to write something!");
+			//     return false
+			//   }
 			  
-			  $.ajax({
-			    headers: {
-			        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-			    },
-			  	type: 'put',
-			  	url: '{{ url("item/subtype") }}' + '/' + id,
-			  	dataType: 'json',
-			  	data: {
-			  		'name': inputValue
-			  	},
-			  	success: function(response){
-			  		if(response == 'success')
-			  		{
-			  			swal('Success','Information Updated','success')	
-			  		}
-			  		else
-			  		swal('Error','Problem Occurred while processing your data','error')
-			  		table.ajax.reload();
-			  	},
-			  	error: function(){
-			  		swal('Error','Problem Occurred while processing your data','error')
-			  	}
-			  })
-			});
+			//   $.ajax({
+			//     headers: {
+			//         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			//     },
+			//   	type: 'put',
+			//   	url: '{{ url("item/subtype") }}' + '/' + id,
+			//   	dataType: 'json',
+			//   	data: {
+			//   		'name': inputValue
+			//   	},
+			//   	success: function(response){
+			//   		if(response == 'success')
+			//   		{
+			//   			swal('Success','Information Updated','success')	
+			//   		}
+			//   		else
+			//   		swal('Error','Problem Occurred while processing your data','error')
+			//   		table.ajax.reload();
+			//   	},
+			//   	error: function(){
+			//   		swal('Error','Problem Occurred while processing your data','error')
+			//   	}
+			//   })
+			// });
 		});
 
 	    $('#itemSubType').on('click','.delete',function(){

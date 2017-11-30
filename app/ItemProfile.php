@@ -221,67 +221,64 @@ class ItemProfile extends \Eloquent{
 	*	@param $receipt_id referencing receipt table
 	*
 	*/
-	public static function createRecord($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id)
+	public function profile()
 	{
+
 		/**
 		*
-		*	Pass the parameters to transaction / stored procedure 
+		*	Set local information
 		*
 		*/
-		DB::transaction(function() use ($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id)
-		{
-			/**
-			*
-			*	Create a record on item profile table
-			*	@param $propertynumber
-			*	@param $serialnumber
-			*	@param $location name
-			*	@param $datereceived
-			*	@param $inventory_id referencing inventory table
-			*	@param $receipt_id referencing receipt table
-			*
-			*/
-			$itemprofile = ItemProfile::createItemProfile(
-						$propertynumber,
-						$serialnumber,
-						$location,
-						$datereceived,
-						$inventory_id,
-						$receipt_id
-					);
+		$_org = config('app.local.constant');
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Create initial ticket
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			ItemProfile::createProfilingTicket($itemprofile->id,$datereceived);
-		    
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Set the location of the item
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-		    RoomInventory::createRecord($location,$itemprofile->id);
+		$inventory = Inventory::find($this->inventory_id);
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Add 1 to profiled items count
-			|	Used to check if how many items are not yet profiled
-			|	Located in inventory table
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-		    Inventory::addProfiled($inventory_id);
-		});
+		$itemtype = isset($inventory->itemtype->id) ? "-" . $inventory->itemtype->id : "";
+		$itemsubtype = isset($inventory->itemsubtype->id) ? "-" . $inventory->itemsubtype->id : "";
+
+		$local =  ItemProfile::whereHas('inventory',function($query) use ($inventory){
+			$query->where('itemtype_id','=',$inventory->itemtype_id)
+			->where('itemsubtype_id','=',$inventory->itemsubtype_id);
+		})->count();
+
+		$this->local_id =  $_org . $itemtype . $itemsubtype . "-" . ($local + 1);
+
+		$this->status = 'working';
+		$this->profiled_by = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
+		$this->save();	
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Create initial ticket
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		ItemProfile::createProfilingTicket($this->id,$this->datereceived);
+	    
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Set the location of the item
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+	    RoomInventory::createRecord($this->location,$this->id);
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Add 1 to profiled items count
+		|	Used to check if how many items are not yet profiled
+		|	Located in inventory table
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+	    Inventory::addProfiled($this->inventory_id);
+
 	}
 
 	/*
@@ -309,40 +306,15 @@ class ItemProfile extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		Ticket::generateEquipmentTicket($item_id,$tickettype,$ticketname,$details,$fullname,$staffassigned,$ticket_id,$status);
-	}
-
-	/**
-	*
-	*	@param $propertynumber
-	*	@param $serialnumber
-	*	@param $location name
-	*	@param $datereceived
-	*	@param $inventory_id referencing inventory table
-	*	@param $receipt_id referencing receipt table
-	*
-	*/
-	public static function createItemProfile($propertynumber,$serialnumber,$location,$datereceived,$inventory_id,$receipt_id)
-	{
-		$datereceived = Carbon::parse($datereceived)->toDateString();
-		$itemprofile = new ItemProfile;
-		$itemprofile->propertynumber = $propertynumber;
-		$itemprofile->serialnumber = $serialnumber;
-		$itemprofile->location = $location;
-		$itemprofile->datereceived = $datereceived;
-		$itemprofile->status = 'working';
-		$itemprofile->inventory_id = $inventory_id;
-		$itemprofile->receipt_id = $receipt_id;
-		$itemprofile->profiled_by = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
-		$itemprofile->save();	
-
-		/*
-		|--------------------------------------------------------------------------
-		| return collection of profiled item
-		|--------------------------------------------------------------------------
-		|
-		*/
-		return $itemprofile;
+		$ticket = new Ticket;
+		$ticket->tickettype = $tickettype;
+		$ticket->ticketname = $ticketname;
+		$ticket->tickettype = $tickettype;
+		$ticket->details = $details;
+		$ticket->staffassigned = $staffassigned;
+		$ticket->ticket_id = $ticket_id;
+		$ticket->status = $status;
+		$ticket->generate($item_id);
 	}
 
 	/**

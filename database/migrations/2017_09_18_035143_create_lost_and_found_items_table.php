@@ -18,13 +18,13 @@ class CreateLostAndFoundItemsTable extends Migration
             $table->string('identifier')->unique();
             $table->string('description')->nullable();
             $table->string('imagepath')->nullable();
-            $table->datetime('datefound');
+            $table->datetime('date_found');
             $table->string('claimant')->nullable();
-            $table->string('claimantdesc')->nullable();
-            $table->datetime('dateclaimed')->nullable();
+            $table->string('claimant_desc')->nullable();
+            $table->datetime('date_claimed')->nullable();
             $table->string('status')->nullable()->default('unclaimed');
-            $table->string('addedby')->nullable();
-            $table->string('processedby')->nullable();
+            $table->string('added_by')->nullable();
+            $table->string('processed_by')->nullable();
             $table->timestamps();
         });
     }

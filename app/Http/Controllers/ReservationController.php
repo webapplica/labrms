@@ -65,7 +65,7 @@ class ReservationController extends Controller {
 	 */
 	public function store()
 	{		
-
+		
 		$location = $this->sanitizeString(Input::get('location'));
 		$purpose = $this->sanitizeString(Input::get('purpose'));
 		$dateofuse = $this->sanitizeString(Input::get('dateofuse'));

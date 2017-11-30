@@ -13,13 +13,13 @@ class Unit extends Model
 	protected $primaryKey = 'id';
 
 	public static $rules = array(
-		
-		'Inventory ID' => 'required|exists:inventory,id',
-		'Unit' => 'required'
+		'Name' => 'required|unique:unit,name',
+		'Description' => ''
 	);
-	public static $updaterules = array(
-		'Inventory ID' => ''
-		'Unit' => ''
+
+	public static $updateRules = array(
+		'Name' => 'required',
+		'Description' => ''
 	);
 
 }

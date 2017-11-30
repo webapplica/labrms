@@ -15,11 +15,9 @@ class CreateUnitTable extends Migration
     {
         Schema::create('unit', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('inventory_id')->unsigned();
-            $table->foreign('inventory_id')->references('id')->on('inventory')
-                                        ->onUpdate('cascade')
-                                        ->onDelete('cascade');
-            $table->string('unit',20);                            
+            $table->string('abbreviation',20)->nullable();
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

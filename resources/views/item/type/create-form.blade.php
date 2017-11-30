@@ -3,8 +3,7 @@
   <div class="col-md-12">
     {{ Form::label('category','Category') }}
     {{ Form::select('category',$category,Input::old('category'),[
-      'class'=>'form-control',
-      'placeholder'=>'Description'
+      'class'=>'form-control'
     ]) }}
   </div>
 </div>

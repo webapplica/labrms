@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTicketviewTable extends Migration {
+class CreateTicketView extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -39,8 +39,7 @@ class CreateTicketviewTable extends Migration {
                     ON inventory.itemtype_id = itemtype.id
                 JOIN user
                     ON user.id = ticket.staffassigned
-                WHERE itemtype.name != 'System Unit'
-            UNION
+            UNION DISTINCT
             SELECT 
                 ticket.id,
                 ticket.created_at AS 'date',

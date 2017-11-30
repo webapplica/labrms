@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Inventory;
-use App\ItemType;
 use App;
 use Session;
 use Validator;
@@ -24,7 +22,6 @@ class ItemInventoryController extends Controller {
 		{
 			return json_encode([
 					'data' => App\Inventory::with('itemtype')
-									->select('id','itemtype_id','brand','model','details','warranty','unit','quantity','profileditems')
 									->get()
 					]);
 		}
@@ -44,6 +41,13 @@ class ItemInventoryController extends Controller {
 		$brand = null;
 		$model = null;
 		$itemtype = null;
+		$itemsubtype = null;
+
+		$itemsubtypes = App\ItemSubType::pluck('name','id');
+
+		$itemtypes = App\ItemType::pluck('name','id');
+
+		$units = App\Unit::pluck('abbreviation','abbreviation');
 
 		if(Input::has('brand'))
 		{
@@ -60,6 +64,11 @@ class ItemInventoryController extends Controller {
 			$itemtype = $this->sanitizeString(Input::get('itemtype'));
 		}
 
+		if(Input::has('itemsubtype'))
+		{
+			$itemsubtype = $this->sanitizeString(Input::get('itemsubtype'));
+		}
+
 		$itemtypes = App\ItemType::category('equipment')->pluck('name','name');
 
 		return view('inventory.item.create')
@@ -67,7 +76,11 @@ class ItemInventoryController extends Controller {
 					->with('brand',$brand)
 					->with('model',$model)
 					->with('itemtype',$itemtype)
-						->with('title','Inventory::add');
+					->with('itemsubtype',$itemsubtype)
+					->with('itemtypes',$itemtypes)
+					->with("units",$units)
+					->with('itemsubtypes',$itemsubtypes)
+					->with('title','Inventory::add');
 	}
 
 	/**
@@ -104,10 +117,10 @@ class ItemInventoryController extends Controller {
 		//inventory
 		$brand = $this->sanitizeString(Input::get('brand'));
 		$itemtype = $this->sanitizeString(Input::get('itemtype'));
+		$itemsubtype = $this->sanitizeString(Input::get('itemsubtype'));
 		$model = $this->sanitizeString(Input::get('model'));
 		$quantity = $this->sanitizeString(Input::get('quantity'));
 		$unit = $this->sanitizeString(Input::get('unit'));
-		$warranty = $this->sanitizeString(Input::get('warranty'));
 		$details = $this->sanitizeString(Input::get('details'));
 
 		//validator
@@ -116,7 +129,6 @@ class ItemInventoryController extends Controller {
 				'Brand' => $brand,
 				'Model' => $model,
 				'Details' => $details,
-				'Warranty' => $warranty,
 				'Unit' => $unit,
 				'Quantity' => $quantity,
 				'Profiled Items' => 0
@@ -134,10 +146,10 @@ class ItemInventoryController extends Controller {
 		$inventory = App\Inventory::createRecord([
 			'brand' => $brand,
 			'itemtype' => $itemtype,
+			'itemsubtype' => $itemsubtype,
 			'model' => $model,
 			'quantity' => $quantity,
 			'unit' => $unit,
-			'warranty' => $warranty,
 			'details' => $details
 		],[
 			'number' => $number,
@@ -179,7 +191,6 @@ class ItemInventoryController extends Controller {
 			return json_encode(
 				App\Inventory::where('id','=',$id)
 								->with('itemtype')
-								->select('id','itemtype_id','brand','model','details','warranty','unit','quantity','profileditems')
 								->first()
 			);
 		}
@@ -283,7 +294,7 @@ class ItemInventoryController extends Controller {
 		{
 			$brand = $this->sanitizeString(Input::get('term'));
 			return json_encode(
-				Inventory::where('brand','like','%'.$brand.'%')->distinct()->pluck('brand')
+				App\Inventory::where('brand','like','%'.$brand.'%')->distinct()->pluck('brand')
 			);
 		}
 	}

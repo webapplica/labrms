@@ -12,6 +12,7 @@ class SoftwareTypeTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('softwaretype')->truncate();
      DB::table('softwaretype')->delete();
    	//insert some dummy records
    	SoftwareType::insert(array(

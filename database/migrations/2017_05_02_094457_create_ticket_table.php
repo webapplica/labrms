@@ -21,11 +21,19 @@ class CreateTicketTable extends Migration {
 			$table->string('author',100);
 			$table->string('staffassigned',100)->nullable();
 			$table->integer('ticket_id')->unsigned()->nullable();
-			$table->foreign('ticket_id')->references('id')->on('ticket')
-										->onUpdate('cascade')
-										->onDelete('cascade');
+			$table->foreign('ticket_id')
+					->references('id')
+					->on('ticket')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->string('status');
 			$table->string('comments')->nullable();
+	        $table->string('closed_by',254)->nullable();
+	        $table->string('validated_by',254)->nullable();
+	        $table->datetime('deadline')->nullable();
+	        $table->boolean('trashable')->nullable();
+	        $table->string('severity')->nullable();
+	        $table->string('nature')->nullable();
 			$table->timestamps();
 		});
 	}

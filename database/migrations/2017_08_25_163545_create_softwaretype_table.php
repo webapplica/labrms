@@ -14,8 +14,9 @@ class CreateSoftwaretypeTable extends Migration
     public function up()
     {
         Schema::create('softwaretype', function (Blueprint $table) {
-            $table->string('type',100);
-            
+            $table->increments('id');
+            $table->string('type',100)->unique();
+            $table->timestamps();
         });
     }
 

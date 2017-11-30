@@ -72,11 +72,10 @@ Software
 	            { data: "minsysreq" },
 	            { data: "maxsysreq" },
 	            { data: function(callback){
-	            	htmllist = `<ul class="list-unstyled">`
+	            	htmllist = ``
 	            	callback.roomsoftware.forEach(function(element){
-	            		htmllist += `<li class="col-xs-12">` + element.room.name + ` <button class="remove btn btn-danger btn-xs" data-id="`+ callback.id +`" data-room="`+ element.room.id +`" style="border:none;"><span class="glyphicon glyphicon-remove"></span></button></li>`
+	            		htmllist += `<button class="remove btn btn-primary btn-sm" data-id="`+ callback.id +`" data-room="`+ element.room.id +`" style="border:none;margin:3px;">` + element.room.name + ` <span class="glyphicon glyphicon-remove"></span></button>`
 	            	})
-	            	htmllist += `</ul>`
 	            	return htmllist;
 	            } },
 	            { data: function(callback){

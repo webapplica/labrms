@@ -91,7 +91,7 @@ class ItemType extends \Eloquent{
 
 	public function setCategoryAttribute($value)
 	{
-		$this->category = ucfirst($value);
+		$this->attributes['category'] = ucfirst($value);
 	}
 
 	public function getCategoryAttribute($value)

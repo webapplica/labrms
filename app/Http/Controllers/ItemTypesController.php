@@ -55,7 +55,7 @@ class ItemTypesController extends Controller {
 		$validator = Validator::make([
 			'name' => $name,
 			'description' => $description
-		],ItemType::$rules);
+		],App\ItemType::$rules);
 
 		if($validator->fails())
 		{
@@ -64,7 +64,7 @@ class ItemTypesController extends Controller {
 				->withErrors($validator);
 		}
 
-		ItemType::createRecord($name,$description,$category);
+		App\ItemType::createRecord($name,$description,$category);
 
 		Session::flash('success-message','Item type created');
 		return redirect('item/type');
@@ -85,7 +85,7 @@ class ItemTypesController extends Controller {
 		$itemtype = App\Itemtype::find($id);
 		return view('item.type.edit')
 			->with('itemtype',$itemtype)
-			->with('category',ItemType::$category)
+			->with('category',App\ItemType::$category)
 			->with('title',"Item Type::$itemtype->name");
 	}
 
@@ -107,7 +107,7 @@ class ItemTypesController extends Controller {
 				->withErrors($validator);
 		}
 
-		$itemtype = App\Itemtype::find($id);
+		$itemtype = App\ItemType::find($id);
 		$itemtype->name = $name;
 		$itemtype->description = $description;
 		$itemtype->category = $category;

@@ -21,11 +21,13 @@ class ItemSubTypesController extends Controller
         if(Request::ajax())
         {
             return json_encode([
-                'data' => App\ItemSubType::all()
+                'data' => App\ItemSubType::with('itemtype')->get()
             ]);
         }
 
-        return view('item.subtype.index');
+        $itemtypes = App\ItemType::pluck('name','id');
+        return view('item.subtype.index')
+                    ->with('itemtypes',$itemtypes);
     }
 
     /**
@@ -35,6 +37,7 @@ class ItemSubTypesController extends Controller
      */
     public function create()
     {
+        return redirect('item/subtype');
         return view('item.subtype.create');
     }
 
@@ -46,11 +49,12 @@ class ItemSubTypesController extends Controller
      */
     public function store()
     {
-
         $name = $this->sanitizeString(Input::get('name'));
+        $itemtype = $this->sanitizeString(Input::get("itemtype"));
 
         $validator = Validator::make([
-            'Name' => $name
+            'Name' => $name,
+            'Item Type' => $itemtype
         ],App\ItemSubType::$rules);
 
         if($validator->fails())
@@ -62,6 +66,7 @@ class ItemSubTypesController extends Controller
 
         $itemsubtype = new App\ItemSubType;
         $itemsubtype->name = $name;
+        $itemsubtype->itemtype_id = $itemtype;
         $itemsubtype->save();
 
         Session::flash('success-message','Item Sub Type added');
@@ -87,7 +92,17 @@ class ItemSubTypesController extends Controller
      */
     public function edit($id)
     {
-        return view('item.subtype.edit');
+        $itemsubtype = App\ItemSubType::find($id);
+
+        if(count($itemsubtype) > 0)
+        {
+            $itemtypes = App\ItemType::pluck('name','id');
+            return view('item.subtype.edit')
+                    ->with('itemtypes',$itemtypes)
+                    ->with("itemsubtype",$itemsubtype);
+        }
+
+        return redirect('/');
     }
 
     /**
@@ -99,44 +114,41 @@ class ItemSubTypesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $name = $this->sanitizeString(Input::get('name'));
+        $id = $this->sanitizeString($id);
+        $itemtype = $this->sanitizeString(Input::get("itemtype"));
+
+        $validator = Validator::make([
+            'Name' => $name,
+            'Item Type' => $itemtype
+        ],App\ItemSubType::$updateRules);
+
         if(Request::ajax())
         {
-            $name = $this->sanitizeString(Input::get('name'));
-            $id = $this->sanitizeString($id);
-
-            $validator = Validator::make([
-                'Name' => $name
-            ],App\ItemSubType::$updateRules);
 
             if($validator->fails())
             {
-                return redirect('item/subtype')
-                        ->withInput()
-                        ->withErrors($validator);
+                return json_encode('error');
             }
 
             $itemsubtype = App\ItemSubType::find($id);
             $itemsubtype->name = $name;
+            $itemsubtype->itemtype_id = $itemtype;
             $itemsubtype->save();
 
             return json_encode('success');
         }
 
-        $name = $this->sanitizeString(Input::get('name'));
-
-        $validator = Validator::make([
-            'Name' => $name
-        ],App\ItemSubType::$rules);
-
         if($validator->fails())
         {
-            return redirect('item/subtype')
+            return back()
                     ->withInput()
                     ->withErrors($validator);
         }
 
         $itemsubtype = App\ItemSubType::find($id);
         $itemsubtype->name = $name;
+        $itemsubtype->itemtype_id = $itemtype;
         $itemsubtype->save();
 
         Session::flash('success-message','Item Sub Type updated');

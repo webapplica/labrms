@@ -28,7 +28,6 @@ class Inventory extends \Eloquent
     'brand',
     'model',
     'details',
-    'warranty',
     'unit',
     'quantity',
     'profileditems'
@@ -58,7 +57,6 @@ class Inventory extends \Eloquent
   	'Brand' => 'min:2|max:100',
   	'Model' => 'min:2|max:100',
   	'Details' => 'min:5|max:1000',
-  	'Warranty' => 'min:5|max:100',
   	'Unit' => 'required',
   	'Quantity' => 'required|numeric',
   	'Profiled Items' => 'numeric'
@@ -75,7 +73,6 @@ class Inventory extends \Eloquent
 		'Brand' => 'min:2|max:100',
 		'Model' => 'min:2|max:100',
 		'Details' => 'min:5|max:1000',
-		'Warranty' => 'min:5|max:100',
 		'Unit' => 'numeric',
 		'Quantity' => 'numeric',
 		'Profiled Items' => 'numeric'
@@ -119,6 +116,11 @@ class Inventory extends \Eloquent
   public function itemtype()
   {
     return $this->belongsTo('App\Itemtype','itemtype_id','id');
+  }
+
+  public function itemsubtype()
+  {
+    return $this->belongsTo('App\ItemSubType','itemsubtype_id','id');
   }
 
   /**
@@ -192,10 +194,10 @@ class Inventory extends \Eloquent
       $inventory = new Inventory;
       $inventory->brand = $_inventory['brand'];
       $inventory->itemtype_id = $_inventory['itemtype'];
+      $inventory->itemsubtype_id = $_inventory['itemsubtype'];
       $inventory->model = $_inventory['model'];
       $inventory->quantity = $_inventory['quantity'];
       $inventory->unit = $_inventory['unit'];
-      $inventory->warranty = $_inventory['warranty'];
       $inventory->details = $_inventory['details'];
       $inventory->profileditems = 0;
       $inventory->save();

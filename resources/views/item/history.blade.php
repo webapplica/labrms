@@ -56,7 +56,7 @@ Item History
           <tr>
             <th>Ticket ID</th>
             <th>Ticket Type</th>
-            <th>Name</th>
+            <th>Title</th>
             <th>Details</th>
             <th>Author</th>
             <th>Staff Assigned</th>

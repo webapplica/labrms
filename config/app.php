@@ -27,6 +27,10 @@ return [
         'subimage' => env('COMPANY_SUBIMAGE','Secondary Image Link')
     ],
 
+    'local' => [
+        'constant' => env('LOCAL_CONST'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

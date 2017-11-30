@@ -11,6 +11,7 @@ class LanguageTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('languages')->truncate();
         DB::table('languages')->insert([
             'name'        => 'English',
             'flag'        => '',

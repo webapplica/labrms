@@ -13,6 +13,7 @@ class TickettypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
+        DB::table('tickettype')->truncate();
 	   	//delete users table records
 	   	DB::table('tickettype')->delete();
 

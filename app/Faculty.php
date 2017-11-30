@@ -5,7 +5,7 @@ namespace App;
 use App\RoomSchedule;
 use Illuminate\Database\Eloquent\Model;
 
-class FacultyView extends Model
+class Faculty extends Model
 {
 	
 	/**
@@ -13,7 +13,7 @@ class FacultyView extends Model
 	*	table name
 	*
 	*/
-    protected $table  = 'facultyview';
+    protected $table  = 'faculty_v';
 
 	/**
 	*

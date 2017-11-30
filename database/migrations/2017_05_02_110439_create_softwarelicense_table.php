@@ -16,11 +16,14 @@ class CreateSoftwarelicenseTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('software_id')->unsigned();
-			$table->foreign('software_id')->references('id')->on('software')
-                ->onDelete('cascade');
+			$table->foreign('software_id')
+					->references('id')
+					->on('software')
+                	->onDelete('cascade')
+                	->onUpdate('cascade');
 			$table->string('key',100);
-			$table->boolean('multipleuse');//true if the key can be used again on other pc
-			$table->boolean('inuse');//true if the key is already in use
+			$table->integer('multipleuse');
+			$table->integer('inuse');
 			$table->timestamps();
 		});
 	}

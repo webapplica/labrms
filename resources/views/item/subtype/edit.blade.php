@@ -1,11 +1,11 @@
 @extends('layouts.master-blue')
 @section('content')
-{{ Form::open(array('class' => 'form-horizontal','method'=>'put','route'=>array('type.update',$itemtype->id),'id'=>'itemTypeForm')) }}
+{{ Form::open(array('class' => 'form-horizontal','method'=>'put','route'=>array('subtype.update',$itemsubtype->id),'id'=>'itemTypeForm')) }}
 <div class="container-fluid" id="page-body">
   <div class="row">
     <div class="col-md-offset-3 col-md-6">
       <div class="panel panel-body ">
-        <legend><h3 class="text-muted">Item Types</h3></legend>
+        <legend><h3 class="text-muted">Item Sub Types</h3></legend>
         @if (count($errors) > 0)
             <div class="alert alert-danger alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -18,36 +18,27 @@
         @endif
         <ol class="breadcrumb">
             <li>
-                <a href="{{ url('item/type') }}">Item Type</a>
+                <a href="{{ url('item/type') }}">Item Sub Type</a>
             </li>
-            <li>{{ $itemtype->id }}</li>
+            <li>{{ $itemsubtype->id }}</li>
             <li class="active">Edit</li>
         </ol>
         <div class="form-group">
           <div class="col-md-12">
-            {{ Form::label('category','Category') }}
-            {{ Form::select('category',$category,Input::old('category'),[
-              'class'=>'form-control'
+            {{ Form::label('name','Name') }}
+            {{ Form::text('name',isset($itemsubtype->name) ? $itemsubtype->name : Input::old('name'),[
+              'class' => 'form-control',
+              'id' => 'subtype-name',
+              'placeholder' => 'Item Sub Type'
             ]) }}
           </div>
         </div>
         <div class="form-group">
           <div class="col-md-12">
-            {{ Form::label('name','Item name') }}
-            {{ Form::text('name',$itemtype->name,[
-              'id' => 'name',
-              'class'=>'form-control',
-              'placeholder'=>'Item name'
-            ]) }}
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            {{ Form::label('description','Description') }}
-            {{ Form::textarea('description',$itemtype->description,[
-              'id' => 'description',
-              'class'=>'form-control',
-              'placeholder'=>'Description'
+            {{ Form::label('name','Item Type') }}
+            {{ Form::select('itemtype',$itemtypes,isset($itemsubtype->itemtype_id) ? $itemsubtype->itemtype_id : Input::old('itemtype'),[
+              'class' => 'form-control',
+              'id' => 'itemtype'
             ]) }}
           </div>
         </div>

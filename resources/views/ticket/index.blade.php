@@ -211,9 +211,11 @@ Tickets
 			  </button>
 			  <ul class="dropdown-menu" id="tickettype-button">
 		   		@foreach($tickettype as $tickettype)
+		   		@if($tickettype->type != "Action Taken")
 				<li role="presentation">
 					<a class="tickettype"  data-name='{{ $tickettype->type }}'>{{ $tickettype->type }}</a>
 				</li>
+				@endif
 			    @endforeach
 			  </ul>
 			</div>

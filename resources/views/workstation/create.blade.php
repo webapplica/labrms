@@ -59,7 +59,7 @@ Workstation | Add
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('name','Workstation Name') }}
-              {{ Form::text('name',Input::old('name'),[
+              {{ Form::text('name',isset($name) ? $name : Input::old('name'),[
                 'id'=>'name',
                 'class'=>'form-control',
                 'placeholder' => 'Workstation Name'
@@ -118,8 +118,8 @@ Workstation | Add
 
           <div class="form-group">
             <div class="col-sm-12">
-              {{ Form::label('mouse','Mouse Brand') }}
-              <span tabindex="0"  type="button" id="keyboard-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" data-trigger="focus" title="Help" data-content="This field accepts a property number of existing mouse" style="text-decoration: none;"></span>
+              {{ Form::label('mouse','Mouse') }}
+              <span tabindex="0"  type="button" id="keyboard-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" data-trigger="focus" title="Help" data-content="This field accepts local id of mouse" style="text-decoration: none;"></span>
               {{ Form::text('mouse',Input::old('mouse'),[
                 'id'=>'mouse',
                 'class'=>'form-control',
