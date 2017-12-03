@@ -156,6 +156,11 @@ class ItemProfile extends \Eloquent{
 		return $query->where('location','=',$location);	
 	}
 
+	public function scopeLocal($query, $value)
+	{
+		return $query->where('local','=',$value);
+	}
+
 	/*
 	*
 	*	Limit the scope by propertynumber

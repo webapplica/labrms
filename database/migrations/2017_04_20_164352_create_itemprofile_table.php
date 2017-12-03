@@ -22,7 +22,7 @@ class CreateItemprofileTable extends Migration {
 					->on('inventory')
 					->onUpdate('cascade')
 					->onDelete('cascade');
-			$table->integer('receipt_id')->unsigned();
+			$table->integer('receipt_id')->unsigned()->nullable();
 			$table->foreign('receipt_id')
 					->references('id')
 					->on('receipt')

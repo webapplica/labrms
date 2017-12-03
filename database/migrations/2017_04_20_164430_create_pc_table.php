@@ -15,34 +15,34 @@ class CreatePcTable extends Migration {
 		Schema::create('pc', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('systemunit_id')->unsigned();
+			$table->string('systemunit_id')->unique();
 			$table->foreign('systemunit_id')
-					->references('id')
+					->references('local_id')
 					->on('itemprofile')
 					->onUpdate('cascade')
 					->onDelete('cascade');
-			$table->integer('monitor_id')->unsigned()->nullable();
+			$table->string('monitor_id')->unique()->nullable();
 			$table->foreign('monitor_id')
-					->references('id')
+					->references('local_id')
 					->on('itemprofile')
 					->onUpdate('cascade')
 					->onDelete('cascade');
-			$table->integer('keyboard_id')->unsigned()->nullable();
+			$table->string('keyboard_id')->unique()->nullable();
 			$table->foreign('keyboard_id')
-					->references('id')
+					->references('local_id')
 					->on('itemprofile')
 					->onUpdate('cascade')
 					->onDelete('cascade');
-			$table->integer('avr_id')->unsigned()->nullable();
+			$table->string('avr_id')->unique()->nullable();
 			$table->foreign('avr_id')
-					->references('id')
+					->references('local_id')
 					->on('itemprofile')
 					->onUpdate('cascade')
 					->onDelete('cascade');
 			$table->string('oskey',50)->nullable();
-			$table->integer('mouse_id')->unsigned()->nullable();
+			$table->string('mouse_id')->unique()->nullable();
 			$table->foreign('mouse_id')
-					->references('id')
+					->references('local_id')
 					->on('itemprofile')
 					->onUpdate('cascade')
 					->onDelete('cascade');

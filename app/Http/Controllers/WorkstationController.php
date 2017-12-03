@@ -59,7 +59,6 @@ class WorkstationController extends Controller {
 
 		$validator = Validator::make([
 			'Operating System Key' => $oskey,
-			'Workstation Name' => $name,
 			'avr' => $avr,
 			'Keyboard' => $keyboard,
 			'Monitor' => $monitor,
@@ -74,7 +73,23 @@ class WorkstationController extends Controller {
 					->withErrors($validator);
 		}
 
-		Pc::assemble($name,$systemunit,$monitor,$avr,$keyboard,$oskey,$mouse);
+		/*
+		*
+		*	Transaction used to prevent error on saving
+		*
+		*/
+		DB::beginTransaction();
+
+		$pc = new App\Pc;
+		$pc->systemunit_id = $systemunit;
+		$pc->monitor = $monitor;
+		$pc->avr = $avr;
+		$pc->keyboard = $keyboard;
+		$pc->oskey = $oskey;
+		$pc->mouse = $mouse;
+		$pc->assemble();
+
+		DB::commit();
 		Session::flash('success-message','Workstation assembled');
 		return redirect('workstation');
 	}
@@ -206,9 +221,15 @@ class WorkstationController extends Controller {
 		$os = $this->sanitizeString(Input::get('os'));
 		$keyboard = $this->sanitizeString(Input::get('keyboard'));
 		$mouse = $this->sanitizeString(Input::get('mouse'));
+		$systemunit = $this->sanitizeString(Input::get('systemunit'));
 
 		$validator = Validator::make([
-		  'Operating System Key' => $os
+		  'Operating System Key' => $os,
+		  'System Unit' => $systemunit,
+		  'AVR' => $avr,
+		  'Keyboard' => $keyboard,
+		  'Mouse' => $mouse,
+		  'Monitor' => $monitor
 		],Pc::$updateRules);
 
 		if($validator->fails())
@@ -218,90 +239,30 @@ class WorkstationController extends Controller {
 		    ->withErrors($validator);
 		}
 
-		$details = "Workstation updated with the following propertynumber:" ;
+		/*
+		*
+		*	Transaction used to prevent error on saving
+		*
+		*/
+		DB::beginTransaction();
 
 		$pc = Pc::find($id);
 		$pc->oskey = $os;
+		$pc->mouse_id = $mouse;
+		$pc->monitor_id = $monitor;
+		$pc->avr_id = $avr;
+		$pc->keyboard_id = $keyboard;
+		$pc->systemunit_id = $systemunit;
 
-		if(Input::has('mousetag'))
-		{
+		$details = "Workstation updated with the following propertynumber:" ;
+		$details = $details . "$_avr->propertynumber for AVR";
+		$details = $details . "$_monitor->propertynumber for Monitor ";
+		$details = $details . "$_keyboard->propertynumber for Keyboard";
+		$details = $details .  "$mouse as mouse brand";
 
-			$validator = Validator::make([ 'mouse'=>$mouse ],[
-			  'mouse' => 'required|exists:supply,brand'
-			]);
-
-			if($validator->fails())
-			{
-			  return redirect("workstation/$id/edit")
-			    ->withInput()
-			    ->withErrors($validator);
-			}
-
-			Supply::releaseForWorkstation($mouse);
-			$pc->mouse = $mouse;
-			$details = $details .  "$mouse as mouse brand";
-		}
-
-		if(Input::has('monitor'))
-		{
-
-			$validator = Validator::make([ 'monitor' => $monitor ],[
-			  'monitor' => 'required|exists:itemprofile,propertynumber'
-			]);
-
-			if($validator->fails())
-			{
-			  return redirect("workstation/$id/edit")
-			    ->withInput()
-			    ->withErrors($validator);
-			}
-
-			$pc->monitor = $monitor;
-			$details = $details . "$_monitor->propertynumber for Monitor ";
-		}
-
-		if(Input::has('avr'))
-		{
-
-			$validator = Validator::make([ 'avr' => $avr ],[
-			  'avr' => 'required|exists:itemprofile,propertynumber'
-			]);
-
-			if($validator->fails())
-			{
-			  return redirect("workstation/$id/edit")
-			    ->withInput()
-			    ->withErrors($validator);
-			}
-
-			$pc->$avr = $avr;
-			$details = $details . "$_avr->propertynumber for AVR";
-		}
-
-		if(Input::has('keyboard'))
-		{
-
-			$validator = Validator::make([ 'keyboard' => $keyboard ],[
-			  'keyboard' => 'required|exists:itemprofile,propertynumber'
-			]);
-
-			if($validator->fails())
-			{
-			  return redirect("workstation/$id/edit")
-			    ->withInput()
-			    ->withErrors($validator);
-			}
-
-			$pc->$keyboard = $keyboard;
-			$details = $details . "$_keyboard->propertynumber for Keyboard";
-		}
-
-		$pc->save();
-
-		$ticketname = 'Workstation Update';
-		$staffassigned = Auth::user()->id;
-		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-		Ticket::generatePcTicket($pc->id,'Receive',$ticketname,$details,$author,$staffassigned,null,'Closed');
+		$pc->update();
+		
+		DB::commit();
 
 		Session::flash('success-message','Workstation  updated');
 		return redirect('workstation');

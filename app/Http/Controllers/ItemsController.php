@@ -914,11 +914,13 @@ class ItemsController extends Controller {
 				App\ItemProfile::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
-									$query->where('name','=','Display');
+									$query->where('name','=','Monitor');
+								})->orWhereHas('itemsubtype',function($query){
+									$query->where('name','=','Monitor');
 								});
 							})
-							->where('propertynumber','like','%'.$monitor.'%')
-							->pluck('propertynumber')
+							->where('local_id','like','%'.$monitor.'%')
+							->pluck('local_id')
 			);
 		}
 	}
@@ -959,10 +961,12 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','Keyboard');
+								})->orWhereHas('itemsubtype',function($query){
+									$query->where('name','=','Keyboard');
 								});
 							})
-							->where('propertynumber','like','%'.$keyboard.'%')
-							->pluck('propertynumber')
+							->where('local_id','like','%'.$keyboard.'%')
+							->pluck('local_id')
 			);
 		}
 	}
@@ -1003,10 +1007,12 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','AVR');
+								})->orWhereHas('itemsubtype',function($query){
+									$query->where('name','=','AVR');
 								});
 							})
-							->where('propertynumber','like','%'.$avr.'%')
-							->pluck('propertynumber')
+							->where('local_id','like','%'.$avr.'%')
+							->pluck('local_id')
 			);
 		}
 	}
@@ -1047,10 +1053,58 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','System Unit');
+								})->orWhereHas('itemsubtype',function($query){
+									$query->where('name','=','System Unit');
 								});
 							})
-							->where('propertynumber','like','%'.$systemunit.'%')
-							->pluck('propertynumber')
+							->where('local_id','like','%'.$systemunit.'%')
+							->pluck('local_id')
+			);
+		}
+	}
+
+	/**
+	*
+	*	get list of mouse
+	*	uses ajax request
+	*	@param local id
+	*	@return lists of local id
+	*
+	*/
+	public function getSystemUnitList()
+	{
+
+		/*
+		|--------------------------------------------------------------------------
+		|
+		| 	Checks if request is made through ajax
+		|
+		|--------------------------------------------------------------------------
+		|
+		*/
+		if(Request::ajax())
+		{
+			$systemunit = $this->sanitizeString(Input::get('term'));
+
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	get system unit not in pc
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			return json_encode(
+				App\Itemprofile::unassembled()
+							->whereHas('inventory',function($query){
+								$query->whereHas('itemtype',function($query){
+									$query->where('name','=','Mouse');
+								})->orWhereHas('itemsubtype',function($query){
+									$query->where('name','=','Mouse');
+								});
+							})
+							->where('local_id','like','%'.$systemunit.'%')
+							->pluck('local_id')
 			);
 		}
 	}

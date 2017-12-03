@@ -1161,6 +1161,14 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	*/
 	Route::get('get/item/profile/monitor/propertynumber','ItemsController@getMonitorList');
 
+	/*
+	|--------------------------------------------------------------------------
+	| return all monitor property number
+	|--------------------------------------------------------------------------
+	|
+	*/
+	Route::get('get/item/profile/mouse/propertynumber','ItemsController@getMouseList');
+
 
 	/*
 	|--------------------------------------------------------------------------

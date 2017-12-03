@@ -163,8 +163,9 @@ Workstation | Add
 
     });
 
-    $('#mouse').autocomplete({
-      source: "{{ url('get/supply/mouse/brand') }}"
+    $('#avr').autocomplete({
+      source: "{{ url('get/item/profile/mouse/propertynumber') }}"
+
     });
 
     @if( Session::has("success-message") )
