@@ -32,7 +32,7 @@ class Pc extends \Eloquent{
 		'Mouse' => 'exists:itemprofile,local_id'
 	);
 	//Validation rules!
-	public static $rules = array(
+	public static $updateRules = array(
 		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
 		'avr' => 'nullable|exists:itemprofile,local_id',
 		'Monitor' => 'nullable|exists:itemprofile,plocal_id',
@@ -148,7 +148,7 @@ class Pc extends \Eloquent{
 		$ticket->generate($this->id);
     }
 
-    public function update()
+    public function updateParts()
     {
 
 		$details = "";

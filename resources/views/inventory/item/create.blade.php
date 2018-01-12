@@ -86,16 +86,6 @@ Inventory | Create
 					</div>
 					<div class="form-group">
 						<div class="col-sm-12">
-						{{ Form::label('itemsubtype','Sub Type') }}
-						{{ Form::select('itemsubtype',$itemsubtypes,isset($itemsubtype) ? $itemsubtype : Input::old('itemsubtype'),[
-							'class' => 'form-control',
-							'id' => 'itemsubtype',
-							'placeholder' => 'None'
-						]) }}
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-sm-12">
 						{{ Form::label('details','Item Details') }}
 						{{ Form::textarea('details',Input::old('details'),[
 							'class' => 'form-control',
