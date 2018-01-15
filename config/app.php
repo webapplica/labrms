@@ -224,6 +224,9 @@ return [
         Cviebrock\EloquentSluggable\ServiceProvider::class, 
         Backpack\PageManager\PageManagerServiceProvider::class,
 
+
+        Yajra\DataTables\DataTablesServiceProvider::class,
+
     ],
 
     /*
@@ -275,6 +278,7 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'HTML' => Collective\Html\HtmlFacade::class,
         'Input' => Illuminate\Support\Facades\Input::class,
+        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
 
     ],
 

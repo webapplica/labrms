@@ -42,12 +42,14 @@ class ItemInventoryController extends Controller {
 		$model = null;
 		$itemtype = null;
 		$itemsubtype = null;
+		$units = [ null => 'None' ];
+		$receipts = [ null => 'None' ];
 
 		$itemsubtypes = App\ItemSubType::pluck('name','id');
-
 		$itemtypes = App\ItemType::pluck('name','id');
-
-		$units = App\Unit::pluck('abbreviation','abbreviation');
+		$units = $units + App\Unit::pluck('abbreviation','abbreviation')->toArray();
+		$itemtypes = App\ItemType::category('equipment')->pluck('name','id');
+		$receipts = $receipts +  App\Receipt::pluck('number','number')->toArray();
 
 		if(Input::has('brand'))
 		{
@@ -69,8 +71,6 @@ class ItemInventoryController extends Controller {
 			$itemsubtype = $this->sanitizeString(Input::get('itemsubtype'));
 		}
 
-		$itemtypes = App\ItemType::category('equipment')->pluck('name','name');
-
 		return view('inventory.item.create')
 					->with('itemtypes',$itemtypes)
 					->with('brand',$brand)
@@ -80,6 +80,7 @@ class ItemInventoryController extends Controller {
 					->with('itemtypes',$itemtypes)
 					->with("units",$units)
 					->with('itemsubtypes',$itemsubtypes)
+					->with('receipts',$receipts)
 					->with('title','Inventory::add');
 	}
 

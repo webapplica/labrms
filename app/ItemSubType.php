@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemSubType extends Model
 {
-    protected $table = 'itemsubtype';
+    protected $table = 'item_subtypes';
 	protected $primaryKey = 'id';
 	public $fillable = ['name'];
 	public static $rules = array(

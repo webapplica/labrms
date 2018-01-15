@@ -168,6 +168,10 @@
               <a href="{{ url('ticket') }}">Ticketing</a>
             </li> <!-- end of ticket dropdown tab -->
 
+            <!-- ticket dropdown tab -->
+            <li>
+              <a href="{{ url('receipt') }}">Receipt</a>
+            </li> <!-- end of ticket dropdown tab -->
 
             <!-- inventory dropdown tab -->
             <li class="dropdown-submenu">

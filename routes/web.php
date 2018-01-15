@@ -126,6 +126,8 @@ Route::middleware(['auth','laboratorystaff'])->group(function(){
 
 	Route::resource('lostandfound','LostAndFoundController');
 
+	Route::resource('receipt', 'ReceiptsController');
+
 	Route::resource('room/scheduling','RoomSchedulingController');
 
 	Route::prefix('lend')->group(function(){

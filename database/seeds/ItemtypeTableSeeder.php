@@ -2,9 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\Itemtype;
 
-class ItemtypeTableSeeder extends Seeder {
+class ItemTypeTableSeeder extends Seeder {
 	/**
 	 * Run the database seeds.
 	 *
@@ -12,11 +11,10 @@ class ItemtypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-		Itemtype::truncate();
-		//delete users table records
-		DB::table('itemtype')->delete();
+		App\Itemtype::truncate();
+
 		//insert some dummy records
-		Itemtype::insert(array(
+		App\Itemtype::insert(array(
 			[
 			   'name' => 'System Unit',
 			   'description' => 'Computer set',

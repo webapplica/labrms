@@ -14,7 +14,7 @@ class ItemType extends \Eloquent{
 	* table name
 	*
 	*/
-	protected $table = 'itemtype';
+	protected $table = 'item_types';
 
 	/**
 	*
