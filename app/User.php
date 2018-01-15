@@ -16,7 +16,7 @@ class User extends \Eloquent implements Authenticatable {
 	* table name
 	*
 	*/	
-	protected $table  = 'user';
+	protected $table  = 'users';
 
 	/**
 	*

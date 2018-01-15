@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Semester extends \Eloquent
 {
 
-	protected $table = 'semester';
+	protected $table = 'semesters';
 	protected $primaryKey = 'id';
 	public $timestamps = true;
 	public $fillable = ['semester','datestart','dateend'];

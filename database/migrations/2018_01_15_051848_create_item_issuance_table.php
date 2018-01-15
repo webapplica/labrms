@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomReservationTable extends Migration
+class CreateItemIssuanceTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,22 +13,21 @@ class CreateRoomReservationTable extends Migration
      */
     public function up()
     {
-        Schema::create('room_reservation', function (Blueprint $table) {
-            $table->integer('reservation_id')->unsigned();
-            $table->foreign('reservation_id')
+        Schema::create('item_issuance', function (Blueprint $table) {
+            $table->integer('item_id')->unsigned();
+            $table->foreign('item_id')
                     ->references('id')
-                    ->on('reservations')
+                    ->on('items')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->integer('room_id')->unsigned();
-            $table->foreign('room_id')
+            $table->integer('issuance_id')->unsigned();
+            $table->foreign('issuance_id')
                     ->references('id')
-                    ->on('rooms')
+                    ->on('issuances')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->primary([ 'room_id', 'reservation_id' ]);
+            $table->primary([ 'item_id', 'issuance_id' ]);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -39,6 +38,6 @@ class CreateRoomReservationTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('room_reservation');
+        Schema::dropIfExists('item_issuance');
     }
 }

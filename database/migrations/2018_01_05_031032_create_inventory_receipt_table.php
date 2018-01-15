@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomReservationTable extends Migration
+class CreateInventoryReceiptTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,22 +13,23 @@ class CreateRoomReservationTable extends Migration
      */
     public function up()
     {
-        Schema::create('room_reservation', function (Blueprint $table) {
-            $table->integer('reservation_id')->unsigned();
-            $table->foreign('reservation_id')
+        Schema::create('inventory_receipt', function (Blueprint $table) {
+            $table->integer('inventory_id')->unsigned();
+            $table->foreign('inventory_id')
                     ->references('id')
-                    ->on('reservations')
+                    ->on('inventories')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->integer('room_id')->unsigned();
-            $table->foreign('room_id')
+            $table->integer('receipt_id')->unsigned();
+            $table->foreign('receipt_id')
                     ->references('id')
-                    ->on('rooms')
+                    ->on('receipts')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->primary([ 'room_id', 'reservation_id' ]);
+            $table->integer('received_quantity');
+            $table->decimal('received_unitcost', 8, 2)->nullable();
+            $table->integer('profiled_items');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -39,6 +40,6 @@ class CreateRoomReservationTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('room_reservation');
+        Schema::dropIfExists('inventory_receipt');
     }
 }

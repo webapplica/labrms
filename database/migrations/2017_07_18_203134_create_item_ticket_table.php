@@ -14,19 +14,19 @@ class CreateItemTicketTable extends Migration {
 	{
 		Schema::create('item_ticket', function(Blueprint $table)
 		{
-			$table->increments('id');
             $table->integer('item_id')->unsigned();
 			$table->foreign('item_id')
 					->references('id')
-					->on('itemprofile')
+					->on('items')
 					->onUpdate('cascade')
 					->onDelete('cascade');
             $table->integer('ticket_id')->unsigned();
 			$table->foreign('ticket_id')
 					->references('id')
-					->on('ticket')
+					->on('tickets')
 					->onUpdate('cascade')
 					->onDelete('cascade');
+			$table->primary([ 'item_id', 'ticket_id' ]);
 			$table->timestamps();
 		});
 	}

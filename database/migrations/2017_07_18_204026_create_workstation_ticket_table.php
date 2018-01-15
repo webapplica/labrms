@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserTicketTable extends Migration {
+class CreateWorkstationTicketTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,13 +12,12 @@ class CreateUserTicketTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('user_ticket', function(Blueprint $table)
+		Schema::create('workstation_ticket', function(Blueprint $table)
 		{
-			$table->increments('id');
-            $table->integer('user_id')->unsigned();
-			$table->foreign('user_id')
+            $table->integer('workstation_id')->unsigned();
+			$table->foreign('workstation_id')
 					->references('id')
-					->on('users')
+					->on('workstations')
 					->onUpdate('cascade')
 					->onDelete('cascade');
             $table->integer('ticket_id')->unsigned();
@@ -27,6 +26,7 @@ class CreateUserTicketTable extends Migration {
 					->on('tickets')
 					->onUpdate('cascade')
 					->onDelete('cascade');
+			$table->primary([ 'workstation_id', 'ticket_id' ]);
 			$table->timestamps();
 		});
 	}
@@ -38,7 +38,7 @@ class CreateUserTicketTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('user_ticket');
+		Schema::drop('workstation_ticket');
 	}
 
 }

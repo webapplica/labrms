@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SoftwareType extends \Eloquent
 {
-    protected $table = 'softwaretype';
+    protected $table = 'software_types';
 	
 	public $timestamps = false;
 

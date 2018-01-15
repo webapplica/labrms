@@ -26,13 +26,13 @@ class Pc extends \Eloquent{
 	public static $rules = array(
 		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
 		'avr' => 'exists:itemprofile,local_id',
-		'Monitor' => 'exists:itemprofile,local_id',
+		'Monitor' => 'exists:itemprofile,plocal_id',
 		'System Unit' => 'required|exists:itemprofile,local_id',
 		'Keyboard' => 'exists:itemprofile,local_id',
 		'Mouse' => 'exists:itemprofile,local_id'
 	);
 	//Validation rules!
-	public static $updateRules = array(
+	public static $rules = array(
 		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
 		'avr' => 'nullable|exists:itemprofile,local_id',
 		'Monitor' => 'nullable|exists:itemprofile,plocal_id',
@@ -48,21 +48,21 @@ class Pc extends \Eloquent{
 
 	public function systemunit()
 	{
-		return $this->belongsTo('App\ItemProfile','systemunit_id','local_id');
+		return $this->belongsTo('App\ItemProfile','systemunit_id','id');
 	}
 
 	public function monitor()
 	{
-		return $this->belongsTo('App\ItemProfile','monitor_id','local_id');
+		return $this->belongsTo('App\ItemProfile','monitor_id','id');
 	}
 	public function keyboard()
 	{
-		return $this->belongsTo('App\ItemProfile','keyboard_id','local_id');
+		return $this->belongsTo('App\ItemProfile','keyboard_id','id');
 	}
 
 	public function avr()
 	{
-		return $this->belongsTo('App\ItemProfile','avr_id','local_id');
+		return $this->belongsTo('App\ItemProfile','avr_id','id');
 	}
 
 	public function software()
@@ -148,7 +148,7 @@ class Pc extends \Eloquent{
 		$ticket->generate($this->id);
     }
 
-    public function updateParts()
+    public function update()
     {
 
 		$details = "";
@@ -541,6 +541,6 @@ class Pc extends \Eloquent{
     		$location = '-' . $this->location;
     	}
 
-    	return $cons . $location . $id;
+    	return $cost . $location . $id;
     }
 }

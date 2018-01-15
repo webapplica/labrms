@@ -16,11 +16,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends \Eloquent{
 
+
+	protected $table = 'tickets';
+	public $timestamps = true;
 	public $underrepair = "";
 	public $undermaintenance = false;
-
-	protected $table = 'ticket';
-	public $timestamps = true;
 
 	public $fillable = ['item_id','tickettype','ticketname','details','author','staffassigned','ticket_id','status'];
 	protected $primaryKey = 'id';

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomSoftwareTable extends Migration {
+class CreateSoftwareLicensesTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,22 +12,18 @@ class CreateRoomSoftwareTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('room_software', function(Blueprint $table)
+		Schema::create('software_licenses', function(Blueprint $table)
 		{
-			$table->integer('room_id')->unsigned();
-			$table->foreign('room_id')
-					->references('id')
-					->on('rooms');
+			$table->increments('id');
 			$table->integer('software_id')->unsigned();
 			$table->foreign('software_id')
 					->references('id')
 					->on('softwares')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-			$table->primary([ 'room_id', 'software_id' ]);
+                	->onDelete('cascade')
+                	->onUpdate('cascade');
+			$table->string('key',100);
+			$table->integer('usage');
 			$table->timestamps();
-			$table->softDeletes();
-	
 		});
 	}
 
@@ -38,7 +34,7 @@ class CreateRoomSoftwareTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('room_software');
+		Schema::drop('software_licenses');
 	}
 
 }

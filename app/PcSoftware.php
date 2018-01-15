@@ -93,18 +93,16 @@ class PcSoftware extends \Eloquent{
 		$details = "$softwarename has been installed";
 		$staffassigned = Auth::user()->id;
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-
-		$tickettype = 'Maintenance';
-		$details = 'Installed Software';
-
-		$ticket = new Ticket;
-		$ticket->ticketname = $details;
-		$ticket->tickettype = $tickettype;
-		$ticket->details = $details;
-		$ticket->author = $author;
-		$ticket->staffassigned = $staffassigned;
-		$ticket->status = 'Closed';
-		$ticket->generate($id);
+		Ticket::generatePcTicket(
+			$id,
+			'Maintenance',
+			'Installed Software',
+			$details,
+			$author,
+			$staffassigned,
+			null,
+			'Closed'
+		);
 	}
 
     /**
@@ -185,17 +183,15 @@ class PcSoftware extends \Eloquent{
 		$details = "$softwarename has been removed from workstation";
 		$staffassigned = Auth::user()->id;
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-
-		$tickettype = 'Maintenance';
-		$details = 'Installed Software';
-
-		$ticket = new Ticket;
-		$ticket->ticketname = $details;
-		$ticket->tickettype = $tickettype;
-		$ticket->details = $details;
-		$ticket->author = $author;
-		$ticket->staffassigned = $staffassigned;
-		$ticket->status = 'Closed';
-		$ticket->generate($id);
+		Ticket::generatePcTicket(
+			$id,
+			'Maintenance',
+			'Uninstalled Software',
+			$details,
+			$author,
+			$staffassigned,
+			null,
+			'Closed'
+		);
     }
 }

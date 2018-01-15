@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SoftwareLicense extends \Eloquent{
 	
-	protected $table = 'softwarelicense';
+	protected $table = 'softwarelicenses';
 	
 	public $timestamps = true;
 
@@ -35,11 +35,8 @@ class SoftwareLicense extends \Eloquent{
 	public static function install($id)
 	{
 		$softwarelicense = SoftwareLicense::find($id);
-
-		if(count($softwarelicense) > 0){
-			$softwarelicense->inuse = $softwarelicense->inuse + 1;
-			$softwarelicense->save();
-		}
+		$softwarelicense->inuse = $softwarelicense->inuse + 1;
+		$softwarelicense->save();
 	}
 
 	/**
@@ -50,10 +47,10 @@ class SoftwareLicense extends \Eloquent{
 	*/
 	public static function uninstall($id){
 		$softwarelicense = SoftwareLicense::find($id);
-		if(count($softwarelicense) > 0 && $softwarelicense->inuse > 0){
+		if($softwarelicense->inuse > 0){
 			$softwarelicense->inuse = $softwarelicense->inuse - 1;
-			$softwarelicense->save();
 		}
+		$softwarelicense->save();
 	}
 
 

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
 class SpecialEvent extends \Eloquent{
-  protected $table = 'event';
+  protected $table = 'events';
   protected $primaryKey = 'id';
 
   public $timestamps = true;

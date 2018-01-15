@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomReservationTable extends Migration
+class CreateTicketTagTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,22 +13,21 @@ class CreateRoomReservationTable extends Migration
      */
     public function up()
     {
-        Schema::create('room_reservation', function (Blueprint $table) {
-            $table->integer('reservation_id')->unsigned();
-            $table->foreign('reservation_id')
+        Schema::create('tag_ticket', function (Blueprint $table) {
+            $table->integer('tag_id')->unsigned();
+            $table->foreign('tag_id')
                     ->references('id')
-                    ->on('reservations')
+                    ->on('tags')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->integer('room_id')->unsigned();
-            $table->foreign('room_id')
+            $table->integer('ticket_id')->unsigned();
+            $table->foreign('ticket_id')
                     ->references('id')
-                    ->on('rooms')
+                    ->on('tickets')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-            $table->primary([ 'room_id', 'reservation_id' ]);
+            $table->primary([ 'tag_id', 'ticket_id' ]);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -39,6 +38,6 @@ class CreateRoomReservationTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('room_reservation');
+        Schema::dropIfExists('tag_ticket');
     }
 }

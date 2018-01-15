@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Software extends \Eloquent{
 
-	protected $table = 'software';
+	protected $table = 'softwares';
 	public $timestamps = true;
 	protected $primaryKey = 'id';
 	public $fillable = ['softwarename','softwaretype','licensetype','company','minsysreq','maxsysreq'];
