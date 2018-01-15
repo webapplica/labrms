@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Validator;
 use Session;
 use Auth;
+use DB;
+use App;
 use App\Pc;
 use App\Software;
 use App\Supply;
@@ -80,13 +82,14 @@ class WorkstationController extends Controller {
 		*/
 		DB::beginTransaction();
 
+
 		$pc = new App\Pc;
 		$pc->systemunit_id = $systemunit;
-		$pc->monitor = $monitor;
-		$pc->avr = $avr;
-		$pc->keyboard = $keyboard;
+		$pc->monitor_id = ($monitor == "" || is_null($monitor)) ? null : $monitor;
+		$pc->avr_id = ($avr == "" || is_null($avr)) ? null : $avr;
+		$pc->keyboard_id = ($keyboard == "" || is_null($keyboard)) ? null : $keyboard;
 		$pc->oskey = $oskey;
-		$pc->mouse = $mouse;
+		$pc->mouse_id = ($mouse == "" || is_null($mouse)) ? null : $mouse;
 		$pc->assemble();
 
 		DB::commit();
@@ -109,7 +112,7 @@ class WorkstationController extends Controller {
 			$workstation = Pc::find($id);
 
 			return json_encode([
-				'data' => Software::whereHas('roomsoftware',function($query) use ($workstation) {
+				'data' => App\Software::whereHas('roomsoftware',function($query) use ($workstation) {
 								$query->where('room_id','=',$workstation->systemunit->roominventory->room_id);
 							})
 							->with('pcsoftware.softwarelicense')
@@ -121,7 +124,7 @@ class WorkstationController extends Controller {
 
 			$room = "";
 			$software = "";
-			$workstation = Pc::with('systemunit')
+			$workstation = App\Pc::with('systemunit')
 						->with('keyboard')
 						->with('monitor')
 						->find($id);
@@ -132,7 +135,7 @@ class WorkstationController extends Controller {
 
 				try
 				{
-					$software = Software::whereHas('roomsoftware',function($query) use ($room) {
+					$software = App\Software::whereHas('roomsoftware',function($query) use ($room) {
 								$query->where('room_id','=',$room);
 							})->get();
 				} 
@@ -145,7 +148,7 @@ class WorkstationController extends Controller {
 			$total = 0;
 			$mouseissued = 0;
 
-			$mouseissued = Ticket::whereIn('id',function($query) use ($id)
+			$mouseissued = App\Ticket::whereIn('id',function($query) use ($id)
 			{
 
 				/*
@@ -162,7 +165,7 @@ class WorkstationController extends Controller {
 					->pluck('ticket_id');
 			})->where('details','like','%'.'As Mouse Brand' . '%')->count();
 
-			$total = Ticket::whereIn('id',function($query) use ($id)
+			$total = App\Ticket::whereIn('id',function($query) use ($id)
 			{
 
 				/*
@@ -260,7 +263,7 @@ class WorkstationController extends Controller {
 		$details = $details . "$_keyboard->propertynumber for Keyboard";
 		$details = $details .  "$mouse as mouse brand";
 
-		$pc->update();
+		$pc->updateParts();
 		
 		DB::commit();
 

@@ -740,6 +740,8 @@ class TicketsController extends Controller {
 	*/
 	public function getPcTicket($id)
 	{
+		$ticket = new App\Ticket;
+		$ticket->getPcTickets($id);
 		if(Request::ajax())
 		{
 
@@ -752,7 +754,7 @@ class TicketsController extends Controller {
 			|
 			*/
 			return json_encode([
-				'data' => App\Ticket::getPcTickets($id)
+				'data' => $ticket
 			]);
 		}
 
@@ -765,7 +767,7 @@ class TicketsController extends Controller {
 		|
 		*/
 		return json_encode([
-			'data' => App\Ticket::getPcTickets($id)
+			'data' => $ticket
 		]);
 	}
 
@@ -1026,53 +1028,22 @@ class TicketsController extends Controller {
 		$status = 'Closed';
 		$item = Input::get('item');
 
-		App\Ticket::generateMaintenanceTicket($tag,$ticketname,$details,$underrepair,$workstation);
-
 		if(count($item) > 0)
 		{
 
 			foreach($item as $item)
 			{
 
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	Check if the tag is equipment
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				$itemprofile = App\ItemProfile::propertyNumber($item)->first();
-				if( count($itemprofile) > 0)
-				{
-
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Create equipment ticket
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					App\Ticket::generateEquipmentTicket($itemprofile->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
-
-				}
-				else
-				{
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Check if the equipment is connected to pc
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					$pc = App\Pc::isPc($item);
-					if(count($pc) > 0)
-					{
-						App\Ticket::generatePcTicket($pc->id,$tickettype,$ticketname,$details,$author,$staffassigned,null,$status);
-					}
-				}
+				$ticket = new App\Ticket;
+				$ticket->ticketname = $ticketname;
+				$ticket->tickettype = $tickettype;
+				$ticket->details = $details;
+				$ticket->author = $author;
+				$this->undermaintenance = $underrepair;
+				$ticket->staffassigned = $staffassigned;
+				$ticket->status = $status;
+				$ticket->generate($tag);
+				
 			}
 
 		}

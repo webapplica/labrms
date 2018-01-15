@@ -1071,7 +1071,7 @@ class ItemsController extends Controller {
 	*	@return lists of local id
 	*
 	*/
-	public function getSystemUnitList()
+	public function getMouseList()
 	{
 
 		/*

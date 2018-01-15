@@ -84,7 +84,7 @@ Inventory | Create
 						]) }}
 						</div>
 					</div>
-					<div class="form-group">
+	{{-- 				<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('itemsubtype','Sub Type') }}
 						{{ Form::select('itemsubtype',$itemsubtypes,isset($itemsubtype) ? $itemsubtype : Input::old('itemsubtype'),[
@@ -93,7 +93,7 @@ Inventory | Create
 							'placeholder' => 'None'
 						]) }}
 						</div>
-					</div>
+					</div> --}}
 					<div class="form-group">
 						<div class="col-sm-12">
 						{{ Form::label('details','Item Details') }}

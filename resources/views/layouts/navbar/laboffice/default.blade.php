@@ -138,10 +138,10 @@
                 <!-- create tab -->
                 <li>{{ link_to('reservation/create','Item') }}</li>
                 @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
-                <!-- ticket dropdown tab -->
+{{--                 <!-- ticket dropdown tab -->
                 <li>
                   <a href="{{ url('room/scheduling') }}">Room</a>
-                </li> <!-- end of ticket dropdown tab -->
+                </li> <!-- end of ticket dropdown tab --> --}}
                 @endif
                 <!-- view all reservation -->
                 <li>{{ HTML::link('reservation/','List') }}</li>
@@ -151,7 +151,7 @@
             </li> <!-- end of reservation dropdown tab -->
 
             <!-- inventory dropdown tab -->
-            <li class="dropdown-submenu">
+            {{-- <li class="dropdown-submenu">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Ticketing
               </a>
               <!-- dropdown items -->
@@ -161,7 +161,13 @@
                 <li>{{ link_to('ticket/maintenance','Maintenance') }}</li>
                 <li>{{ HTML::link('ticket/incident','Incident') }}</li>
               </ul> <!-- end of dropdown items -->
-            </li> <!-- end of inventory dropdown tab -->
+            </li> <!-- end of inventory dropdown tab -->   --}}
+
+            <!-- ticket dropdown tab -->
+            <li>
+              <a href="{{ url('ticket') }}">Ticketing</a>
+            </li> <!-- end of ticket dropdown tab -->
+
 
             <!-- inventory dropdown tab -->
             <li class="dropdown-submenu">

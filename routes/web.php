@@ -540,7 +540,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	*/
 	Route::post('ticket/maintenance',[
 		'as'=>'ticket.maintenance',
-		'uses'=>'MaintenanceTicketsController@post'
+		'uses'=>'TicketsController@maintenance'
 	]);
 
 	/*

@@ -194,7 +194,7 @@ class Inventory extends \Eloquent
       $inventory = new Inventory;
       $inventory->brand = $_inventory['brand'];
       $inventory->itemtype_id = $_inventory['itemtype'];
-      $inventory->itemsubtype_id = $_inventory['itemsubtype'];
+      $inventory->itemsubtype_id = null;
       $inventory->model = $_inventory['model'];
       $inventory->quantity = $_inventory['quantity'];
       $inventory->unit = $_inventory['unit'];

@@ -35,8 +35,11 @@ class SoftwareLicense extends \Eloquent{
 	public static function install($id)
 	{
 		$softwarelicense = SoftwareLicense::find($id);
-		$softwarelicense->inuse = $softwarelicense->inuse + 1;
-		$softwarelicense->save();
+
+		if(count($softwarelicense) > 0){
+			$softwarelicense->inuse = $softwarelicense->inuse + 1;
+			$softwarelicense->save();
+		}
 	}
 
 	/**
@@ -47,10 +50,10 @@ class SoftwareLicense extends \Eloquent{
 	*/
 	public static function uninstall($id){
 		$softwarelicense = SoftwareLicense::find($id);
-		if($softwarelicense->inuse > 0){
+		if(count($softwarelicense) > 0 && $softwarelicense->inuse > 0){
 			$softwarelicense->inuse = $softwarelicense->inuse - 1;
+			$softwarelicense->save();
 		}
-		$softwarelicense->save();
 	}
 
 
