@@ -12,16 +12,16 @@ class RoomCategoryTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('roomcategory')->truncate();
-        DB::table('roomcategory')->delete();
-      //insert some dummy records
-      RoomCategory::insert(array(
-        ['category' => 'systems development laboratory'], /*, 'description' => ''*/
-        ['category' => 'software application laboratory'],/*, 'description' => ''*/
-        ['category' => 'programming laboratory'],/*, 'description' => ''*/
-        ['category' => 'multimedia laboratory'],/*, 'description' => ''*/
-        ['category' => 'computerhardware laboratory']/*, 'description' => ''*/
-      ));
+        App\RoomCategory::truncate();
+        
+        //insert some dummy records
+        App\RoomCategory::insert(array(
+          ['category' => 'systems development laboratory'], /*, 'description' => ''*/
+          ['category' => 'software application laboratory'],/*, 'description' => ''*/
+          ['category' => 'programming laboratory'],/*, 'description' => ''*/
+          ['category' => 'multimedia laboratory'],/*, 'description' => ''*/
+          ['category' => 'computerhardware laboratory']/*, 'description' => ''*/
+        ));
    	
     }
 }

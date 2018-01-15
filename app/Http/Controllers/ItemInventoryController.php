@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App;
 use Session;
 use Validator;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
 class ItemInventoryController extends Controller {
@@ -16,18 +16,40 @@ class ItemInventoryController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			return json_encode([
 					'data' => App\Inventory::with('itemtype')
 									->get()
 					]);
 		}
+		
+		$brand = null;
+		$model = null;
+		$itemtype = null;
+		$itemsubtype = null;
+		$units = [ null => 'None' ];
+		$receipts = [ null => 'None' ];
+
+		$itemsubtypes = App\ItemSubType::pluck('name','id');
+		$itemtypes = App\ItemType::pluck('name','id');
+		$units = $units + App\Unit::pluck('abbreviation','abbreviation')->toArray();
+		$itemtypes = App\ItemType::category('equipment')->pluck('name','id');
+		$receipts = $receipts +  App\Receipt::pluck('number','number')->toArray();
 
 		return view('inventory.item.index')
-						->with('title','Inventory');
+						->with('title','Inventory')
+						->with('itemtypes',$itemtypes)
+						->with('brand',$brand)
+						->with('model',$model)
+						->with('itemtype',$itemtype)
+						->with('itemsubtype',$itemsubtype)
+						->with('itemtypes',$itemtypes)
+						->with("units",$units)
+						->with('itemsubtypes',$itemsubtypes)
+						->with('receipts',$receipts);
 	}
 
 
@@ -36,7 +58,7 @@ class ItemInventoryController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		$brand = null;
 		$model = null;
@@ -51,24 +73,24 @@ class ItemInventoryController extends Controller {
 		$itemtypes = App\ItemType::category('equipment')->pluck('name','id');
 		$receipts = $receipts +  App\Receipt::pluck('number','number')->toArray();
 
-		if(Input::has('brand'))
+		if($request->has('brand'))
 		{
-			$brand = $this->sanitizeString(Input::get('brand'));
+			$brand = $this->sanitizeString($request->get('brand'));
 		}
 
-		if(Input::has('model'))
+		if($request->has('model'))
 		{
-			$model = $this->sanitizeString(Input::get('model'));
+			$model = $this->sanitizeString($request->get('model'));
 		}
 
-		if(Input::has('itemtype'))
+		if($request->has('itemtype'))
 		{
-			$itemtype = $this->sanitizeString(Input::get('itemtype'));
+			$itemtype = $this->sanitizeString($request->get('itemtype'));
 		}
 
-		if(Input::has('itemsubtype'))
+		if($request->has('itemsubtype'))
 		{
-			$itemsubtype = $this->sanitizeString(Input::get('itemsubtype'));
+			$itemsubtype = $this->sanitizeString($request->get('itemsubtype'));
 		}
 
 		return view('inventory.item.create')
@@ -89,40 +111,17 @@ class ItemInventoryController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		//receipt
-		$number = $this->sanitizeString(Input::get('number'));
-		$ponumber = $this->sanitizeString(Input::get('ponumber'));
-		$podate = $this->sanitizeString(Input::get('podate'));
-		$invoicedate = $this->sanitizeString(Input::get('invoicedate'));
-		$invoicenumber = $this->sanitizeString(Input::get('invoicenumber'));
-		$fundcode = $this->sanitizeString(Input::get('fundcode'));
-
-		$validator = Validator::make([
-				'Property Acknowledgement Receipt' => $number,
-				'Purchase Order Number' => $ponumber,
-				'Purchase Order Date' => $podate,
-				'Invoice Number' => $invoicenumber,
-				'Invoice Date' => $invoicedate,
-				'Fund Code' => $fundcode
-			],App\Receipt::$rules);
-
-		if($validator->fails())
-		{
-			return redirect('inventory/item/create')
-				->withInput()
-				->withErrors($validator);
-		}
-
 		//inventory
-		$brand = $this->sanitizeString(Input::get('brand'));
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$itemsubtype = $this->sanitizeString(Input::get('itemsubtype'));
-		$model = $this->sanitizeString(Input::get('model'));
-		$quantity = $this->sanitizeString(Input::get('quantity'));
-		$unit = $this->sanitizeString(Input::get('unit'));
-		$details = $this->sanitizeString(Input::get('details'));
+		$brand = $this->sanitizeString($request->get('brand'));
+		$itemtype = $this->sanitizeString($request->get('itemtype'));
+		$itemsubtype = $this->sanitizeString($request->get('itemsubtype'));
+		$model = $this->sanitizeString($request->get('model'));
+		$quantity = $this->sanitizeString($request->get('quantity'));
+		$unit = $this->sanitizeString($request->get('unit'));
+		$details = $this->sanitizeString($request->get('details'));
+		$receipt = $this->sanitizeString($request->get('receipt'));
 
 		//validator
 		$validator = Validator::make([
@@ -142,28 +141,28 @@ class ItemInventoryController extends Controller {
 				->withErrors($validator);
 		}
 
-		$itemtype = App\ItemType::type($itemtype)->pluck('id')->first();
+		$receipt = App\Receipt::findByNumber($receipt);
+		$itemtype = App\ItemType::find($itemtype);
 
-		$inventory = App\Inventory::createRecord([
-			'brand' => $brand,
-			'itemtype' => $itemtype,
-			'itemsubtype' => $itemsubtype,
-			'model' => $model,
-			'quantity' => $quantity,
-			'unit' => $unit,
-			'details' => $details
-		],[
-			'number' => $number,
-			'ponumber' => $ponumber,
-			'podate' => $podate,
-			'invoicenumber' => $invoicenumber,
-			'invoicedate' => $invoicedate,
-			'fundcode' => $fundcode
-		]);
+		$inventory = new App\Inventory;
+		$inventory->brand = $brand;
+		$inventory->itemtype_id = $itemtype->id;
+		$inventory->itemsubtype_id = null;
+		$inventory->model = $model;
+		$inventory->unit = $unit;
+		$inventory->details = $details;
+		$inventory->save();
+
+		$inventory->receipts()->syncWithoutDetaching(array(
+			$receipt->id => [
+				'received_quantity' => $quantity,
+				'profiled_items' => $quantity
+			]
+		));
 
 		Session::flash('success','Items added to Inventory');
 
-		if(Input::has('redirect-profiling'))
+		if($request->has('redirect-profiling'))
 		{
 			return redirect("item/profile/create?id=$inventory->id");
 		}
@@ -178,7 +177,7 @@ class ItemInventoryController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 
 		if($id == 'search')
@@ -187,7 +186,7 @@ class ItemInventoryController extends Controller {
 		}
 
 
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			return json_encode(
 				App\Inventory::where('id','=',$id)
@@ -212,16 +211,16 @@ class ItemInventoryController extends Controller {
 		}
 	}
 
-	public function update($id)
+	public function update(Request $request, $id)
 	{
 
 		//inventory
-		$brand = $this->sanitizeString(Input::get('brand'));
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$model = $this->sanitizeString(Input::get('model'));
-		$unit = $this->sanitizeString(Input::get('unit'));
-		$warranty = $this->sanitizeString(Input::get('warranty'));
-		$details = $this->sanitizeString(Input::get('details'));
+		$brand = $this->sanitizeString($request->get('brand'));
+		$itemtype = $this->sanitizeString($request->get('itemtype'));
+		$model = $this->sanitizeString($request->get('model'));
+		$unit = $this->sanitizeString($request->get('unit'));
+		$warranty = $this->sanitizeString($request->get('warranty'));
+		$details = $this->sanitizeString($request->get('details'));
 
 		//validator
 		$validator = Validator::make([
@@ -269,7 +268,7 @@ class ItemInventoryController extends Controller {
 
 	public function import()
 	{
-		$file = Input::file('file');
+		$file = $request->file('file');
 		// $filename = str_random(12);
 		//$filename = $file->getClientOriginalName();
 		//$extension =$file->getClientOriginalExtension();
@@ -289,22 +288,22 @@ class ItemInventoryController extends Controller {
 		return redirect('inventory/item/view/import');
 	}
 
-	public function getBrands()
+	public function getBrands(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$brand = $this->sanitizeString(Input::get('term'));
+			$brand = $this->sanitizeString($request->get('term'));
 			return json_encode(
 				App\Inventory::where('brand','like','%'.$brand.'%')->distinct()->pluck('brand')
 			);
 		}
 	}
 
-	public function getModels()
+	public function getModels(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$model = $this->sanitizeString(Input::get('term'));
+			$model = $this->sanitizeString($request->get('term'));
 			return json_encode(
 				App\Inventory::where('model','like','%'.$model.'%')->distinct()->pluck('model')
 			);
@@ -323,15 +322,15 @@ class ItemInventoryController extends Controller {
 					->with('inventory',[]);
 	}
 
-	public function search()
+	public function search(Request $request)
 	{
-		// return Input::all();
-		$keyword = $this->sanitizeString(Input::get('keyword'));
-		$total = $this->sanitizeString(Input::get('total'));
-		$brand = $this->sanitizeString(Input::get('brand'));
-		$model = $this->sanitizeString(Input::get('model'));
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$profiled = $this->sanitizeString(Input::get('profiled'));
+		// return $request->all();
+		$keyword = $this->sanitizeString($request->get('keyword'));
+		$total = $this->sanitizeString($request->get('total'));
+		$brand = $this->sanitizeString($request->get('brand'));
+		$model = $this->sanitizeString($request->get('model'));
+		$itemtype = $this->sanitizeString($request->get('itemtype'));
+		$profiled = $this->sanitizeString($request->get('profiled'));
 
 		$inventory = new App\Inventory;
 
@@ -348,27 +347,27 @@ class ItemInventoryController extends Controller {
 			});
 		}
 
-		if(Input::get('include-total') == 'on')
+		if($request->get('include-total') == 'on')
 		{
 			$inventory = $inventory->where('quantity','like','%'.$total.'%');
 		}
 
-		if(Input::get('include-profiled') == 'on')
+		if($request->get('include-profiled') == 'on')
 		{
 			$inventory = $inventory->where('quantity','like','%'.$profiled.'%');
 		}
 
-		if(Input::get('include-brand') == 'on')
+		if($request->get('include-brand') == 'on')
 		{
 			$inventory = $inventory->where('quantity','like','%'.$brand.'%');
 		}
 
-		if(Input::get('include-model') == 'on')
+		if($request->get('include-model') == 'on')
 		{
 			$inventory = $inventory->where('quantity','like','%'.$model.'%');
 		}
 
-		if(Input::get('include-itemtype') == 'on')
+		if($request->get('include-itemtype') == 'on')
 		{
 			$inventory = $inventory->where('quantity','like','%'.$itemtype.'%');
 		}

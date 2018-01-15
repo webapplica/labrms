@@ -2,7 +2,7 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('category','Category') }}
-    {{ Form::select('category',$category,Input::old('category'),[
+    {{ Form::select('category',$category, isset($itemtype->category) ? $itemtype->category : old('category') ,[
       'class'=>'form-control'
     ]) }}
   </div>
@@ -10,7 +10,7 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('name','Item Type Name') }}
-    {{ Form::text('name',Input::old('name'),[
+    {{ Form::text('name',  isset($itemtype->name) ? $itemtype->name : old('name'), [
       'class'=>'form-control',
       'placeholder'=>'Item name'
     ]) }}
@@ -19,30 +19,15 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('description','Description (Optional)') }}
-    {{ Form::textarea('description',Input::old('description'),[
+    {{ Form::textarea('description',  isset($itemtype->description) ? $itemtype->description : old('description'), [
       'class'=>'form-control',
       'placeholder'=>'Description'
     ]) }}
   </div>
 </div>
-<div class="form-group">
-  <div class="col-md-12">
-    <button class="btn btn-primary btn-block btn-lg" type="submit">
-      <span class="glyphicon glyphicon-check"></span> <span>Submit</span>
-    </button>
-  </div>
-</div>
 {{ Form::close() }}
 <script>
   $(document).ready(function(){
-
-    @if( Session::has("success-message") )
-        swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-
-    @if( Session::has("error-message") )
-        swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
 
     $('#submit').click(function(){
       swal({
@@ -64,6 +49,5 @@
       });
     });
 
-    $('#page-body').show();
   });
 </script>

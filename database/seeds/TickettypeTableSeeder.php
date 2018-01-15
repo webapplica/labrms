@@ -2,9 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\Tickettype;
 
-class TickettypeTableSeeder extends Seeder {
+class TicketTypeTableSeeder extends Seeder {
 
 	/**
 	 * Run the database seeds.
@@ -13,17 +12,16 @@ class TickettypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-        DB::table('tickettype')->truncate();
-	   	//delete users table records
-	   	DB::table('tickettype')->delete();
+        App\TicketType::truncate();
 
-	    Tickettype::insert(array(
-	    	['type'=>'Complaint'],
-			['type'=>'Action Taken'],
-			['type'=>'Transfer'],
-			['type'=>'Maintenance'],
-			['type'=>'Lent'],
-			['type'=>'Incident']));
+	    App\TicketType::insert(array(
+	    	[ 'name'=>'Complaint'],
+			[ 'name'=>'Action Taken'],
+			[ 'name'=>'Transfer'],
+			[ 'name'=>'Maintenance'],
+			[ 'name'=>'Lent'],
+			[ 'name'=>'Incident']
+		));
 	}
 
 }

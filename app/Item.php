@@ -98,7 +98,7 @@ class Item extends \Eloquent{
 	*/
 	public function inventory()
 	{
-		return $this->belongsTo('App\Inventory','inventory_id','id');
+		return $this->belongsTo('App\Inventory', 'inventory_id', 'id');
 	}
 
 	/*

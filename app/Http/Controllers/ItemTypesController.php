@@ -52,10 +52,12 @@ class ItemTypesController extends Controller {
 		$description = $this->sanitizeString(Input::get('description'));
 		$category = $this->sanitizeString(Input::get('category'));
 
+		$itemtype = new App\ItemType;
+
 		$validator = Validator::make([
 			'name' => $name,
 			'description' => $description
-		],App\ItemType::$rules);
+		],$itemtype->rules());
 
 		if($validator->fails())
 		{
@@ -64,7 +66,10 @@ class ItemTypesController extends Controller {
 				->withErrors($validator);
 		}
 
-		App\ItemType::createRecord($name,$description,$category);
+		$itemtype->name = $name;
+		$itemtype->description = $description;
+		$itemtype->category = $category;
+		$itemtype->save();
 
 		Session::flash('success-message','Item type created');
 		return redirect('item/type');
@@ -95,10 +100,12 @@ class ItemTypesController extends Controller {
 		$description = $this->sanitizeString(Input::get('description'));
 		$category = $this->sanitizeString(Input::get('category'));
 
+		$itemtype = App\ItemType::find($id);
+
 		$validator = Validator::make([
 			'name' => $name,
 			'description' => $description
-		],App\Itemtype::$updateRules);
+		], $itemtype->updateRules());
 
 		if($validator->fails())
 		{
@@ -107,7 +114,6 @@ class ItemTypesController extends Controller {
 				->withErrors($validator);
 		}
 
-		$itemtype = App\ItemType::find($id);
 		$itemtype->name = $name;
 		$itemtype->description = $description;
 		$itemtype->category = $category;

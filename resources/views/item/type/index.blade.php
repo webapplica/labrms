@@ -31,7 +31,7 @@
 	    language: {
 	        searchPlaceholder: "Search..."
 	    },
-    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 					    "<'row'<'col-sm-12'tr>>" +
 					    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 		"processing": true,
@@ -43,10 +43,10 @@
             { data: "category" },
             { data: function(callback){
 							return `
-								<button data-id="`+ callback.id +`" class="edit btn btn-sm btn-default btn-flat" style="margin-right:5px;padding: 6px 10px;">
+								<button data-id="`+ callback.id +`" class="edit btn btn-sm btn-default">
 									<span class="glyphicon glyphicon-pencil"></span>  Update
 								</button>
-								<button data-id="`+ callback.id +`" class="delete btn btn-sm btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;">
+								<button data-id="`+ callback.id +`" class="delete btn btn-sm btn-danger">
 									<span class="glyphicon glyphicon-trash"></span> Remove
 								</button>
 							`;
@@ -55,7 +55,7 @@
     } );
 
 	 	$("div.toolbar").html(`
- 			<button id="new" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;" data-target="createItemTypeModal" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span>  Add</button>
+ 			<button id="new" class="btn btn-primary" data-target="createItemTypeModal" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span>  Add</button>
 		`);
 
     $('#new').on('click',function(){
@@ -70,22 +70,22 @@
 
 		$('#itemTypeTable').on('click','.delete',function(){
 			id = $(this).data('id')
-      swal({
-        title: "Are you sure?",
-        text: "This Item Type will be removed from database?",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel it!",
-        closeOnConfirm: false,
-        closeOnCancel: false
-      },
-      function(isConfirm){
-        if (isConfirm) {
+		      swal({
+		        title: "Are you sure?",
+		        text: "This Item Type will be removed from database?",
+		        type: "warning",
+		        showCancelButton: true,
+		        confirmButtonText: "Yes, delete it!",
+		        cancelButtonText: "No, cancel it!",
+		        closeOnConfirm: false,
+		        closeOnCancel: false
+		      },
+		      function(isConfirm){
+		        if (isConfirm) {
 					$.ajax({
-		        headers: {
-		            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-		        },
+				        headers: {
+				            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				        },
 						type: 'delete',
 						url: '{{ url("item/type/") }}' + "/" + id,
 						data: {
@@ -105,10 +105,10 @@
 							swal('Operation Unsuccessful','Error occurred while deleting a record','error')
 						}
 					});
-        } else {
-          swal("Cancelled", "Operation Cancelled", "error");
-        }
-    	})
+		        } else {
+		          swal("Cancelled", "Operation Cancelled", "error");
+		        }
+    		})
 		});
 
 	});

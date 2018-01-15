@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purpose extends \Eloquent{
 
-  protected $table = 'purpose';
+  protected $table = 'purposes';
 
 	public $timestamps = true;
 

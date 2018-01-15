@@ -23,8 +23,6 @@
 @stop
 @section('content')
 <div class="container-fluid" id="page-body">
-	@include('modal.inventory.create')
-	@include('modal.inventory.item.profile.create')
 	<div class="col-md-12">
 		<div class="panel panel-body table-responsive">
 			<legend><h3 class="text-muted">Inventory</h3></legend>
@@ -72,31 +70,31 @@
 							"<'row'<'col-sm-12'tr>>" +
 							"<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
-					ajax: "{{ url('inventory/item') }}",
-					columns: [
-							{ data: "id" },
-							{ data: "model" },
-							{ data: "brand" },
-							{ data: "itemtype.name" },
-							{ data: "details" },							
-							{ data: "unit" },
-							{ data: "quantity" },
-							{ data: function(callback){
-								return callback.quantity - callback.profileditems
-							} },
-							{ data: function(callback){
-								return `
-									<a href="{{ url('item/profile/create?id=') }}`+callback.id+`" id="profile" class="btn btn-success btn-sm" type="button">
-										<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-										<span class="hidden-sm hidden-xs">Profile Items</span>
-									</a>
-									<a href="{{ url('item/profile') }}/`+callback.id+`" id="view" class="btn btn-sm btn-default" type="button">
-										<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-										<span class="hidden-sm hidden-xs">View Profiled Items</span>
-									</a>
-								`
-							}}
-					],
+			ajax: "{{ url('inventory') }}",
+			columns: [
+					{ data: "id" },
+					{ data: "model" },
+					{ data: "brand" },
+					{ data: "itemtype.name" },
+					{ data: "details" },							
+					{ data: "unit" },
+					{ data: "quantity" },
+					{ data: function(callback){
+						return callback.quantity - callback.profileditems
+					} },
+					{ data: function(callback){
+						return `
+							<a href="{{ url('item/profile/create?id=') }}`+callback.id+`" id="profile" class="btn btn-success btn-sm" type="button">
+								<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+								<span class="hidden-sm hidden-xs">Profile Items</span>
+							</a>
+							<a href="{{ url('item/profile') }}/`+callback.id+`" id="view" class="btn btn-sm btn-default" type="button">
+								<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+								<span class="hidden-sm hidden-xs">View Profiled Items</span>
+							</a>
+						`
+					}}
+			],
 	    });
 
 	 	$("div.toolbar").html(`
@@ -108,23 +106,9 @@
 
 	 	$('div.search-bar').html(`
 	 		<div class="col-sm-12">
-				<a href="{{ url('inventory/item/search') }}" class="pull-right" style="font-size:10px;text-decoration:none;">Advance Search</a>
+				<a href="{{ url('inventory/search') }}" class="pull-right" style="font-size:10px;text-decoration:none;">Advance Search</a>
 			</div>
  		`)
-
-    // table
-    //     .on( 'select', function ( e, dt, type, indexes ) {
-    //         // var rowData = table.rows( indexes ).data().toArray();
-    //         // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
-    //         $('#profile').show()
-    //         $('#view').show()
-    //     } )
-    //     .on( 'deselect', function ( e, dt, type, indexes ) {
-    //         // var rowData = table.rows( indexes ).data().toArray();
-    //         // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
-    //         $('#profile').hide()
-    //         $('#view').hide()
-    //     } );
 
 	    $('[data-toggle="popover"]').popover();
 
@@ -136,13 +120,13 @@
 			try{
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
 				{
-					window.location.href = "{{ url('inventory/item/create') }}"
+					window.location.href = "{{ url('inventory/create') }}"
 											 + '?brand=' + table.row('.selected').data().brand
 											 + '&' +'model=' + table.row('.selected').data().model
 											 + '&' +'itemtype=' + table.row('.selected').data().itemtype.name
 				}
 			}catch( error ){
-				window.location.href = "{{ url('inventory/item/create') }}"
+				window.location.href = "{{ url('inventory/create') }}"
 			}
 	    })
 
@@ -150,37 +134,12 @@
 			try{
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
 				{
-					window.location.href = "{{ url('inventory/item') }}" + '/' + table.row('.selected').data().id + '/edit'
+					window.location.href = "{{ url('inventory') }}" + '/' + table.row('.selected').data().id + '/edit'
 				}
 			}catch( error ){
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
 	    })
-
-		// $('#view').on('click',function(){
-		// 	try{
-		// 		if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-		// 		{
-		// 			window.location.href = "{{ url('item/profile') }}" + '/' + table.row('.selected').data().id
-		// 		}
-		// 	}catch( error ){
-		// 		swal('Oops..','You must choose atleast 1 row','error');
-		// 	}
-		// })
-
-	 //    $('#profile').on('click',function(){
-		// 		try{
-		// 			if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-		// 			{
-		// 	    	// $('#inventory_id').text($(this).data('id'))
-		// 	    	// $('#inventory_id').val($(this).data('id'))
-		// 	    	// $('#createItemProfileModal').modal('show');
-		// 	    	window.location.href = "{{ url('item/profile/create?id=') }}" + table.row('.selected').data().id
-		// 			}
-		// 		}catch( error ){
-		// 			swal('Oops..','You must choose atleast 1 row','error');
-		// 		}
-	 //    })
 	} );
 </script>
 @stop

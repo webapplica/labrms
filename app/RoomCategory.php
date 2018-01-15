@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoomCategory extends Model
 {
-    protected $table = 'roomcategory';
+    protected $table = 'room_categories';
 	
 	public $timestamps = false;
 

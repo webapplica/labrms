@@ -23,7 +23,7 @@
 <div class="form-group">
 	<div class="col-sm-12">
 	{{ Form::label('itemtype','Type') }}
-	{{ Form::select('itemtype',$itemtypes,isset($itemtype) ? $itemtype : Input::old('itemtype'),[
+	{{ Form::select('itemtype', $itemtypes, isset($itemtype) ? $itemtype : Input::old('itemtype'),[
 		'class' => 'form-control',
 		'id' => 'itemtype'
 	]) }}

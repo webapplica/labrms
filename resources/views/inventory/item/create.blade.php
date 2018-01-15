@@ -6,31 +6,14 @@ Inventory | Create
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @include('layouts.navbar')
 @stop
-@section('style')
-{{ HTML::style(asset('css/style.css')) }}
-{{ HTML::style(asset('css/jquery-ui.min.css')) }}
-<style>
-	#inventory{
-		display:none;
-	}
-
-	#podate,#invoicedate{
-		background-color:white;
-	}
-
-</style>
-@stop
-@section('script-include')
-{{ HTML::script(asset('js/jquery-ui.js')) }}
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class='col-md-offset-3 col-md-6'>
 		<div class="panel panel-body" style="padding-top: 20px;padding-left: 40px;padding-right: 40px;">
-	 		{{ Form::open(['method'=>'post','route'=>'inventory.item.store','class'=>'form-horizontal','id'=>'inventoryForm']) }}
+	 		{{ Form::open(['method'=>'post','route'=>'inventory.store','class'=>'form-horizontal','id'=>'inventoryForm']) }}
 			<legend><h3 style="color:#337ab7;"><span id="form-name">Inventory</span></h3></legend>
 			<ul class="breadcrumb">
-				<li><a href="{{ url('inventory/item') }}">Item Inventory</a></li>
+				<li><a href="{{ url('inventory') }}">Item Inventory</a></li>
 				<li class="active">Create</li>
 			</ul>
 			@include('errors.alert')

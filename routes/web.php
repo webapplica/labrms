@@ -366,46 +366,46 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::prefix('inventory')->group(function(){
-		Route::get('item/search',[
-			'as' => 'inventory.item.search.view',
+		Route::get('/search',[
+			'as' => 'inventory.search.view',
 			'uses' => 'ItemInventoryController@searchView'
 		]);
 
-		Route::post('item/search',[
-			'as' => 'inventory.item.search',
+		Route::post('/search',[
+			'as' => 'inventory.search',
 			'uses' => 'ItemInventoryController@search'
 		]);
 
-		Route::get('item',[
-			'as' => 'inventory.item.index',
+		Route::get('/',[
+			'as' => 'inventory.index',
 			'uses' => 'ItemInventoryController@index'
 		]);
-		Route::get('item/create',[
-			'as' => 'inventory.item.create',
+		Route::get('create',[
+			'as' => 'inventory.create',
 			'uses' => 'ItemInventoryController@create'
 		]);
-		Route::post('item',[
-			'as' => 'inventory.item.store',
+		Route::post('/',[
+			'as' => 'inventory.store',
 			'uses' => 'ItemInventoryController@store'
 		]);
-		Route::get('item/{item}',[
-			'as' => 'inventory.item.show',
+		Route::get('{inventory}',[
+			'as' => 'inventory.show',
 			'uses' => 'ItemInventoryController@show'
 		]);
-		Route::get('item/{item}/edit',[
-			'as' => 'inventory.item.edit',
+		Route::get('{inventory}/edit',[
+			'as' => 'inventory.edit',
 			'uses' => 'ItemInventoryController@edit'
 		]);
-		Route::put('item/{item}',[
-			'as' => 'inventory.item.update',
+		Route::put('{inventory}',[
+			'as' => 'inventory.update',
 			'uses' => 'ItemInventoryController@update'
 		]);
-		Route::patch('item/{item}',[
-			'as' => 'inventory.item.update',
+		Route::patch('{inventory}',[
+			'as' => 'inventory.update',
 			'uses' => 'ItemInventoryController@update'
 		]);
-		Route::delete('item/{item}',[
-			'as' => 'inventory.item.destroy',
+		Route::delete('{inventory}',[
+			'as' => 'inventory.destroy',
 			'uses' => 'ItemInventoryController@destroy'
 		]);
 
@@ -415,8 +415,8 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		Route::get('item/view/import',[
-			'as'=> 'inventory.item.view.import',
+		Route::get('view/import',[
+			'as'=> 'inventory.view.import',
 			'uses' => 'ItemInventoryController@importView'
 		]);
 
@@ -426,8 +426,8 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		Route::post('item/view/import',[
-			'as'=> 'inventory.item.import',
+		Route::post('view/import',[
+			'as'=> 'inventory.import',
 			'uses' => 'ItemInventoryController@import'
 		]);
 
@@ -1008,7 +1008,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('get/inventory/item/type/equipment',[
-		'as' => 'inventory.item.type.equipment',
+		'as' => 'inventory.type.equipment',
 		'uses'=>'ItemTypesController@getItemTypesForEquipmentInventory'
 	]);
 
@@ -1019,7 +1019,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('get/inventory/item/type/supply',[
-		'as' => 'inventory.item.type.supply',
+		'as' => 'inventory.type.supply',
 		'uses'=>'ItemTypesController@getItemTypesForSuppliesInventory'
 	]);
 
@@ -1080,7 +1080,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('get/item/brand/all',[
-		'as' => 'inventory.item.brand.all',
+		'as' => 'inventory.brand.all',
 		'uses' => 'ItemsController@getItemBrands'
 	]);
 
@@ -1091,7 +1091,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('get/item/model/all',[
-		'as' => 'inventory.item.model.all',
+		'as' => 'inventory.model.all',
 		'uses' => 'ItemsController@getItemModels'
 	]);
 
@@ -1113,7 +1113,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::get('get/item/propertynumber/server',[
-		'as' => 'inventory.item.propertynumber.server',
+		'as' => 'inventory.propertynumber.server',
 		'uses' => 'ItemsController@getPropertyNumberOnServer'
 	]);
 

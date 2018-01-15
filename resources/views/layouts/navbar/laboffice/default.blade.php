@@ -180,7 +180,7 @@
               <!-- dropdown items -->
               <ul class="dropdown-menu">
                 <!-- tenant inventory tab -->
-                <li>{{ link_to('inventory/item','Item') }}</li>
+                <li>{{ link_to('inventory','Item') }}</li>
                 <li>{{ link_to('workstation','Workstation') }}</li>
                 <li>{{ HTML::link('inventory/room','Room') }}</li>
                 <li>{{ HTML::link('supplies','Supplies') }}</li>

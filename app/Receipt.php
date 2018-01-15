@@ -36,5 +36,10 @@ class Receipt extends \Eloquent{
 		);
 	}
 
+	public function scopeFindByNumber($query, $value)
+	{
+		return $query->where('number', '=', $value)->first();
+	}
+
 
 }

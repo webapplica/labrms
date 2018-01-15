@@ -23,34 +23,7 @@
             <li>{{ $itemtype->id }}</li>
             <li class="active">Edit</li>
         </ol>
-        <div class="form-group">
-          <div class="col-md-12">
-            {{ Form::label('category','Category') }}
-            {{ Form::select('category',$category,Input::old('category'),[
-              'class'=>'form-control'
-            ]) }}
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            {{ Form::label('name','Item name') }}
-            {{ Form::text('name',$itemtype->name,[
-              'id' => 'name',
-              'class'=>'form-control',
-              'placeholder'=>'Item name'
-            ]) }}
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            {{ Form::label('description','Description') }}
-            {{ Form::textarea('description',$itemtype->description,[
-              'id' => 'description',
-              'class'=>'form-control',
-              'placeholder'=>'Description'
-            ]) }}
-          </div>
-        </div>
+        @include('item.type.form')
         <div class="form-group">
           <div class="col-md-12">
                 <button class="btn btn-primary btn-flat btn-block btn-lg" type="submit" style="padding:10px;">

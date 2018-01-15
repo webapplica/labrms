@@ -5,7 +5,7 @@ namespace App;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class MaintenanceActivity extends \Eloquent{
+class Activity extends \Eloquent{
   //Database driver
   /*
   1 - Eloquent (MVC Driven)
@@ -15,7 +15,7 @@ class MaintenanceActivity extends \Eloquent{
 
 
   //The table in the database used by the model.
-  protected $table = 'maintenanceactivity';
+  protected $table = 'activities';
   public $fillable = ['type','activity','details'];
   public $timestamps = true;
   //Validation rules!

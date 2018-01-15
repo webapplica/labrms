@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\Purpose;
 
 class PurposeTableSeeder extends Seeder {
 
@@ -14,9 +13,9 @@ class PurposeTableSeeder extends Seeder {
 	public function run()
 	{
 		//delete purpose table records
-		DB::table('purpose')->delete();
+		App\Purpose::truncate();
 
-		Purpose::insert(array(
+		App\Purpose::insert(array(
 		[
       	 'title'=>'Oral Defense',
       	 'description'=>''

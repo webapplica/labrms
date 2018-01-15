@@ -16,7 +16,7 @@ class Inventory extends \Eloquent
   * table name
   *
   */
-  protected $table = 'inventory';
+  protected $table = 'inventories';
 
   /**
   *
@@ -24,7 +24,7 @@ class Inventory extends \Eloquent
   *
   */
   public $fillable = [
-    'itemtype',
+    'itemtype_id',
     'brand',
     'model',
     'details',
@@ -53,7 +53,7 @@ class Inventory extends \Eloquent
   *
   */
   public static $rules = array(
-  	'Item Type' => 'required|exists:Itemtype,name',
+  	'Item Type' => 'required|exists:item_types,id',
   	'Brand' => 'min:2|max:100',
   	'Model' => 'min:2|max:100',
   	'Details' => 'min:5|max:1000',
@@ -78,9 +78,9 @@ class Inventory extends \Eloquent
 		'Profiled Items' => 'numeric'
 	);
 
-  public function itemprofile()
+  public function items()
   {
-    return $this->hasMany('App\Itemprofile','inventory_id','id');
+    return $this->hasMany('App\Item','inventory_id','id');
   }
 
   public function getBrandAttribute($value)
@@ -115,7 +115,7 @@ class Inventory extends \Eloquent
 
   public function itemtype()
   {
-    return $this->belongsTo('App\Itemtype','itemtype_id','id');
+    return $this->belongsTo('App\ItemType','itemtype_id','id');
   }
 
   public function itemsubtype()
@@ -123,119 +123,9 @@ class Inventory extends \Eloquent
     return $this->belongsTo('App\ItemSubType','itemsubtype_id','id');
   }
 
-  /**
-  *
-  * @param $_inventory array of inventory information
-  * @param $_receipt array of receipt details
-  *
-  */
-  public static function createRecord($_inventory,$_receipt)
+  public function receipts()
   {
-
-    /*
-    |--------------------------------------------------------------------------
-    |
-    |   Instantiate inventory
-    |
-    |--------------------------------------------------------------------------
-    |
-    */
-    $inventory;
-
-    /*
-    |--------------------------------------------------------------------------
-    |
-    |   Get the record
-    |
-    |--------------------------------------------------------------------------
-    |
-    */
-    $inventory = Inventory::brand($_inventory['brand'])
-          ->model($_inventory['model'])
-          ->type($_inventory['itemtype'])
-          ->first();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    |
-    |   Checks if inventory details exists
-    |   1 - Update Quantity
-    |   2 - Create new record
-    |
-    |--------------------------------------------------------------------------
-    |
-    */
-    if($inventory)
-    {
-
-      /*
-      |--------------------------------------------------------------------------
-      |
-      |   Update quantity
-      |
-      |--------------------------------------------------------------------------
-      |
-      */
-      $inventory->quantity = $inventory->quantity + $_inventory['quantity'];
-      $inventory->save();
-    }
-    else
-    {
-
-      /*
-      |--------------------------------------------------------------------------
-      |
-      |   Create new inventory
-      |
-      |--------------------------------------------------------------------------
-      |
-      */
-      $inventory = new Inventory;
-      $inventory->brand = $_inventory['brand'];
-      $inventory->itemtype_id = $_inventory['itemtype'];
-      $inventory->itemsubtype_id = $_inventory['itemsubtype'];
-      $inventory->model = $_inventory['model'];
-      $inventory->quantity = $_inventory['quantity'];
-      $inventory->unit = $_inventory['unit'];
-      $inventory->details = $_inventory['details'];
-      $inventory->profileditems = 0;
-      $inventory->save();
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    |
-    |   Create a receipt
-    |
-    |--------------------------------------------------------------------------
-    |
-    */
-   
-    $receipt_info = [];
-   
-    if(isset($_receipt['receipt']))
-    {
-      $receipt_info = Receipt::find($_receipt['receipt']);
-    }
-
-
-    if(count($receipt_info) <= 0)
-    {
-      $receipt = new Receipt;
-      $receipt->number = $_receipt['number'];
-      $receipt->pono = $_receipt['ponumber'];
-      $receipt->podate = Carbon::parse($_receipt['podate'])->toDateString();
-      $receipt->invoiceno = $_receipt['invoicenumber'];
-      $receipt->invoicedate = Carbon::parse($_receipt['invoicedate'])->toDateString();
-      $receipt->fundcode = $_receipt['fundcode'];
-      $receipt->inventory_id = $inventory->id;
-      $receipt->save();
-    }
-
-    return $inventory;
-
+    return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id');
   }
 
   /**

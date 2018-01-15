@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\Room;
 
 class RoomTableSeeder extends Seeder {
 
@@ -14,9 +13,9 @@ class RoomTableSeeder extends Seeder {
 	 
 	public function run()
 	{
-    DB::table('room')->truncate();
-   	DB::table('room')->delete();
-   	Room::insert(array(
+    App\Room::truncate();
+
+   	App\Room::insert(array(
        [
         'name' => 'S501',
         'category' => 'Web Development',

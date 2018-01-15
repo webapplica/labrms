@@ -13,12 +13,10 @@ class UserTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-        DB::table('user')->truncate();
-		//delete users table records
-		DB::table('user')->delete();
+        App\User::truncate();
 
 		//insert some dummy records
-		User::insert([
+		App\User::insert([
 			[
 			   'username' => 'admin',
 			   'password' => Hash::make('12345678'),

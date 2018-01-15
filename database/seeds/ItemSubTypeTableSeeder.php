@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\ItemSubType;
 
 class ItemSubTypeTableSeeder extends Seeder {
 	/**
@@ -12,11 +11,10 @@ class ItemSubTypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-		ItemSubType::truncate();
-		//delete users table records
-		DB::table('itemsubtype')->delete();
+		App\ItemSubType::truncate();
+
 		//insert some dummy records
-		ItemSubType::insert(array(
+		App\ItemSubType::insert(array(
 			[
 				'itemtype_id' => 2,
 				'name' => 'TV'

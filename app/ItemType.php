@@ -53,20 +53,25 @@ class ItemType extends \Eloquent{
 	* validation rules
 	*
 	*/
-	public static $rules = array(
-		'name' => 'required|min:2|max:50|unique:itemtype,name',
-		'description' => 'required|min:5|max:450'
-	);
+	public function rules(){
+		return array(
+			'name' => 'required|min:2|max:50|unique:item_types,name',
+			'description' => 'required|min:5|max:450'
+		);
+	}
 
 	/**
 	*
 	* update rules
 	*
 	*/
-	public static $updateRules = array(
-		'name' => 'min:2|max:50',
-		'description' => 'min:5|max:450'
-	);
+	public function updateRules(){
+		$name = $this->name;
+		return array(
+			'name' => 'required|min:2|max:50|unique:item_types,name,'. $name .',name',
+			'description' => 'required|min:5|max:450'
+		);
+	}
 
 	/**
 	*
@@ -74,7 +79,7 @@ class ItemType extends \Eloquent{
 	*
 	*/
 	public static $existInTableRules = array(
-		'id' => 'exists:itemtype,id'
+		'id' => 'exists:item_types,id'
 	);
 
 	/**
@@ -106,20 +111,20 @@ class ItemType extends \Eloquent{
 		}
 	}
 
-	public function itemprofile()
+	public function items()
 	{
-		return $this->hasManyThrough('App\ItemProfile','App\Inventory','id','id');
+		return $this->hasManyThrough('App\Items','App\Inventory','id','id');
 	}
 
 	/**
 	*
 	*	@param $type accepts the type name
-	*	usage: ItemType::type('System Unit')->get();
+	*	usage: ItemType::findByType('System Unit')->get();
 	*
 	*/
-  public function scopeType($query,$type)
+  public function scopeFindByType($query, $value)
   {
-  	return $query->where('name','=',$type);
+  	return $query->where('name','=', $value);
   }
 
 	/**
@@ -131,27 +136,5 @@ class ItemType extends \Eloquent{
   public function scopeCategory($query,$category)
   {
   	return $query->where('category','=',$category);
-  }
-
-  /**
-  *
-  *	saves record to database
-  *	@param $name
-  *	@param $description
-  *	@param $category
-  *	@return item type details
-  *
-  */
-  public static function createRecord($name,$description,$category)
-  {
-  	DB::transaction(function() use ($name,$description,$category)
-  	{
-		$itemtype = new ItemType;
-		$itemtype->name = $name;
-		$itemtype->description = $description;
-		$itemtype->category = $category;
-		$itemtype->save();
-		return $itemtype;
-  	});
   }
 }

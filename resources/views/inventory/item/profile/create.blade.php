@@ -43,16 +43,7 @@ Item Profile
 					</ul>
 				</div>
 			@endif
-	    @if (count($errors) > 0)
-	   	 <div class="alert alert-danger alert-dismissible" role="alert">
-	        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	            <ul style='margin-left: 10px;'>
-	                @foreach ($errors->all() as $error)
-	                    <li>{{ $error }}</li>
-	                @endforeach
-	            </ul>
-	        </div>
-	    @endif
+	    @include('errors.alert')
 		<div class="col-md-12">
 			<p class="text-muted">
 				<span class="">Last Profiled Item: {{ $lastprofiled }}</span>
@@ -307,7 +298,7 @@ Item Profile
 					},1000);
 
 					setTimeout(function(){
-						window.location.href = '{{ route("inventory.item.index") }}';
+						window.location.href = '{{ route("inventory.index") }}';
 					},5000);
 
 				}else if(response.length == 0){
@@ -325,7 +316,7 @@ Item Profile
 					},1000);
 
 					setTimeout(function(){
-						window.location.href = '{{ route("inventory.item.index") }}';
+						window.location.href = '{{ route("inventory.index") }}';
 					},5000);
 
 				}else{

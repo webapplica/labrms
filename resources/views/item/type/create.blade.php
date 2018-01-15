@@ -22,7 +22,14 @@
                </ul>
              </div>
          @endif
-         @include('item.type.create-form')
+         @include('item.type.form')
+        <div class="form-group">
+          <div class="col-md-12">
+            <button class="btn btn-primary btn-block btn-lg" type="submit">
+              <span class="glyphicon glyphicon-check"></span> <span>Submit</span>
+            </button>
+          </div>
+        </div>
        </div> <!-- centered  -->
      </div>
    </div>

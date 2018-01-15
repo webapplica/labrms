@@ -14,7 +14,7 @@ class Room extends \Eloquent{
 
  	// use SoftDeletes;
 	//The table in the database used by the model.
-	protected $table = 'room';
+	protected $table = 'rooms';
 	// protected $dates = ['deleted_at'];
 
 	public $fillable = ['name','category','description','status'];
