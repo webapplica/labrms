@@ -6,30 +6,6 @@ Inventory
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @include('layouts.navbar')
 @stop
-@section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-{{ HTML::style(asset('css/style.min.css')) }}
-<style>
-	#page-body,#assign,#delete{
-		display: none;
-	}
-
-	a > hover{
-		text-decoration: none;
-	}
-
-	th , tbody{
-		text-align: center;
-	}
-
-	td{
-		font-size:12px;
-	}
-</style>
-@stop
-@section('script-include')
-<script src="{{ asset('js/jQuery.succinct.min.js') }}"></script>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
 @include('modal.inventory.item.assign')
@@ -37,7 +13,7 @@ Inventory
 		<div class="panel panel-body table-responsive">
 			<legend><h3 class="text-muted">{{ $inventory->itemtype->name }} Inventory</h3></legend>
 			<ol class="breadcrumb">
-			  <li><a href="{{ url('inventory/item') }}">Item Inventory</a></li>
+			  <li><a href="{{ url('inventory') }}">Item Inventory</a></li>
 			  <li class="active">{{{ $inventory->model }}}</li>
 			</ol>
 			<p class="text-muted">Note: Actions will be shown when a row has been selected</p>	
@@ -76,8 +52,6 @@ Inventory
 </div>
 @stop
 @section('script')
-{{ HTML::script(asset('js/dataTables.select.min.js')) }}
-{{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
 
@@ -99,9 +73,9 @@ Inventory
 				columns: [
 						{ data: "id" },
 						{ data: "local_id" },
-						{ data: "propertynumber" },
-						{ data: "serialnumber" },
-						{ data: "location" },
+						{ data: "property_number" },
+						{ data: "serial_number" },
+						{ data: "location_name" },
 						{data: function(callback){
 							return moment(callback.datereceived).format("dddd, MMMM Do YYYY");
 						}},
@@ -111,39 +85,20 @@ Inventory
 						{ data: "status" },
 						{ data: function(callback){
 							return `
-							<a href="{{ url('item/profile/history') }}/`+callback.id+`" class="btn btn-xs btn-block btn-default">
-								View
+							<a href="{{ url('item/profile/history') }}/`+callback.id+`" class="btn btn-sm btn-default">
+								<span class="glyphicon glyphicon-list" aria-hidden="true"></span> View
 							</a>
+						  	<button class="btn btn-success btn-sm" data-toggle="modal" data-target="#assignModal" id="assign">
+						  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Assign
+						  	</button>
+							<button id="delete" class="btn btn-danger btn-sm" type="button">
+								<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+								<span class="hidden-sm hidden-xs">Condemn</span>
+							</button>
 							`
 						} }
 				],
 		});
-
-		$("div.toolbar").html(`
-		  	<button class="btn btn-success btn-sm" data-toggle="modal" data-target="#assignModal" id="assign">
-		  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Assign
-		  	</button>
-			<div class="btn-group">
-				<button id="delete" class="btn btn-danger btn-sm" type="button">
-					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-					<span class="hidden-sm hidden-xs">Condemn</span>
-				</button>
-			</div>
-		`);
- 
-	    table
-	        .on( 'select', function ( e, dt, type, indexes ) {
-	            // var rowData = table.rows( indexes ).data().toArray();
-	            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
-	            $('#assign').show()
-	            $('#delete').show()
-	        } )
-	        .on( 'deselect', function ( e, dt, type, indexes ) {
-	            // var rowData = table.rows( indexes ).data().toArray();
-	            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
-	            $('#assign').hide()
-	            $('#delete').hide()
-	        } );
 
 		$('#assign').on('click',function(){
 			$('#assign-item').val(table.row('.selected').data().id)
@@ -156,8 +111,7 @@ Inventory
 			try{
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
 				{
-					// $('#updateFacultyModal').modal('show');
-						window.location.href = "{{ url('item/profile') }}" + '/' + table.row('.selected').data().id + '/edit'
+					window.location.href = "{{ url('item/profile') }}" + '/' + table.row('.selected').data().id + '/edit'
 				}
 			}catch( error ){
 				swal('Oops..','You must choose atleast 1 row','error');
@@ -213,16 +167,8 @@ Inventory
 			}catch( error ){
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
-    });
+	    });
 
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-		$('#page-body').show();
 	} );
 </script>
 @stop

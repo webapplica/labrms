@@ -78,6 +78,20 @@ class Inventory extends \Eloquent
 		'Profiled Items' => 'numeric'
 	);
 
+  protected $appends = [
+    'quantity', 'unprofiled'
+  ];
+
+  public function getQuantityAttribute()
+  {
+    return $this->receipts->sum('pivot.received_quantity');
+  }
+
+  public function getUnprofiledAttribute()
+  {
+    return $this->receipts->sum('pivot.received_quantity') - $this->receipts->sum('pivot.profiled_items');
+  }
+
   public function items()
   {
     return $this->hasMany('App\Item','inventory_id','id');
@@ -125,7 +139,9 @@ class Inventory extends \Eloquent
 
   public function receipts()
   {
-    return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id');
+    return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id')
+            ->withPivot('received_quantity', 'received_unitcost', 'profiled_items')
+            ->withTimestamps();
   }
 
   /**
@@ -135,11 +151,12 @@ class Inventory extends \Eloquent
   * validate before using this function
   *
   */
-  public static function addProfiled($inventory_id)
+  public static function addProfiled($inventory_id, $receipt_id)
   {
 		$inventory = Inventory::find($inventory_id);
-		$inventory->profileditems = $inventory->profileditems + 1;
-		$inventory->save();
+		$inventory = $inventory->receipts()->find($receipt_id);
+    $inventory->pivot->profiled_items = $inventory->pivot->profiled_items + 1;
+		$inventory->pivot->save();
   }
 
 

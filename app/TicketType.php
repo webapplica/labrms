@@ -6,19 +6,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketType extends \Eloquent{
- //Database driver
-   /*
-     1 - Eloquent (MVC Driven)
-     2 - DB (Directly query to SQL database, no model required)
-   */
-   //The table in the database used by the model.
 
-
-   //The table in the database used by the model.
    protected $table = 'ticket_types';
-   public $fillable = ['type','categories'];
-   public $timestamps = true;
-   //Validation rules!
    protected $primaryKey = 'id';
+   public $timestamps = true;
+   public $fillable = ['name','details'];
+
+   public function scopeFindByName($query, $value)
+   {
+      $query->whereIn('name', [$value, ucfirst($value), ucwords($value)])->first();
+   }
 
 }

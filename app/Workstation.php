@@ -5,40 +5,22 @@ namespace App;
 use Carbon\Carbon;
 use Auth;
 use DB;
-use App\ItemProfile;
-use App\Pc;
-use App\Ticket;
-use App\Inventory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pc extends \Eloquent{
-	//Database driver
-	/*
-		1 - Eloquent (MVC Driven)
-		2 - DB (Directly query to SQL database, no model required)
-	*/
-	//The table in the database used by the model.
-	protected $table = 'pc';
+class Workstation extends \Eloquent{
+
+	protected $table = 'workstations';
 	protected $primaryKey = 'id';
 	public $timestamps = false;
 	public $fillable = ['oskey','mouse','keyboard_id','systemunit_id','monitor_id','avr_id'];
-	//Validation rules!
+
 	public static $rules = array(
 		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
-		'avr' => 'exists:itemprofile,local_id',
-		'Monitor' => 'exists:itemprofile,plocal_id',
-		'System Unit' => 'required|exists:itemprofile,local_id',
-		'Keyboard' => 'exists:itemprofile,local_id',
-		'Mouse' => 'exists:itemprofile,local_id'
-	);
-	//Validation rules!
-	public static $rules = array(
-		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
-		'avr' => 'nullable|exists:itemprofile,local_id',
-		'Monitor' => 'nullable|exists:itemprofile,plocal_id',
-		'System Unit' => 'nullable|exists:itemprofile,local_id',
-		'Keyboard' => 'nullable|exists:itemprofile,local_id',
-		'Mouse' => 'nullable|exists:itemprofile,local_id'
+		'avr' => 'exists:items,local_id',
+		'Monitor' => 'exists:items,plocal_id',
+		'System Unit' => 'required|exists:items,local_id',
+		'Keyboard' => 'exists:items,local_id',
+		'Mouse' => 'exists:items,local_id'
 	);
 
 	public function roominventory()
@@ -48,21 +30,21 @@ class Pc extends \Eloquent{
 
 	public function systemunit()
 	{
-		return $this->belongsTo('App\ItemProfile','systemunit_id','id');
+		return $this->belongsTo('App\Item','systemunit_id','id');
 	}
 
 	public function monitor()
 	{
-		return $this->belongsTo('App\ItemProfile','monitor_id','id');
+		return $this->belongsTo('App\Item','monitor_id','id');
 	}
 	public function keyboard()
 	{
-		return $this->belongsTo('App\ItemProfile','keyboard_id','id');
+		return $this->belongsTo('App\Item','keyboard_id','id');
 	}
 
 	public function avr()
 	{
-		return $this->belongsTo('App\ItemProfile','avr_id','id');
+		return $this->belongsTo('App\Item','avr_id','id');
 	}
 
 	public function software()
@@ -103,11 +85,11 @@ class Pc extends \Eloquent{
 		*/
 		if(isset($this->name))
 		{
-			$details = 'Workstation ' . $this->name . ' assembled with the following propertynumber:';			
+			$details = 'Workstation ' . $this->name . ' assembled with the following property number:';			
 		}
 		else
 		{
-			$details = 'Workstation assembled with the following propertynumber:';
+			$details = 'Workstation assembled with the following property number:';
 		}
 
 		if(isset($this->systemunit_id))
@@ -136,19 +118,19 @@ class Pc extends \Eloquent{
 			$details = $details . $this->mouse_id . ' for mouse. ';
 		}
 
-		$ticketname = 'Workstation Assembly';
+		$name = 'Workstation Assembly';
 		$staffassigned = Auth::user()->id;
 
 		$ticket = new Ticket;
-		$ticket->tickettype = 'Receive';
-		$ticket->ticketname = $ticketname;
+		$ticket->type = 'Receive';
+		$ticket->name = $name;
 		$ticket->details = $details;
 		$ticket->staffassigned = $staffassigned;
 		$ticket->status = 'Closed';
 		$ticket->generate($this->id);
     }
 
-    public function update()
+    public function updateParts()
     {
 
 		$details = "";
@@ -162,11 +144,11 @@ class Pc extends \Eloquent{
 		*/
 		if(isset($this->name))
 		{
-			$details = 'Workstation ' . $this->name . ' update with the following propertynumber:';			
+			$details = 'Workstation ' . $this->name . ' update with the following property number:';			
 		}
 		else
 		{
-			$details = 'Workstation assembled with the following propertynumber:';
+			$details = 'Workstation assembled with the following property number:';
 		}
 
 		if(isset($this->systemunit_id))
@@ -198,12 +180,12 @@ class Pc extends \Eloquent{
     	$this->name = $this->generateWorkstationName();
 		$this->save();
 
-		$ticketname = 'Workstation Update';
+		$name = 'Workstation Update';
 		$staffassigned = Auth::user()->id;
 
 		$ticket = new Ticket;
-		$ticket->tickettype = 'Maintenance';
-		$ticket->ticketname = $ticketname;
+		$ticket->type = 'Maintenance';
+		$ticket->name = $name;
 		$ticket->details = $details;
 		$ticket->staffassigned = $staffassigned;
 		$ticket->status = 'Closed';
@@ -213,7 +195,7 @@ class Pc extends \Eloquent{
     public static function condemn($id,$systemunit,$monitor,$keyboard,$avr)
     {
 
-    	$pc = Pc::find($id);
+    	$pc = Workstation::find($id);
 
     	if($systemunit)
     	{
@@ -247,11 +229,11 @@ class Pc extends \Eloquent{
     		}
     	}
 
-		$ticketname = 'Workstation Condemn';
+		$name = 'Workstation Condemn';
 		$staffassigned = Auth::user()->id;
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
     	$details = `Workstation condemned on` . Carbon::now()->toDayDateTimeString() . 'by ' . $author;
-    	Ticket::generatePcTicket($pc->id,'condemn',$ticketname,$details,$author,$staffassigned,null,'Closed');
+    	Ticket::generateWorkstationTicket($pc->id,'condemn',$name,$details,$author,$staffassigned,null,'Closed');
     	$pc->delete();
     }
 
@@ -275,22 +257,22 @@ class Pc extends \Eloquent{
 
     /**
     *
-    *	@param $propertynumber of item
+    *	@param $property number of item
     *	@return null or pc details
     *
     */
-    public static function isPc($tag)
+    public static function isWorkstation($tag)
     {
 		    
 		/*
 		|--------------------------------------------------------------------------
 		|
-		| 	Check if propertynumber exists
+		| 	Check if property number exists
 		|
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$item = ItemProfile::propertyNumber($tag)->first();
+		$item = Item::propertyNumber($tag)->first();
     	if( count($item) > 0) 
     	{
 		    
@@ -302,7 +284,7 @@ class Pc extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-    		$id = Pc::getID($item);
+    		$id = Workstation::getID($item);
 		    
 			/*
 			|--------------------------------------------------------------------------
@@ -312,7 +294,7 @@ class Pc extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-	    	$pc = Pc::where('systemunit_id', '=', $id)
+	    	$pc = Workstation::where('systemunit_id', '=', $id)
 	    		->orWhere('monitor_id','=',$id)
 	    		->orWhere('avr_id','=',$id)
 	    		->orWhere('keyboard_id','=',$id)
@@ -345,7 +327,7 @@ class Pc extends \Eloquent{
 				|--------------------------------------------------------------------------
 				|
 				*/
-				if(count($pc = Pc::name($tag)->first()) > 0)
+				if(count($pc = Workstation::name($tag)->first()) > 0)
 				{
 					return $pc;
 				}
@@ -366,7 +348,7 @@ class Pc extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$pc = Pc::name($tag)->first();
+			$pc = Workstation::name($tag)->first();
 			if(count($pc) > 0)
 			{
 				return $pc;
@@ -389,7 +371,7 @@ class Pc extends \Eloquent{
     */
     public static function setItemStatus($id,$status,$monitor = true, $keyboard = true, $avr = true, $systemunit = true)
     {
-    	$pc = Pc::find($id);
+    	$pc = Workstation::find($id);
  		DB::transaction(function() use ($pc,$status,$avr,$systemunit,$keyboard,$monitor){
 			/*
 			|--------------------------------------------------------------------------
@@ -403,7 +385,7 @@ class Pc extends \Eloquent{
 	    	{
 	    		if( isset($pc->systemunit_id) )
 	    		{
-	    			ItemProfile::setItemStatus($pc->systemunit_id,$status);
+	    			Item::setItemStatus($pc->systemunit_id,$status);
 	    		}
 	    	}
 
@@ -419,7 +401,7 @@ class Pc extends \Eloquent{
 	    	{
 	    		if( isset($pc->monitor_id) )
 	    		{
-	    			ItemProfile::setItemStatus($pc->monitor_id,$status);
+	    			Item::setItemStatus($pc->monitor_id,$status);
 	    		}
 	    	}
 
@@ -435,7 +417,7 @@ class Pc extends \Eloquent{
 	    	{
 	    		if( isset($pc->keyboard_id) )
 	    		{
-	    			ItemProfile::setItemStatus($pc->keyboard_id,$status);
+	    			Item::setItemStatus($pc->keyboard_id,$status);
 	    		}
 	    	}
 
@@ -451,7 +433,7 @@ class Pc extends \Eloquent{
 	    	{
 	    		if( isset($pc->avr_id) )
 	    		{
-	    			ItemProfile::setItemStatus($pc->avr_id,$status);
+	    			Item::setItemStatus($pc->avr_id,$status);
 	    		}
 	    	}
 	    });
@@ -473,28 +455,28 @@ class Pc extends \Eloquent{
     *	@param room accepts room name
     *
     */
-    public static function setPcLocation($pc,$room)
+    public static function setWorkstationLocation($pc,$room)
     {
 
-		$pc = Pc::find($pc);
+		$pc = Workstation::find($pc);
 		if(isset($pc->systemunit_id))
 		{
-			ItemProfile::setLocation($pc->systemunit_id,$room);
+			Item::setLocation($pc->systemunit_id,$room);
 		}
 
 		if(isset($pc->avr_id))
 		{
-			ItemProfile::setLocation($pc->avr_id,$room);
+			Item::setLocation($pc->avr_id,$room);
 		}
 
 		if(isset($pc->keyboard_id))
 		{
-			ItemProfile::setLocation($pc->keyboard_id,$room);
+			Item::setLocation($pc->keyboard_id,$room);
 		}
 
 		if(isset($pc->monitor_id))
 		{
-			ItemProfile::setLocation($pc->monitor_id,$room);
+			Item::setLocation($pc->monitor_id,$room);
 		}
 
 		/*
@@ -502,12 +484,12 @@ class Pc extends \Eloquent{
 		*	create a transfer ticket
 		*
 		*/
-		$details = "Pc location has been set to $room";
+		$details = "Workstation location has been set to $room";
 		$staffassigned = Auth::user()->id;
 
 		$ticket = new Ticket;
-		$ticket->tickettype = 'Transfer';
-		$ticket->ticketname = 'Set Item Location';
+		$ticket->type = 'Transfer';
+		$ticket->name = 'Set Item Location';
 		$ticket->details = $details;
 		$ticket->staffassigned = $staffassigned;
 		$ticket->status = 'Closed';
@@ -529,7 +511,7 @@ class Pc extends \Eloquent{
     	} 
     	else if($id == null || !isset($id) || $id == "")
     	{
-    		$id = Pc::count();
+    		$id = Workstation::count();
     	}
 
     	$id = '-' . $id;

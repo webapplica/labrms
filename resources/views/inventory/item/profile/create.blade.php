@@ -16,10 +16,6 @@ Item Profile
 	.panel-padding{
 		padding: 10px;
 	}
-
-	.btn-flat {
-		padding: 10px;
-	}
 </style>
 @stop
 @section('script-include')
@@ -31,18 +27,18 @@ Item Profile
 		{{ Form::open(['method'=>'post','route'=>'item.profile.store','class'=>'form-horizontal','id'=>'profilingForm']) }}
 		<legend><h3 class="text-muted">Item Profile</h3></legend>
 		<ol class="breadcrumb">
-		  <li><a href="{{ url('inventory/item') }}">Item Inventory</a></li>
+		  <li><a href="{{ url('inventory') }}">Item Inventory</a></li>
 		  <li class="active">Create</li>
 		</ol>
-			@if( Session::has('success')  )
-			 <div class="alert alert-success alert-dismissible" role="alert">
-					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<ul class="list-unstyled" style='margin-left: 10px;'>
+		@if( Session::has('success')  )
+		 <div class="alert alert-success alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<ul class="list-unstyled" style='margin-left: 10px;'>
 
-						<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
-					</ul>
-				</div>
-			@endif
+					<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
+				</ul>
+			</div>
+		@endif
 	    @include('errors.alert')
 		<div class="col-md-12">
 			<p class="text-muted">
@@ -56,24 +52,22 @@ Item Profile
 				<div class="form-group">
 					<div class="col-sm-12">
 						<label for="inventory_id">
-							Inventory ID
-							<span type="button" id="inventory-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" title="Details" data-content="This inventory consists of the type of '{{ $inventory->itemtype->name }}' brand of '{{ $inventory->brand }}', and model '{{ $inventory->model }}'" style="text-decoration: none;"></span>
+							Inventory Name
 						</label>
-						{{ Form::text('inventory_id',$inventory->id,[
+						{{ Form::text('inventory_name',"$inventory->brand-$inventory->model-".$inventory->itemtype->name,[
 							'class' => 'form-control',
-							'placeholder' => 'Inventory ID',
+							'placeholder' => "$inventory->brand-$inventory->model" ,
 							'readonly',
 							'style'=>'background-color:white;'
 						]) }}
+						<input type="hidden" value="{{ $inventory->id }}" name="inventory_id" />
 					</div>
 				</div>
 				<div class="form-group">
 					<div class="col-sm-12">
 					{{ Form::label('receipt_id','Acknowledgement Receipt') }}
-					{{ Form::select('receipt_id',['List empty'],Input::old('receipt_id'),[
+					{{ Form::select('receipt_id', $receipts,Input::old('receipt_id'),[
 						'class' => 'form-control readonly-white',
-						'placeholder' => 'Information ID',
-						'readonly',
 						'style'=>'background-color:white;'
 					]) }}
 					</div>
@@ -97,11 +91,11 @@ Item Profile
 				<div class="form-group">
 					<div class="col-sm-12">
 					{{ Form::label('location','Location') }}
-					{{ Form::select('location',['Loading all locations ..'],Input::old('location'),[
-						'id' => 'location',
-						'class' => 'form-control',
-						'placeholder' => 'Location'
-					]) }}
+					<select name="location" id="location" class="form-control">
+					@foreach($locations as $key=>$value)
+						<option {{ (old('location') == $key) ? 'selected=selected' : ($value == 'Server') ? 'selected=selected' : null }} value="{{ $key }}">{{ $value }}</option>
+					@endforeach
+					</select>
 					<p class="text-muted pull-right" style="font-size:10px;"><span class="text-danger">Note:</span> The Default Storage Location is <strong>Server Room</strong></p>
 					</div>
 				</div>
@@ -141,7 +135,7 @@ Item Profile
 				</div>
 				<div class="form-group pull-right">
 						<div class="col-md-12">
-							<button type="button" id="next" class="btn btn-flat btn-primary" style="padding-left: 20px;padding-right: 20px;">Next</button>
+							<button type="button" id="next" class="btn btn-md btn-primary" style="padding-left: 20px;padding-right: 20px;">Next</button>
 						</div>
 				</div>
 			</div>
@@ -157,9 +151,9 @@ Item Profile
 				</table>
 				<div class="form-group pull-right">
 					<div class="col-md-12">
-						<button type="button" id="previous" class="btn btn-flat btn-default" style="padding-left: 20px;padding-right: 20px;">Previous</button>
+						<button type="button" id="previous" class="btn btn-md btn-default">Previous</button>
 					{{ Form::submit('Profile',[
-						'class'=> 'btn btn-md btn-flat btn-primary',
+						'class'=> 'btn btn-md btn-primary',
 						'name' => 'Profile'
 					]) }}
 					</div>
@@ -176,7 +170,6 @@ Item Profile
 	$(document).ready(function(){
 		$('#next').on('click',function(){
 			quantity = $('#quantity').val()
-
 			if ( quantity == "" ){
 				swal('Error Occurred!','Quantity must be greater than zero','error')
 			} else if ( quantity == null ){
@@ -274,95 +267,6 @@ Item Profile
 	      `)
 	    }
 
-		$.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-			type: 'get',
-			url: '{{ route("item.profile.receipt.all") }}',
-			data: { 'id' : {{ (is_numeric($inventory->id)) ? $inventory->id : '-1' }} },
-			dataType: 'json',
-			success: function(response){
-				var options = '';
-				if(response == 'error'){
-					var second = 4;
-
-					setInterval(function(){
-						swal({
-							title: "Oops..",
-							text: "Inventory ID not valid! Returning to Item  Inventory in "+second+" seconds",
-							showConfirmButton: false
-
-						});
-						second -= 1;
-					},1000);
-
-					setTimeout(function(){
-						window.location.href = '{{ route("inventory.index") }}';
-					},5000);
-
-				}else if(response.length == 0){
-
-					var second = 4;
-
-					setInterval(function(){
-						swal({
-							title: "Oops..",
-							text: "There are no Acknowledgement Receipt for this item! Returning to Inventory in "+second+" seconds",
-							showConfirmButton: false
-
-						});
-						second -= 1;
-					},1000);
-
-					setTimeout(function(){
-						window.location.href = '{{ route("inventory.index") }}';
-					},5000);
-
-				}else{
-
-					for( ctr = 0 ; ctr < response.length ; ctr++ ){
-						options += `<option value=`+response[ctr].id+`>`+response[ctr].number+`</option>`;
-					}
-
-					$('#receipt_id').html('');
-					$('#receipt_id').append(options);
-				}
-
-			},
-			error: function(response){
-				swal('Oops...','Error ocurred while fetching data','error');
-				console.log(response.responseJSON)
-			}
-		});
-
-		$.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-			type : "get",
-			url : "{{ route('room.index') }}",
-			dataType : "json",
-			success : function(response){
-				options = "";
-				for(ctr = 0;ctr<response.data.length;ctr++){
-					options += `<option value='`+response.data[ctr].name+`'>`+response.data[ctr].name+`</option>'`;
-				}
-
-				$('#location').html("");
-				$('#location').append(options);
-				@if(Input::old('location'))
-				$('#location').val("{{ Input::old('location') }}");
-				@else
-				$('#location').val('Server');
-				@endif
-			},
-			error : function(response){
-				$('#location').html("<option>Loading all locations ...</option>")
-				console.log(response.responseJSON);
-			}
-		});
-
 		$('#propertynumber').on('focus',function(){
 			var current = $('#propertynumber').val()
 			var constant = "PUP-";
@@ -378,13 +282,6 @@ Item Profile
 		$('#inventory-help').click(function(){
 			$('#inventory-help').popover('show')
 		});
-
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 		@if(Input::old('dateReceived'))
 			$('#dateReceived').val({{ Input::old('dateReceived') }});
@@ -411,10 +308,10 @@ Item Profile
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
 			type: 'get',
-            url: '{{ url("inventory/item/$inventory->id") }}' ,
+            url: '{{ url("inventory/$inventory->id") }}' ,
 			dataType: 'json',
 			success: function(response){
-				$('#total').text(parseInt(response.quantity) - parseInt(response.profileditems));
+				$('#total').text(parseInt(response.unprofiled));
 			}
 		})
 

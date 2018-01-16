@@ -41,5 +41,12 @@ class Receipt extends \Eloquent{
 		return $query->where('number', '=', $value)->first();
 	}
 
+	public function inventory()
+	{
+	    return $this->belongsToMany('App\Inventory', 'inventory_receipt', 'receipt_id', 'inventory_id')
+	            ->withPivot('received_quantity', 'received_unitcost', 'profiled_items')
+	            ->withTimestamps();
+	}
+
 
 }

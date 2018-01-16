@@ -79,16 +79,24 @@ class ItemsController extends Controller {
 		$id = $this->sanitizeString($request->get('id'));
 
 		$inventory = App\Inventory::find($id);
-
-		$lastprofiled = App\Item::where('inventory_id', '=', $inventory->id)
-		->orderBy('created_at','desc')
+		$lastprofiled = App\Item::whereHas('inventory', function($query) use($id) {
+			$query->where('id', '=', $id);	
+		})->orderBy('created_at','desc')
 		->pluck('property_number')
 		->first();
 
+		$receipts = App\Receipt::whereHas('inventory', function($query) use($id) {
+			$query->where('id', '=', $id);	
+		})->pluck('number', 'id');
+
+		$locations = App\Room::pluck('name', 'id');
+
 		return view('inventory.item.profile.create')
-			->with('inventory',$inventory)
-			->with('lastprofiled',$lastprofiled)
-			->with('id',$id);
+			->with('inventory', $inventory)
+			->with('lastprofiled', $lastprofiled)
+			->with('receipts', $receipts)
+			->with('locations', $locations)
+			->with('id', $id);
 	}
 
 
@@ -103,24 +111,24 @@ class ItemsController extends Controller {
 		$inventory_id = $this->sanitizeString($request->get('inventory_id'));
 		$receipt_id = $this->sanitizeString($request->get('receipt_id'));
 		$location = $this->sanitizeString($request->get('location'));
-		$datereceived = $this->sanitizeString($request->get('datereceived'));
-		$propertynumber = "";
-		$serialnumber = "";
+		$date_received = $this->sanitizeString($request->get('datereceived'));
+		$property_number = "";
+		$serial_number = "";
 
 		DB::beginTransaction();
 		foreach($request->get('item') as $item)
 		{
 
-			$propertynumber = $this->sanitizeString($item['propertynumber']);
-			$serialnumber = $this->sanitizeString($item['serialid']);
+			$property_number = $this->sanitizeString($item['propertynumber']);
+			$serial_number = $this->sanitizeString($item['serialid']);
 
 			$validator = Validator::make([
-				'Property Number' => $propertynumber,
-				'Serial Number' => $serialnumber,
+				'Property Number' => $property_number,
+				'Serial Number' => $serial_number,
 				'Location' => $location,
-				'Date Received' => $datereceived,
+				'Date Received' => $date_received,
 				'Status' => 'working'
-			],App\Itemprofile::$rules,[ 'Property Number.unique' => "The :attribute $propertynumber already exists" ]);
+			],App\Item::$rules,[ 'Property Number.unique' => "The :attribute $property_number already exists" ]);
 
 			if($validator->fails())
 			{
@@ -131,10 +139,10 @@ class ItemsController extends Controller {
 			}
 
 			$itemprofile = new App\Item;
-			$itemprofile->propertynumber = $propertynumber;
-			$itemprofile->serialnumber = $serialnumber;
+			$itemprofile->property_number = $property_number;
+			$itemprofile->serial_number = $serial_number;
 			$itemprofile->location = $location;
-			$itemprofile->datereceived = Carbon\Carbon::parse($datereceived)->toDateString();
+			$itemprofile->date_received = Carbon\Carbon::parse($date_received)->toDateString();
 			$itemprofile->inventory_id = $inventory_id;
 			$itemprofile->receipt_id = $receipt_id;
 			$itemprofile->profile();
@@ -142,7 +150,7 @@ class ItemsController extends Controller {
 		DB::commit();
 
 		Session::flash('success-message','Item profiled');
-		return redirect('inventory/item');
+		return redirect('inventory');
 	}
 
 
@@ -183,7 +191,7 @@ class ItemsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
 		$item = App\Item::find($id);
 		return view('inventory.item.profile.edit')
@@ -232,7 +240,7 @@ class ItemsController extends Controller {
 
 		Session::flash('success-message','Item updated');
 
-		return redirect('inventory/item');
+		return redirect('inventory');
 	}
 
 
@@ -266,7 +274,7 @@ class ItemsController extends Controller {
 				|--------------------------------------------------------------------------
 				|
 				*/
-				if(count(App\Pc::isPc($itemprofile->propertynumber)) > 0)
+				if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
 				{
 					return json_encode('connected');
 
@@ -284,7 +292,7 @@ class ItemsController extends Controller {
 
 		App\Inventory::condemn($item->inventory_id);
 		Session::flash('success-message','Item removed from inventory');
-		return redirect('inventory/item');
+		return redirect('inventory');
 	}
 
 	/**
@@ -294,7 +302,7 @@ class ItemsController extends Controller {
 	*	@return view
 	*
 	*/
-	public function history($id)
+	public function history(Request $request, $id)
 	{
 		/**
 		*
@@ -318,7 +326,7 @@ class ItemsController extends Controller {
 	*	@return error or page
 	*
 	*/
-	public function assign()
+	public function assign(Request $request)
 	{
 		$item = $this->sanitizeString($request->get('item'));
 		$room = App\Room::location($this->sanitizeString($request->get('room')))->select('id','name')->first();
@@ -339,7 +347,7 @@ class ItemsController extends Controller {
 		if($validator->fails())
 		{
 			Session::flash('error-message','Error occurred while processing your data');
-			return redirect('inventory/item');
+			return redirect('inventory');
 		}
 
 		/*
@@ -350,8 +358,8 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$itemprofile = App\Itemprofile::find($item);
-		if(count(App\Pc::isPc($itemprofile->propertynumber)) > 0)
+		$itemprofile = App\Item::find($item);
+		if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
 		{
 			Session::flash('error-message','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation');
 			return redirect("item/profile/$id");
@@ -372,7 +380,7 @@ class ItemsController extends Controller {
 	*	@return receipt
 	*
 	*/
-	public function getAllReceipt(){
+	public function getAllReceipt(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -400,8 +408,10 @@ class ItemsController extends Controller {
 			}
 			else
 			{
-				$receipt = App\Receipt::where('inventory_id','=',$id)->select('number','id')->get();
-				return $receipt;
+				$receipt = App\Receipt::whereHas('inventory', function($query) use($id) {
+					$query->where('id', '=', $id);	
+				})->pluck('number', 'id');
+				return json_encode($receipt);
 			}
 		}
 	}
@@ -414,7 +424,7 @@ class ItemsController extends Controller {
 	*	@return item brand
 	*
 	*/
-	public function getItemBrands(){
+	public function getItemBrands(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -457,7 +467,7 @@ class ItemsController extends Controller {
 	*	@return item model
 	*
 	*/
-	public function getItemModels(){
+	public function getItemModels(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -499,7 +509,7 @@ class ItemsController extends Controller {
 	*	@return item brand
 	*
 	*/
-	public function getPropertyNumberOnServer(){
+	public function getPropertyNumberOnServer(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -574,7 +584,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getUnassignedSystemUnit(){
+	public function getUnassignedSystemUnit(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -597,7 +607,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getUnassignedMonitor(){
+	public function getUnassignedMonitor(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -620,7 +630,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getUnassignedAVR(){
+	public function getUnassignedAVR(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -643,7 +653,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getUnassignedKeyboard(){
+	public function getUnassignedKeyboard(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -666,7 +676,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getAllPropertyNumber(){
+	public function getAllPropertyNumber(Request $request){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -678,7 +688,7 @@ class ItemsController extends Controller {
 		*/
 		if($request->ajax())
 		{
-			return json_encode(App\Itemprofile::pluck('propertynumber'));
+			return json_encode(App\Item::pluck('propertynumber'));
 		}
 	}
 
@@ -690,7 +700,7 @@ class ItemsController extends Controller {
 	*	@return item information
 	*
 	*/
-	public function getStatus($propertynumber){
+	public function getStatus(Request $request, $propertynumber){
 
 		/*
 		|--------------------------------------------------------------------------
@@ -740,7 +750,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getMonitorList()
+	public function getMonitorList(Request $request)
 	{
 
 		/*
@@ -786,7 +796,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getKeyboardList()
+	public function getKeyboardList(Request $request)
 	{
 
 		/*
@@ -832,7 +842,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getAVRList()
+	public function getAVRList(Request $request)
 	{
 
 		/*
@@ -878,7 +888,7 @@ class ItemsController extends Controller {
 	*	@return lists of property number
 	*
 	*/
-	public function getSystemUnitList()
+	public function getSystemUnitList(Request $request)
 	{
 
 		/*
@@ -902,7 +912,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				App\Itemprofile::unassembled()
+				App\Item::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','System Unit');
@@ -924,7 +934,7 @@ class ItemsController extends Controller {
 	*	@return lists of local id
 	*
 	*/
-	public function getMouseList()
+	public function getMouseList(Request $request)
 	{
 
 		/*
@@ -948,7 +958,7 @@ class ItemsController extends Controller {
 			|
 			*/
 			return json_encode(
-				App\Itemprofile::unassembled()
+				App\Item::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','Mouse');
@@ -972,7 +982,7 @@ class ItemsController extends Controller {
 	*	@return inventory information
 	*
 	*/
-	public function checkifexisting($itemtype,$brand,$model)
+	public function checkifexisting(Request $request, $itemtype, $brand, $model)
 	{
 		$itemtype = $this->sanitizeString($itemtype);
 		$brand = $this->sanitizeString($brand);
@@ -1002,7 +1012,7 @@ class ItemsController extends Controller {
 		}
 	}
 
-	public function getItemInformation($propertynumber)
+	public function getItemInformation(Request $request, $propertynumber)
 	{
 
 		/*
@@ -1024,7 +1034,7 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$item = App\Pc::isPc($propertynumber);
+			$item = App\Workstation::isWorkstation($propertynumber);
 
 			/*
 			|--------------------------------------------------------------------------
@@ -1040,7 +1050,7 @@ class ItemsController extends Controller {
 			}
 			else
 			{
-				$item = App\Pc::with('systemunit')
+				$item = App\Workstation::with('systemunit')
 							->with('keyboard')
 							->with('avr')
 							->with('monitor')

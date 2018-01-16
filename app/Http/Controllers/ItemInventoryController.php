@@ -20,10 +20,8 @@ class ItemInventoryController extends Controller {
 	{
 		if($request->ajax())
 		{
-			return json_encode([
-					'data' => App\Inventory::with('itemtype')
-									->get()
-					]);
+			$inventory = App\Inventory::with('itemtype')->get();
+			return datatables($inventory)->toJson();
 		}
 		
 		$brand = null;
@@ -156,7 +154,7 @@ class ItemInventoryController extends Controller {
 		$inventory->receipts()->syncWithoutDetaching(array(
 			$receipt->id => [
 				'received_quantity' => $quantity,
-				'profiled_items' => $quantity
+				'profiled_items' => 0
 			]
 		));
 

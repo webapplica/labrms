@@ -79,9 +79,7 @@
 					{ data: "details" },							
 					{ data: "unit" },
 					{ data: "quantity" },
-					{ data: function(callback){
-						return callback.quantity - callback.profileditems
-					} },
+					{ data: "unprofiled" },
 					{ data: function(callback){
 						return `
 							<a href="{{ url('item/profile/create?id=') }}`+callback.id+`" id="profile" class="btn btn-success btn-sm" type="button">

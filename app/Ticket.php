@@ -4,12 +4,6 @@ namespace App;
 
 use DB;
 use Auth;
-use App\Ticket;
-use App\Pc;
-use App\ItemProfile;
-use App\PcTicket;
-use App\RoomTicket;
-use App\Room;
 use Carbon\Carbon;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
@@ -22,12 +16,12 @@ class Ticket extends \Eloquent{
 	public $underrepair = "";
 	public $undermaintenance = false;
 
-	public $fillable = ['item_id','tickettype','ticketname','details','author','staffassigned','ticket_id','status'];
+	public $fillable = ['item_id','type','title','details','author','staff_id','ticket_id','status'];
 	protected $primaryKey = 'id';
 
 	public static $rules = array(
 
-		'Item Id' => 'required|exists:itemprofile,id',
+		'Item Id' => 'required|exists:items,id',
 		'Ticket Type' => 'required|min:2|max:100',
 		'Ticket Name' => 'required|min:2|max:100',
 		'Details' => 'required|min:2|max:500',
@@ -58,9 +52,9 @@ class Ticket extends \Eloquent{
 		return $this->hasOne('App\User','id','staffassigned');
 	}
 
-	public function itemprofile()
+	public function item()
 	{
-		return $this->belongsToMany('App\ItemProfile','item_ticket','item_id','ticket_id');
+		return $this->belongsToMany('App\Item','item_ticket','item_id','ticket_id');
 	}
 
 	public function room()
@@ -70,15 +64,15 @@ class Ticket extends \Eloquent{
 
 	public function pc()
 	{
-		return $this->belongsToMany('App\Pc','pc_ticket','pc_id','ticket_id');
+		return $this->belongsToMany('App\Workstation','pc_ticket','pc_id','ticket_id');
 	}
 
-	public function scopeTickettype($query,$value)
+	public function scopeFindByType($query,$value)
 	{
-		return $query->where('tickettype','=',$value);
+		return $query->where('type','=',$value);
 	}
 
-	public function scopeStatus($query,$value)
+	public function scopeFindByStatus($query,$value)
 	{
 		return $query->where('status','=',$value);
 	}
@@ -115,10 +109,10 @@ class Ticket extends \Eloquent{
 
 	public function setTickettypeAttribute($value)
 	{
-		$this->attributes['tickettype'] = ucwords($value);
+		$this->attributes['type'] = ucwords($value);
 	}
 
-	public function getPcTickets($id)
+	public function getWorkstationTickets($id)
 	{
 		return Ticket::whereIn('id',function($query) use ($id)
 		{
@@ -169,7 +163,7 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if( ($pc = Pc::isPc($tag)) )
+		if( ($pc = Workstation::isWorkstation($tag)) )
 		{
 			return $pc;
 		} 
@@ -182,9 +176,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		else if(($itemprofile = ItemProfile::propertyNumber($tag))->count() > 0) 
+		else if(($item = Item::propertyNumber($tag))->count() > 0) 
 		{
-			return $itemprofile;
+			return $item;
 		}
 
 		/*
@@ -221,6 +215,8 @@ class Ticket extends \Eloquent{
 			$this->attributes['author'] = $author;
 		}
 
+		$this->user_id = Auth::user()->id;
+
 		$this->save();
 		
 		/*
@@ -231,9 +227,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if( ($pc = Pc::isPc($tag)) )
+		if( ($pc = Workstation::isWorkstation($tag)) )
 		{
-			if($this->undermaintenance) Pc::setItemStatus($pc->id,'undermaintenance');
+			if($this->undermaintenance) Workstation::setItemStatus($pc->id,'undermaintenance');
 			$pc->ticket()->attach($this->id);
 		} 
 
@@ -245,10 +241,10 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		else if(($itemprofile = ItemProfile::propertyNumber($tag)->orWhere('id','=',$tag))->count() > 0) 
+		else if(($item = Item::propertyNumber($tag)->orWhere('id','=',$tag))->count() > 0) 
 		{
-			$itemprofile->first()->ticket()->attach($this->id);
-			if($this->undermaintenance) ItemProfile::setItemStatus($itemprofile->id,'undermaintenance');
+			$item->first()->ticket()->attach($this->id);
+			if($this->undermaintenance) Item::setItemStatus($item->id,'undermaintenance');
 		}
 
 		/*
@@ -268,8 +264,8 @@ class Ticket extends \Eloquent{
 
 	public function copyRecordFromExisting($ticket)
 	{
-		$this->tickettype = $ticket->tickettype;
-		$this->ticketname = $ticket->ticketname;
+		$this->type = $ticket->type;
+		$this->title = $ticket->title;
 		$this->details = $ticket->details;
 		$this->author = $ticket->author;
 		$this->staffassigned = $ticket->staffassigned;
@@ -369,8 +365,8 @@ class Ticket extends \Eloquent{
 		$ticket = new Ticket;
 		$ticket->copyRecordFromExisting($this);
 		$ticket->comments = "";
-		$ticket->tickettype = 'action taken';
-		$ticket->ticketname = 'Action Taken';
+		$ticket->type = 'action taken';
+		$ticket->title = 'Action Taken';
 		$ticket->ticket_id = $this->id;
 		$ticket->status = 'Closed';
 		$ticket->generate();
@@ -395,8 +391,8 @@ class Ticket extends \Eloquent{
 		$this->staffassigned = Auth::user()->id;
 		$this->ticket_id = null;
 		$this->status = 'Closed';
-		$this->tickettype = 'condemn';
-		$this->ticketname = 'Item Condemn';
+		$this->type = 'condemn';
+		$this->title = 'Item Condemn';
 
 		/*
 		|--------------------------------------------------------------------------
@@ -406,7 +402,7 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(($itemprofile = ItemProfile::propertyNumber($tag)->first())->count() > 0) $this->generate($itemprofile->id);
+		if(($item = Item::propertyNumber($tag)->first())->count() > 0) $this->generate($item->id);
 	}
 
 	public static function setTaggedStatus($tag,$status)
@@ -420,9 +416,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(($pc = PcTicket::ticket($tag)->first())->count() > 0)
+		if(($pc = WorkstationTicket::ticket($tag)->first())->count() > 0)
 		{
-			Pc::setItemStatus($pc->pc_id,$status);
+			Workstation::setItemStatus($pc->pc_id,$status);
 		}
 
 		/*
@@ -435,24 +431,24 @@ class Ticket extends \Eloquent{
 		*/
 		else if( ($itemticket = ItemTicket::ticketID($tag)->first())->count() > 0)
 		{
-			ItemProfile::setItemStatus($itemticket->item_id,$status);
+			Item::setItemStatus($itemticket->item_id,$status);
 		}
 	}
 
 	/**
 	*
 	*	@param $tag accepts room name, property number of item
-	*	@param $ticketname accepts ticket title
+	*	@param $title accepts ticket title
 	*	@param $details accepts details
 	*
 	*/
-	public function maintenance($tag,$ticketname,$details,$underrepair)
+	public function maintenance($tag,$title,$details,$underrepair)
 	{
 
 		$this->staffassigned = Auth::user()->id;
 		$this->status = 'Open';
 		$this->ticket_id = null;
-		$this->tickettype = 'maintenance';
+		$this->type = 'maintenance';
 		$this->generate();
 	}
 

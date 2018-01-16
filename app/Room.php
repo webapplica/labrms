@@ -17,7 +17,7 @@ class Room extends \Eloquent{
 	protected $table = 'rooms';
 	// protected $dates = ['deleted_at'];
 
-	public $fillable = ['name','category','description','status'];
+	public $fillable = ['name','category','description','status', 'is_default'];
 	public $timestamps = false;
 	protected $primaryKey = 'id';
 	//Validation rules!
@@ -34,29 +34,14 @@ class Room extends \Eloquent{
 
 	);
 
-	public function roominventory()
+	public function scopeFindByLocation($query, $location)
 	{
-		return $this->hasMany('App\RoomInventory','room_id','id');
-	}
-
-	public function scopeLocation($query,$location)
-	{
-		return $query->where('name','=',$location);
+		return $query->where('name', '=', $location);
 	}
 
 	public function ticket()
 	{
 		return $this->belongsToMany('App\Ticket','room_ticket','room_id','ticket_id');
-	}
-
-	/*
-	*
-	*	Foreign key referencing ticket table
-	*
-	*/
-	public function roomticket()
-	{
-		return $this->hasMany('App\RoomTicket','room_id','id');
 	}
 
 }

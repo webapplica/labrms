@@ -2,12 +2,6 @@
 
 namespace App;
 
-use App\Inventory;
-use App\RoomInventory;
-use App\Room;
-use App\ItemType;
-use App\Pc;
-use App\Ticket;
 use Auth;
 use DB;
 use Carbon\Carbon;
@@ -64,8 +58,8 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static $rules = array(
-		'Property Number' => 'required|min:5|max:100|unique:itemprofile,propertynumber',
-		'Serial Number' => 'required|min:5|max:100|unique:itemprofile,serialnumber',
+		'Property Number' => 'required|min:5|max:100|unique:items,property_number',
+		'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
 		'Location' =>'required',
 		'Date Received' =>'required|date',
 		'Status' =>'required|min:5|max:50'
@@ -86,6 +80,15 @@ class Item extends \Eloquent{
 
 	);
 
+	protected $appends = [
+		'location_name'
+	];
+
+	public function getLocationNameAttribute()
+	{
+		return isset($this->room->name) ? $this->room->name : "Not Set" ;
+	}
+
 	public function itemtype()
 	{
 		return $this->hasManyThrough('App\ItemType','App\Inventory','id','id');
@@ -99,16 +102,6 @@ class Item extends \Eloquent{
 	public function inventory()
 	{
 		return $this->belongsTo('App\Inventory', 'inventory_id', 'id');
-	}
-
-	/*
-	*
-	*	Foreign key referencing roominventory table
-	*
-	*/
-	public function roominventory()
-	{
-		return $this->hasOne('App\RoomInventory','item_id','id');
 	}
 
 	/*
@@ -128,18 +121,9 @@ class Item extends \Eloquent{
 	*/
 	public function room()
 	{
-		return $this->belongsToMany('App\Room','roominventory','item_id','room_id');
+		return $this->belongsTo('App\Room', 'location','id');
 	}
 
-	/*
-	*
-	*	Foreign key referencing ticket table
-	*
-	*/
-	public function itemticket()
-	{
-		return $this->hasMany('App\ItemTicket','item_id','id');
-	}
 
 	/*
 	*
@@ -151,12 +135,12 @@ class Item extends \Eloquent{
 		return $this->belongsToMany('App\Ticket','item_ticket','item_id','ticket_id');
 	}
 
-	public function scopeLocation($query,$location)
+	public function scopefindByLocation($query,$location)
 	{
-		return $query->where('location','=',$location);	
+		return $query->where('location','=', $location);	
 	}
 
-	public function scopeLocal($query, $value)
+	public function scopefindByLocalCode($query, $value)
 	{
 		return $query->where('local','=',$value);
 	}
@@ -164,20 +148,20 @@ class Item extends \Eloquent{
 	/*
 	*
 	*	Limit the scope by propertynumber
-	*	usage: ItemProfile::propertyNumber($propertynumber)->get()
+	*	usage: Item::propertyNumber($propertynumber)->get()
 	*
 	*/
 	public function scopePropertyNumber($query,$propertynumber)
 	{
-		return $query->where('propertynumber','=',$propertynumber);
+		return $query->where('property_number','=',$propertynumber);
 	}
 
 	public static function assignToRoom($item,$room)
 	{
 
-		$itemprofile = Itemprofile::find($item);
+		$item = Itemprofile::find($item);
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-		$details = "$itemprofile->propertynumber assigned to $room->name by $author";
+		$details = "$item->propertynumber assigned to $room->name by $author";
 		$tickettype = 'Transfer';
 		$ticketname = 'Transfer';
 		/*
@@ -191,17 +175,17 @@ class Item extends \Eloquent{
 		|
 		*/			
 
-		$itemprofile->location = $room->name;
-		if($itemprofile->deployment == null)
+		$item->location = $room->name;
+		if($item->deployment == null)
 		{
-			$itemprofile->deployment = Carbon::now();
+			$item->deployment = Carbon::now();
 			$ticketname = 'Deployment';
 		}
-		$itemprofile->save();
+		$item->save();
 
-		if(count($itemprofile->room) > 0)
+		if(count($item->room) > 0)
 		{
-			$itemprofile->room()->sync([ 'room_id'=>$room->id ]);
+			$item->room()->sync([ 'room_id'=>$room->id ]);
 		}		
 		else
 		{
@@ -241,7 +225,7 @@ class Item extends \Eloquent{
 		$itemtype = isset($inventory->itemtype->id) ? "-" . $inventory->itemtype->id : "";
 		$itemsubtype = isset($inventory->itemsubtype->id) ? "-" . $inventory->itemsubtype->id : "";
 
-		$local =  ItemProfile::whereHas('inventory',function($query) use ($inventory){
+		$local =  Item::whereHas('inventory',function($query) use ($inventory){
 			$query->where('itemtype_id','=',$inventory->itemtype_id)
 			->where('itemsubtype_id','=',$inventory->itemsubtype_id);
 		})->count();
@@ -260,17 +244,8 @@ class Item extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		ItemProfile::createProfilingTicket($this->id,$this->datereceived);
-	    
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Set the location of the item
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-	    RoomInventory::createRecord($this->location,$this->id);
+		Item::createProfilingTicket($this->id,$this->datereceived);
+	   
 
 		/*
 		|--------------------------------------------------------------------------
@@ -282,7 +257,7 @@ class Item extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-	    Inventory::addProfiled($this->inventory_id);
+	    Inventory::addProfiled($this->inventory_id, $this->receipt_id);
 
 	}
 
@@ -297,9 +272,8 @@ class Item extends \Eloquent{
 		$fullname = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname; 
 		$datereceived = Carbon::parse($datereceived)->toDateString();
 		$details = "Equipment profiled on ".$datereceived. " by ". $fullname . ". ";
-		$tickettype = 'receive';
-		$ticketname = 'Equipment Profiling';
-		$staffassigned = Auth::user()->id;
+		$title = 'Equipment Profiling';
+		$staff_id = Auth::user()->id;
 		$ticket_id = null;
 		$status = 'Closed';
 
@@ -311,13 +285,17 @@ class Item extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
+	
+		$type = TicketType::firstOrCreate([
+			'name' => 'Receive'
+		]);
+
 		$ticket = new Ticket;
-		$ticket->tickettype = $tickettype;
-		$ticket->ticketname = $ticketname;
-		$ticket->tickettype = $tickettype;
+		$ticket->type_id = $type->id;
+		$ticket->title = $title;
 		$ticket->details = $details;
-		$ticket->staffassigned = $staffassigned;
-		$ticket->ticket_id = $ticket_id;
+		$ticket->staff_id = $staff_id;
+		$ticket->predecessor_id = $ticket_id;
 		$ticket->status = $status;
 		$ticket->generate($item_id);
 	}
@@ -335,7 +313,7 @@ class Item extends \Eloquent{
 		*	Initialize item profile
 		*
 		*/
-		$itemprofile;
+		$item;
 
 		/**
 		*
@@ -364,7 +342,7 @@ class Item extends \Eloquent{
 			|
 			*/
 			case 'System Unit':
-			$itemprofile = ItemProfile::getListOfItems($id,'systemunit_id');
+			$item = Item::getListOfItems($id,'systemunit_id');
 			break;
 
 
@@ -375,7 +353,7 @@ class Item extends \Eloquent{
 			|
 			*/
 			case 'Display':
-			$itemprofile = ItemProfile::getListOfItems($id,'monitor_id');
+			$item = Item::getListOfItems($id,'monitor_id');
 			break;
 
 			/*
@@ -385,7 +363,7 @@ class Item extends \Eloquent{
 			|
 			*/
 			case 'AVR':
-			$itemprofile = ItemProfile::getListOfItems($id,'avr_id');
+			$item = Item::getListOfItems($id,'avr_id');
 			break;
 
 			/*
@@ -395,7 +373,7 @@ class Item extends \Eloquent{
 			|
 			*/
 			case $item == 'Keyboard':
-			$itemprofile = ItemProfile::getListOfItems($id,'keyboard_id');
+			$item = Item::getListOfItems($id,'keyboard_id');
 			break;
 		}
 
@@ -404,7 +382,7 @@ class Item extends \Eloquent{
 		*	return collection of item profile
 		*
 		*/
-		return json_encode($itemprofile);
+		return json_encode($item);
 	}
 
 	/**
@@ -415,11 +393,11 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static function getListOfItems($id,$name){
-	$itemprofile = ItemProfile::whereIn('inventory_id',$id)
-	              ->whereNotIn('id',Pc::select($name)->pluck($name))
+	$item = Item::whereIn('inventory_id',$id)
+	              ->whereNotIn('id',Workstation::select($name)->pluck($name))
 	              ->select('propertynumber')
 	              ->get();
-	return $itemprofile;
+	return $item;
 	}
 
 	/**
@@ -429,24 +407,24 @@ class Item extends \Eloquent{
 	*/
 	public function scopeUnassembled($query)
 	{
-		return $query->whereNotIn('id',Pc::whereNotNull('systemunit_id')->pluck('systemunit_id'))
-					->whereNotIn('id',Pc::whereNotNull('monitor_id')->pluck('monitor_id'))
-					->whereNotIn('id',Pc::whereNotNull('keyboard_id')->pluck('keyboard_id'))
-					->whereNotIn('id',Pc::whereNotNull('avr_id')->pluck('avr_id'));
+		return $query->whereNotIn('id',Workstation::whereNotNull('systemunit_id')->pluck('systemunit_id'))
+					->whereNotIn('id',Workstation::whereNotNull('monitor_id')->pluck('monitor_id'))
+					->whereNotIn('id',Workstation::whereNotNull('keyboard_id')->pluck('keyboard_id'))
+					->whereNotIn('id',Workstation::whereNotNull('avr_id')->pluck('avr_id'));
 	}
 
 	/**
 	*
-	*	@param itemprofile id
-	*	@return itemprofile information
+	*	@param item id
+	*	@return item information
 	*
 	*/
 	public static function setItemStatus($id,$status)
 	{
-		$itemprofile = ItemProfile::find($id);
-		$itemprofile->status = $status;
-		$itemprofile->save();
-		return $itemprofile;
+		$item = Item::find($id);
+		$item->status = $status;
+		$item->save();
+		return $item;
 	}
 
 	/**
@@ -463,7 +441,7 @@ class Item extends \Eloquent{
 			*	get the item profile
 			*	assign to $item variable
 			*/
-			$item = ItemProfile::find($_item);
+			$item = Item::find($_item);
 
 			/*
 			*	set item location
@@ -513,7 +491,7 @@ class Item extends \Eloquent{
 
 	public function getIDFromPropertyNumber($propertynumber)
 	{
-		return ItemProfile::propertyNumber($propertynumber)->pluck('id');
+		return Item::propertyNumber($propertynumber)->pluck('id');
 	}
 
 }
