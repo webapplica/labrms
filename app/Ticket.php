@@ -47,9 +47,23 @@ class Ticket extends \Eloquent{
 		'Staff Assigned' => 'required|exists:user,id',
 	);
 
+	protected $appends = [
+		'ticket_type_name'
+	];
+
+	public function getTicketTypeNameAttribute()
+	{
+		return $this->type->name;
+	}
+
 	public function user()
 	{
 		return $this->hasOne('App\User','id','staffassigned');
+	}
+
+	public function type()
+	{
+		return $this->belongsTo('App\TicketType', 'type_id', 'id');
 	}
 
 	public function item()

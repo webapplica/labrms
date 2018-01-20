@@ -88,7 +88,7 @@ Inventory
 							<a href="{{ url('item/profile/history') }}/`+callback.id+`" class="btn btn-sm btn-default">
 								<span class="glyphicon glyphicon-list" aria-hidden="true"></span> View
 							</a>
-						  	<button class="btn btn-success btn-sm" data-toggle="modal" data-target="#assignModal" id="assign">
+						  	<button class="btn btn-success btn-sm" data-toggle="modal" data-id="`+callback.id+`" data-property_number="`+callback.property_number+`" data-serial_number="`+callback.serial_number+`" data-location="`+callback.location_name+`" data-target="#assignModal" id="assign">
 						  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Assign
 						  	</button>
 							<button id="delete" class="btn btn-danger btn-sm" type="button">
@@ -99,13 +99,6 @@ Inventory
 						} }
 				],
 		});
-
-		$('#assign').on('click',function(){
-			$('#assign-item').val(table.row('.selected').data().id)
-			$('#assign-propertynumber').text(table.row('.selected').data().propertynumber)
-			$('#assign-serialid').text(table.row('.selected').data().serialnumber)
-			$('#assign-location').text(table.row('.selected').data().location)
-		})
 
 		$('#edit').on('click',function(){
 			try{

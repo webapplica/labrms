@@ -170,7 +170,7 @@
 
             <!-- ticket dropdown tab -->
             <li>
-              <a href="{{ url('receipt') }}">Receipt</a>
+              <a href="{{ url('receipt') }}">Receipts</a>
             </li> <!-- end of ticket dropdown tab -->
 
             <!-- inventory dropdown tab -->

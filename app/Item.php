@@ -159,11 +159,21 @@ class Item extends \Eloquent{
 	public static function assignToRoom($item,$room)
 	{
 
-		$item = Itemprofile::find($item);
-		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-		$details = "$item->propertynumber assigned to $room->name by $author";
-		$tickettype = 'Transfer';
-		$ticketname = 'Transfer';
+		$item = Item::find($item);
+
+		$staff = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
+		$staff_id = Auth::user()->id;
+		$details = "$item->property_number assigned to $room->name by $staff";
+		$ticket_id = null;
+		$status = 'Closed';
+		$item_id = $item->id;
+
+		$type = TicketType::firstOrCreate([
+			'name' => 'Transfer'
+		]);
+
+		$title = 'Transfer';
+
 		/*
 		|--------------------------------------------------------------------------
 		|
@@ -175,27 +185,24 @@ class Item extends \Eloquent{
 		|
 		*/			
 
-		$item->location = $room->name;
-		if($item->deployment == null)
+		$item->location = $room->id;
+		if($item->deployed_at == null)
 		{
-			$item->deployment = Carbon::now();
-			$ticketname = 'Deployment';
+			$item->deployed_at = Carbon::now();
+			$item->deployed_by = $staff;
+			$title = 'Deployment';
 		}
+
 		$item->save();
 
-		if(count($item->room) > 0)
-		{
-			$item->room()->sync([ 'room_id'=>$room->id ]);
-		}		
-		else
-		{
-			$roominventory = new RoomInventory;
-			$roominventory->room_id = $room->id;
-			$roominventory->item_id = $item;
-			$roominventory->save();
-		}
-
-		Ticket::generateEquipmentTicket($item,$tickettype,$ticketname,$details,$author,Auth::user()->id,null,'Closed');
+		$ticket = new Ticket;
+		$ticket->type_id = $type->id;
+		$ticket->title = $title;
+		$ticket->details = $details;
+		$ticket->staff_id = $staff_id;
+		$ticket->predecessor_id = $ticket_id;
+		$ticket->status = $status;
+		$ticket->generate($item_id);
 
 
 	}

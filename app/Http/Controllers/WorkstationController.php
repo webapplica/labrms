@@ -8,12 +8,7 @@ use Session;
 use Auth;
 use DB;
 use App;
-use App\Pc;
-use App\Software;
-use App\Supply;
-use App\Ticket;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
 
 class WorkstationController extends Controller {
 
@@ -22,11 +17,11 @@ class WorkstationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			return json_encode(['data'=> Pc::with('keyboard','avr','monitor','systemunit.roominventory.room')->get()]);
+			return json_encode(['data'=> App\Workstation::with('keyboard','avr','monitor','systemunit.roominventory.room')->get()]);
 		}
 
 		return view('workstation.index');
@@ -38,7 +33,7 @@ class WorkstationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		return view('workstation.create');
 	}
@@ -49,15 +44,15 @@ class WorkstationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		$systemunit = $this->sanitizeString(Input::get('systemunit'));
-		$monitor = $this->sanitizeString(Input::get('monitor'));
-		$avr = $this->sanitizeString(Input::get('avr'));
-		$keyboard = $this->sanitizeString(Input::get('keyboard'));
-		$oskey = $this->sanitizeString(Input::get('os'));
-		$mouse = $this->sanitizeString(Input::get('mouse'));
-		$name = $this->sanitizeString(Input::get('name'));
+		$systemunit = $this->sanitizeString($request->get('systemunit'));
+		$monitor = $this->sanitizeString($request->get('monitor'));
+		$avr = $this->sanitizeString($request->get('avr'));
+		$keyboard = $this->sanitizeString($request->get('keyboard'));
+		$oskey = $this->sanitizeString($request->get('os'));
+		$mouse = $this->sanitizeString($request->get('mouse'));
+		$name = $this->sanitizeString($request->get('name'));
 
 		$validator = Validator::make([
 			'Operating System Key' => $oskey,
@@ -66,7 +61,7 @@ class WorkstationController extends Controller {
 			'Monitor' => $monitor,
 			'System Unit' => $systemunit,
 			'Mouse' => $mouse
-		],Pc::$rules);
+		],App\Workstation::$rules);
 
 		if($validator->fails())
 		{
@@ -83,7 +78,7 @@ class WorkstationController extends Controller {
 		DB::beginTransaction();
 
 
-		$pc = new App\Pc;
+		$pc = new App\Workstation;
 		$pc->systemunit_id = $systemunit;
 		$pc->monitor_id = ($monitor == "" || is_null($monitor)) ? null : $monitor;
 		$pc->avr_id = ($avr == "" || is_null($avr)) ? null : $avr;
@@ -104,12 +99,12 @@ class WorkstationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$workstation = Pc::find($id);
+			$workstation = App\Workstation::find($id);
 
 			return json_encode([
 				'data' => App\Software::whereHas('roomsoftware',function($query) use ($workstation) {
@@ -124,7 +119,7 @@ class WorkstationController extends Controller {
 
 			$room = "";
 			$software = "";
-			$workstation = App\Pc::with('systemunit')
+			$workstation = App\App\Workstation::with('systemunit')
 						->with('keyboard')
 						->with('monitor')
 						->find($id);
@@ -201,9 +196,9 @@ class WorkstationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
-		$pc = Pc::where('id','=',$id)
+		$pc = App\Workstation::where('id','=',$id)
 					->with('keyboard','avr','monitor','systemunit.roominventory.room')
 					->first();
 
@@ -217,14 +212,14 @@ class WorkstationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		$avr = $this->sanitizeString(Input::get('avr'));
-		$monitor = $this->sanitizeString(Input::get('monitor'));
-		$os = $this->sanitizeString(Input::get('os'));
-		$keyboard = $this->sanitizeString(Input::get('keyboard'));
-		$mouse = $this->sanitizeString(Input::get('mouse'));
-		$systemunit = $this->sanitizeString(Input::get('systemunit'));
+		$avr = $this->sanitizeString($request->get('avr'));
+		$monitor = $this->sanitizeString($request->get('monitor'));
+		$os = $this->sanitizeString($request->get('os'));
+		$keyboard = $this->sanitizeString($request->get('keyboard'));
+		$mouse = $this->sanitizeString($request->get('mouse'));
+		$systemunit = $this->sanitizeString($request->get('systemunit'));
 
 		$validator = Validator::make([
 		  'Operating System Key' => $os,
@@ -233,7 +228,7 @@ class WorkstationController extends Controller {
 		  'Keyboard' => $keyboard,
 		  'Mouse' => $mouse,
 		  'Monitor' => $monitor
-		],Pc::$updateRules);
+		],App\Workstation::$updateRules);
 
 		if($validator->fails())
 		{
@@ -249,7 +244,7 @@ class WorkstationController extends Controller {
 		*/
 		DB::beginTransaction();
 
-		$pc = Pc::find($id);
+		$pc = App\Workstation::find($id);
 		$pc->oskey = $os;
 		$pc->mouse_id = $mouse;
 		$pc->monitor_id = $monitor;
@@ -278,18 +273,18 @@ class WorkstationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$pc = $this->sanitizeString(Input::get('selected'));
-			$keyboard = $this->sanitizeString(Input::get('keyboard'));
-			$avr = $this->sanitizeString(Input::get('avr'));
-			$monitor = $this->sanitizeString(Input::get('monitor'));
-			$systemunit = $this->sanitizeString(Input::get('systemunit'));
+			$pc = $this->sanitizeString($request->get('selected'));
+			$keyboard = $this->sanitizeString($request->get('keyboard'));
+			$avr = $this->sanitizeString($request->get('avr'));
+			$monitor = $this->sanitizeString($request->get('monitor'));
+			$systemunit = $this->sanitizeString($request->get('systemunit'));
 			try
 			{
-				Pc::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
+				App\Workstation::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
 			} 
 			catch ( Exception $e ) 
 			{  
@@ -299,8 +294,8 @@ class WorkstationController extends Controller {
 			return json_encode('success');
 		}
 
-		$pc = $this->sanitizeString(Input::get('selected'));
-		Pc::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
+		$pc = $this->sanitizeString($request->get('selected'));
+		App\Workstation::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
 
 		Session::flash('success-message','Workstation condemned');
 		return redirect('workstation');
@@ -313,7 +308,7 @@ class WorkstationController extends Controller {
 	*	@param $pc accepts pc id list
 	*
 	*/
-	public function deploy()
+	public function deploy(Request $request)
 	{
 
 		/**
@@ -321,14 +316,14 @@ class WorkstationController extends Controller {
 		*	check if the request is ajax
 		*
 		*/
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$room = $this->sanitizeString(Input::get('room'));
-			$pc = $this->sanitizeString(Input::get('items'));
-			$name = $this->sanitizeString(Input::get('name'));
+			$room = $this->sanitizeString($request->get('room'));
+			$pc = $this->sanitizeString($request->get('items'));
+			$name = $this->sanitizeString($request->get('name'));
 
-			Pc::setPcLocation($pc,$room);
-			$pc = Pc::find($pc);
+			App\Workstation::setWorkstationLocation($pc,$room);
+			$pc = App\Workstation::find($pc);
 			$pc->name = $name;
 			$pc->save();
 
@@ -340,12 +335,12 @@ class WorkstationController extends Controller {
 		*	normal request
 		*
 		*/
-		$room = $this->sanitizeString(Input::get('room'));
-		$pc = $this->sanitizeString(Input::get('items'));
-		$name = $this->sanitizeString(Input::get('name'));
+		$room = $this->sanitizeString($request->get('room'));
+		$pc = $this->sanitizeString($request->get('items'));
+		$name = $this->sanitizeString($request->get('name'));
 
-		Pc::setPcLocation($pc,$room);
-		$pc = Pc::find($pc);
+		App\Workstation::setWorkstationLocation($pc,$room);
+		$pc = App\Workstation::find($pc);
 		$pc->name = $name;
 		$pc->save();
 
@@ -360,7 +355,7 @@ class WorkstationController extends Controller {
 	*	@param $pc accepts pc id list
 	*
 	*/
-	public function transfer()
+	public function transfer(Request $request)
 	{
 
 		/**
@@ -368,14 +363,14 @@ class WorkstationController extends Controller {
 		*	check if the request is ajax
 		*
 		*/
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$room = $this->sanitizeString(Input::get('room'));
-			$pc = $this->sanitizeString(Input::get('items'));
-			$name = $this->sanitizeString(Input::get('name'));
+			$room = $this->sanitizeString($request->get('room'));
+			$pc = $this->sanitizeString($request->get('items'));
+			$name = $this->sanitizeString($request->get('name'));
 
-			Pc::setPcLocation($pc,$room);
-			$pc = Pc::find($pc);
+			App\Workstation::setWorkstationLocation($pc,$room);
+			$pc = App\Workstation::find($pc);
 			$pc->name = $name;
 			$pc->save();
 
@@ -387,12 +382,12 @@ class WorkstationController extends Controller {
 		*	normal request
 		*
 		*/
-		$room = $this->sanitizeString(Input::get('room'));
-		$pc = $this->sanitizeString(Input::get('items'));
-		$name = $this->sanitizeString(Input::get('name'));
+		$room = $this->sanitizeString($request->get('room'));
+		$pc = $this->sanitizeString($request->get('items'));
+		$name = $this->sanitizeString($request->get('name'));
 
-		Pc::setPcLocation($pc,$room);
-		$pc = Pc::find($pc);
+		App\Workstation::setWorkstationLocation($pc,$room);
+		$pc = App\Workstation::find($pc);
 		$pc->name = $name;
 		$pc->save();
 

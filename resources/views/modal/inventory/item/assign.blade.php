@@ -12,7 +12,7 @@
 							<ul class="list-group">
 							  <li class="list-group-item">Property Number:  <span id="assign-propertynumber"></span></li>
 							  <li class="list-group-item">Serial ID:  <span id="assign-serialid"></span></li>
-							  <li class="list-group-item">Location: <span id="assign-location"></span></li>
+							  <li class="list-group-item">Current Location: <span id="assign-location"></span></li>
 							</ul>
 						</div>
 						{{ Form::hidden('item',null,[
@@ -20,7 +20,7 @@
 							'class' => 'form-control'
 						]) }}
 						<div class="form-group">
-						{{ Form::label('Room') }}
+						{{ Form::label('Assign to ( Room ):') }}
 						{{ Form::select('room',['Loading all rooms'],null,[
 							'id' => 'location',
 							'class' => 'form-control'
@@ -34,7 +34,7 @@
 	</div>
 </div>
 <script>
-$('#assignModal').on('show.bs.modal',function(){
+$('#assignModal').on('show.bs.modal',function(event){
 	$.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -55,5 +55,12 @@ $('#assignModal').on('show.bs.modal',function(){
 			$('#location').append(options);
 		}
 	})
+
+	button = $(event.relatedTarget)
+
+	$('#assign-item').val( button.data('id') )
+	$('#assign-propertynumber').text( button.data('property_number') )
+	$('#assign-serialid').text( button.data('serial_number') )
+	$('#assign-location').text( button.data('location') )
 })
 </script>

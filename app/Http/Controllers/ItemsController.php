@@ -162,7 +162,6 @@ class ItemsController extends Controller {
 	 */
 	public function show(Request $request, $id)
 	{
-
 		if($request->ajax())
 		{
 
@@ -312,7 +311,7 @@ class ItemsController extends Controller {
 		*	@return itemtype
 		*
 		*/
-		$itemprofile = App\Item::with('itemticket.ticket')->with('inventory.itemtype')->find($id);
+		$itemprofile = App\Item::with('ticket')->with('inventory.itemtype')->orderBy('id', 'desc')->find($id);
 		
 		return view('item.history')
 				->with('itemprofile',$itemprofile);
@@ -329,26 +328,7 @@ class ItemsController extends Controller {
 	public function assign(Request $request)
 	{
 		$item = $this->sanitizeString($request->get('item'));
-		$room = App\Room::location($this->sanitizeString($request->get('room')))->select('id','name')->first();
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Validates input
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$validator = Validator::make([
-			'Item' => $item,
-			'Room' => $room->id
-		],App\RoomInventory::$rules);
-
-		if($validator->fails())
-		{
-			Session::flash('error-message','Error occurred while processing your data');
-			return redirect('inventory');
-		}
+		$room = App\Room::findByLocation($this->sanitizeString($request->get('room')))->select('id','name')->first();
 
 		/*
 		|--------------------------------------------------------------------------
@@ -358,15 +338,16 @@ class ItemsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$itemprofile = App\Item::find($item);
-		if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
+		$item = App\Item::find($item);
+
+		if(count(App\Workstation::isWorkstation($item->property_number)) > 0)
 		{
 			Session::flash('error-message','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation');
-			return redirect("item/profile/$id");
+			return redirect("item/profile/assign");
 
 		}
 
-		App\Item::assignToRoom($item,$room);
+		App\Item::assignToRoom($item->id, $room);
 
 		Session::flash('success-message',"Item assigned to room $room->name");
 		return redirect()->back();

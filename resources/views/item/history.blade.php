@@ -22,13 +22,13 @@ Item History
       <legend class="text-muted"><h3>Item Profile History</h3></legend>
       <ul class="breadcrumb">
         <li><a href="{{ url('item/profile') }}">Items Profile</a></li>
-        <li class="active">{{ $itemprofile->propertynumber }}</li>
+        <li class="active">{{ $itemprofile->property_number }}</li>
       </ul>
       <table class="table table-hover table-bordered" id="itemProfileTable" cellspacing="0" width="100%">
         <thead>
           <tr rowspan="2">
               <th class="text-left" colspan="4">Property Number:  
-                <span style="font-weight:normal">{{ $itemprofile->propertynumber }}</span> 
+                <span style="font-weight:normal">{{ $itemprofile->property_number }}</span> 
               </th>
               <th class="text-left" colspan="4">Brand:  
                 <span style="font-weight:normal">{{ $itemprofile->inventory->brand }}</span> 
@@ -36,7 +36,7 @@ Item History
           </tr>
           <tr rowspan="2">
               <th class="text-left" colspan="4">Serial Number:  
-                <span style="font-weight:normal">{{ $itemprofile->serialnumber }}</span>  
+                <span style="font-weight:normal">{{ $itemprofile->serial_number }}</span>  
               </th>
               <th class="text-left" colspan="4">Model:  
                 <span style="font-weight:normal">{{ $itemprofile->inventory->model }}</span> 
@@ -51,7 +51,7 @@ Item History
               </th>
           </tr>
           <tr rowspan="2">
-              <th class="text-center" colspan="12">History</th>
+              <th class="text-center" colspan="12">Ticket History</th>
           </tr>
           <tr>
             <th>Ticket ID</th>
@@ -67,11 +67,11 @@ Item History
         @forelse($itemprofile->ticket as $ticket)
           <tr>
             <td>{{ $ticket->id }}</td>
-            <td>{{ $ticket->tickettype }}</td>
-            <td>{{ $ticket->ticketname }}</td>
+            <td>{{ $ticket->ticket_type_name }}</td>
+            <td>{{ $ticket->title }}</td>
             <td>{{ $ticket->details }}</td>
             <td>{{ $ticket->author }}</td>
-            <td>{{ $ticket->user->firstname }} {{ $ticket->user->lastname }}</td>
+            <td>{{ $ticket->author }}</td>
             <td>{{ $ticket->status }}</td>
           </tr>
         @empty
@@ -87,14 +87,7 @@ Item History
   $(document).ready(function(){
 
     $('#itemProfileTable').DataTable();
-    @if( Session::has("success-message") )
-      swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-    @if( Session::has("error-message") )
-      swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
 
-    $('#page-body').show()
   })
 </script>
 @stop

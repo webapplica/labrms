@@ -64,9 +64,9 @@ Items Profile
 								    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			        columns: [
 			            { data: "id" },
-			            { data: "propertynumber" },
-			            { data: "serialnumber" },
-			            { data: "location" },
+			            { data: "property_number" },
+			            { data: "serial_number" },
+			            { data: "location_name" },
 			            { data: "inventory.brand" },
 			            { data: "inventory.model" },
 			            { data: "inventory.itemtype.name" },
