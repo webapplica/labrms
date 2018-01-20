@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\MaintenanceActivity;
+use App;
 use Validator;
 use Session;
 use Illuminate\Support\Facades\Request;
@@ -21,7 +21,7 @@ class MaintenanceActivityController extends Controller {
 		if(Request::ajax())
 		{
 			return json_encode([
-				'data' => MaintenanceActivity::all()
+				'data' => App\Activity::all()
 			]);
 		}
 		
@@ -48,14 +48,14 @@ class MaintenanceActivityController extends Controller {
 	public function store()
 	{
 		$type = $this->sanitizeString(Input::get('maintenancetype'));
-		$activity = $this->sanitizeString(Input::get('activity'));
+		$name = $this->sanitizeString(Input::get('activity'));
 		$details = $this->sanitizeString(Input::get('details'));
 
 		$validator = Validator::make([
 			'Type' => $type,
-			'Activity' => $activity,
+			'Activity' => $name,
 			'Details' => $details
-		],MaintenanceActivity::$rules);
+		],App\Activity::$rules);
 
 		if($validator->fails())
 		{
@@ -64,9 +64,9 @@ class MaintenanceActivityController extends Controller {
 				->withErrors($validator);
 		}
 
-		$maintenanceactivity = new MaintenanceActivity;
+		$maintenanceactivity = new App\Activity;
 		$maintenanceactivity->type = $type;
-		$maintenanceactivity->activity = $activity;
+		$maintenanceactivity->name = $name;
 		$maintenanceactivity->details = $details;
 		$maintenanceactivity->save();
 
@@ -86,7 +86,7 @@ class MaintenanceActivityController extends Controller {
 		
 		if(Request::ajax())
 		{
-			return json_encode( MaintenanceActivity::find($id) );
+			return json_encode( App\Activity::find($id) );
 		}
 	}
 
@@ -99,7 +99,7 @@ class MaintenanceActivityController extends Controller {
 	public function edit($id)
 	{
 		try{
-			$maintenanceactivity = MaintenanceActivity::find($id);
+			$maintenanceactivity = App\Activity::find($id);
 			return view('maintenance.activity.edit')
 					->with('maintenanceactivity',$maintenanceactivity);
 		} catch( Exception $e ){
@@ -117,12 +117,12 @@ class MaintenanceActivityController extends Controller {
 	public function update($id)
 	{
 		$type = $this->sanitizeString(Input::get('maintenancetype'));
-		$activity = $this->sanitizeString(Input::get('activity'));
+		$name = $this->sanitizeString(Input::get('activity'));
 		$details = $this->sanitizeString(Input::get('details'));
 
 		$validator = Validator::make([
-			'Activity' => $activity
-		],MaintenanceActivity::$updateRules);
+			'Activity' => $name
+		],App\Activity::$updateRules);
 
 		if($validator->fails())
 		{
@@ -131,9 +131,9 @@ class MaintenanceActivityController extends Controller {
 				->withErrors($validator);
 		}
 
-		$maintenanceactivity = MaintenanceActivity::find($id);
+		$maintenanceactivity = App\Activity::find($id);
 		$maintenanceactivity->type = $type;
-		$maintenanceactivity->activity = $activity;
+		$maintenanceactivity->name = $name;
 		$maintenanceactivity->details = $details;
 		$maintenanceactivity->save();
 
@@ -153,12 +153,12 @@ class MaintenanceActivityController extends Controller {
 		if(Request::ajax())
 		{
 			$id = $this->sanitizeString(Input::get('id'));
-			$maintenanceactivity = MaintenanceActivity::find($id);
+			$maintenanceactivity = App\Activity::find($id);
 			$maintenanceactivity->delete();
 			return json_encode('success');
 		}
 
-		$maintenanceactivity = MaintenanceActivity::find($id);
+		$maintenanceactivity = App\Activity::find($id);
 		$maintenanceactivity->delete();
 		Session::flash('success-message','Activity removed');
 		return redirect('maintenance/activity');
@@ -177,24 +177,24 @@ class MaintenanceActivityController extends Controller {
 		{
 			$type = $this->sanitizeString(Input::get('type'));
 
-			return json_encode(MaintenanceActivity::type($type)->pluck('activity','id'));
+			return json_encode(App\Activity::type($type)->pluck('activity','id'));
 		}
 	}
 
 	public function getAllMaintenanceActivity()
 	{
 
-		return json_encode(['data'=>MaintenanceActivity::all()]);
+		return json_encode(['data'=>App\Activity::all()]);
 	}
 
 	public function getPreventiveMaintenanceActivity()
 	{
-		return json_encode(MaintenanceActivity::where('type','preventive')->select('problem')->get());
+		return json_encode(App\Activity::where('type','preventive')->select('problem')->get());
 	}
 
 	public function getCorrectiveMaintenanceActivity()
 	{
-		return json_encode(MaintenanceActivity::where('type','corrective')->select('problem')->get());
+		return json_encode(App\Activity::where('type','corrective')->select('problem')->get());
 	}
 
 

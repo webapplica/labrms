@@ -34,6 +34,11 @@ class Room extends \Eloquent{
 
 	);
 
+	public function scopeLocation($query, $location)
+	{
+		return $query->where('name', '=', $location);
+	}
+
 	public function scopeFindByLocation($query, $location)
 	{
 		return $query->where('name', '=', $location);

@@ -56,6 +56,8 @@ Inventory
 	$(document).ready(function() {
 
 		var table = $('#itemProfileTable').DataTable({
+			serverSide: true,
+			processing: true,
 			select: {
 				style: 'single'
 			},
@@ -76,12 +78,8 @@ Inventory
 						{ data: "property_number" },
 						{ data: "serial_number" },
 						{ data: "location_name" },
-						{data: function(callback){
-							return moment(callback.datereceived).format("dddd, MMMM Do YYYY");
-						}},
-						{data: function(callback){
-							return moment(callback.created_at).format("dddd, MMMM Do YYYY");
-						}},
+						{data: "parsed_date_received" },
+						{data: "parsed_date_profiled"},
 						{ data: "status" },
 						{ data: function(callback){
 							return `
@@ -91,7 +89,7 @@ Inventory
 						  	<button class="btn btn-success btn-sm" data-toggle="modal" data-id="`+callback.id+`" data-property_number="`+callback.property_number+`" data-serial_number="`+callback.serial_number+`" data-location="`+callback.location_name+`" data-target="#assignModal" id="assign">
 						  		<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Assign
 						  	</button>
-							<button id="delete" class="btn btn-danger btn-sm" type="button">
+							<button class="btn btn-danger btn-sm delete" type="button" data-id="`+callback.id+`">
 								<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
 								<span class="hidden-sm hidden-xs">Condemn</span>
 							</button>
@@ -100,66 +98,50 @@ Inventory
 				],
 		});
 
-		$('#edit').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					window.location.href = "{{ url('item/profile') }}" + '/' + table.row('.selected').data().id + '/edit'
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
-		});
+	    $('#itemProfileTable').on('click', '.delete', function(){
+	    	id = $(this).data('id')
+	 		swal({
+	          title: "Are you sure?",
+	          text: "This record will be considered as condemned and will be removed. Do you want to continue?",
+	          type: "warning",
+			  confirmButtonColor: "#DD6B55",
+	          showCancelButton: true,
+	          confirmButtonText: "Yes, delete it!",
+	          cancelButtonText: "No, cancel it!",
+	          closeOnConfirm: false,
+	          closeOnCancel: false
+	        },
+	        function(isConfirm){
+	          if (isConfirm) {
+					$.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+					type: 'delete',
+					url: '{{ url("item/profile/") }}' + "/" + id,
+					data: {
+						'id': id
+					},
+					dataType: 'json',
+					success: function(response){
+						if(response == 'success'){
+							swal('Operation Successful','Item condemned','success')
+			        	}else if(response == 'connected'){
+							swal('Operation Unsuccessful','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation','error')
+			        	}else{
+							swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+						}
 
-	    $('#delete').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-			        swal({
-			          title: "Are you sure?",
-			          text: "This record will be considered as condemned and will be removed. Do you want to continue?",
-			          type: "warning",
-  					  confirmButtonColor: "#DD6B55",
-			          showCancelButton: true,
-			          confirmButtonText: "Yes, delete it!",
-			          cancelButtonText: "No, cancel it!",
-			          closeOnConfirm: false,
-			          closeOnCancel: false
-			        },
-			        function(isConfirm){
-			          if (isConfirm) {
-     					$.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-							type: 'delete',
-							url: '{{ url("item/profile/") }}' + "/" + table.row('.selected').data().id,
-							data: {
-								'id': table.row('.selected').data().id
-							},
-							dataType: 'json',
-							success: function(response){
-								if(response == 'success'){
-									swal('Operation Successful','Item condemned','success')
-					        		table.row('.selected').remove().draw( false );
-					        	}else if(response == 'connected'){
-									swal('Operation Unsuccessful','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation','error')
-					        	}else{
-									swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-								}
-							},
-							error: function(){
-								swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-							}
-						});
-			          } else {
-			            swal("Cancelled", "Operation Cancelled", "error");
-			          }
-			        })
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+		        		table.ajax().reload()
+					},
+					error: function(){
+						swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+					}
+				});
+	          } else {
+	            swal("Cancelled", "Operation Cancelled", "error");
+	          }
+	        })
 	    });
 
 	} );

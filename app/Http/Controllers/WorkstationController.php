@@ -78,16 +78,17 @@ class WorkstationController extends Controller {
 		DB::beginTransaction();
 
 
-		$pc = new App\Workstation;
-		$pc->systemunit_id = $systemunit;
-		$pc->monitor_id = ($monitor == "" || is_null($monitor)) ? null : $monitor;
-		$pc->avr_id = ($avr == "" || is_null($avr)) ? null : $avr;
-		$pc->keyboard_id = ($keyboard == "" || is_null($keyboard)) ? null : $keyboard;
-		$pc->oskey = $oskey;
-		$pc->mouse_id = ($mouse == "" || is_null($mouse)) ? null : $mouse;
-		$pc->assemble();
+		$workstation = new App\Workstation;
+		$workstation->systemunit_id = $systemunit;
+		$workstation->monitor_id = ($monitor == "" || is_null($monitor)) ? null : $monitor;
+		$workstation->avr_id = ($avr == "" || is_null($avr)) ? null : $avr;
+		$workstation->keyboard_id = ($keyboard == "" || is_null($keyboard)) ? null : $keyboard;
+		$workstation->oskey = $oskey;
+		$workstation->mouse_id = ($mouse == "" || is_null($mouse)) ? null : $mouse;
+		$workstation->assemble();
 
 		DB::commit();
+		
 		Session::flash('success-message','Workstation assembled');
 		return redirect('workstation');
 	}
@@ -110,7 +111,7 @@ class WorkstationController extends Controller {
 				'data' => App\Software::whereHas('roomsoftware',function($query) use ($workstation) {
 								$query->where('room_id','=',$workstation->systemunit->roominventory->room_id);
 							})
-							->with('pcsoftware.softwarelicense')
+							->with('workstationsoftware.softwarelicense')
 							->get()
 			]);
 		}
@@ -149,13 +150,13 @@ class WorkstationController extends Controller {
 				/*
 				|--------------------------------------------------------------------------
 				|
-				| 	checks if pc is in ticket
+				| 	checks if workstation is in ticket
 				|
 				|--------------------------------------------------------------------------
 				|
 				*/
-				$query->where('pc_id','=',$id)
-					->from('pc_ticket')
+				$query->where('workstation_id','=',$id)
+					->from('workstation_ticket')
 					->select('ticket_id')
 					->pluck('ticket_id');
 			})->where('details','like','%'.'As Mouse Brand' . '%')->count();
@@ -166,13 +167,13 @@ class WorkstationController extends Controller {
 				/*
 				|--------------------------------------------------------------------------
 				|
-				| 	checks if pc is in ticket
+				| 	checks if workstation is in ticket
 				|
 				|--------------------------------------------------------------------------
 				|
 				*/
-				$query->where('pc_id','=',$id)
-					->from('pc_ticket')
+				$query->where('workstation_id','=',$id)
+					->from('workstation_ticket')
 					->select('ticket_id')
 					->pluck('ticket_id');
 			})->where('tickettype','=','Complaint')->count();
@@ -198,12 +199,12 @@ class WorkstationController extends Controller {
 	 */
 	public function edit(Request $request, $id)
 	{
-		$pc = App\Workstation::where('id','=',$id)
+		$workstation = App\Workstation::where('id','=',$id)
 					->with('keyboard','avr','monitor','systemunit.roominventory.room')
 					->first();
 
 		return view('workstation.edit')
-			->with('pc',$pc);
+			->with('workstation',$workstation);
 	}
 
 	/**
@@ -244,13 +245,13 @@ class WorkstationController extends Controller {
 		*/
 		DB::beginTransaction();
 
-		$pc = App\Workstation::find($id);
-		$pc->oskey = $os;
-		$pc->mouse_id = $mouse;
-		$pc->monitor_id = $monitor;
-		$pc->avr_id = $avr;
-		$pc->keyboard_id = $keyboard;
-		$pc->systemunit_id = $systemunit;
+		$workstation = App\Workstation::find($id);
+		$workstation->oskey = $os;
+		$workstation->mouse_id = $mouse;
+		$workstation->monitor_id = $monitor;
+		$workstation->avr_id = $avr;
+		$workstation->keyboard_id = $keyboard;
+		$workstation->systemunit_id = $systemunit;
 
 		$details = "Workstation updated with the following propertynumber:" ;
 		$details = $details . "$_avr->propertynumber for AVR";
@@ -258,7 +259,7 @@ class WorkstationController extends Controller {
 		$details = $details . "$_keyboard->propertynumber for Keyboard";
 		$details = $details .  "$mouse as mouse brand";
 
-		$pc->updateParts();
+		$workstation->updateParts();
 		
 		DB::commit();
 
@@ -277,14 +278,14 @@ class WorkstationController extends Controller {
 	{
 		if($request->ajax())
 		{
-			$pc = $this->sanitizeString($request->get('selected'));
+			$workstation = $this->sanitizeString($request->get('selected'));
 			$keyboard = $this->sanitizeString($request->get('keyboard'));
 			$avr = $this->sanitizeString($request->get('avr'));
 			$monitor = $this->sanitizeString($request->get('monitor'));
 			$systemunit = $this->sanitizeString($request->get('systemunit'));
 			try
 			{
-				App\Workstation::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
+				App\Workstation::condemn($workstation,$systemunit,$monitor,$keyboard,$avr);
 			} 
 			catch ( Exception $e ) 
 			{  
@@ -294,8 +295,8 @@ class WorkstationController extends Controller {
 			return json_encode('success');
 		}
 
-		$pc = $this->sanitizeString($request->get('selected'));
-		App\Workstation::condemn($pc,$systemunit,$monitor,$keyboard,$avr);
+		$workstation = $this->sanitizeString($request->get('selected'));
+		App\Workstation::condemn($workstation,$systemunit,$monitor,$keyboard,$avr);
 
 		Session::flash('success-message','Workstation condemned');
 		return redirect('workstation');
@@ -303,9 +304,9 @@ class WorkstationController extends Controller {
 
 	/**
 	*
-	*	function for deploying pc to another location
+	*	function for deploying workstation to another location
 	*	@param $room accepts room name
-	*	@param $pc accepts pc id list
+	*	@param $workstation accepts workstation id list
 	*
 	*/
 	public function deploy(Request $request)
@@ -319,13 +320,13 @@ class WorkstationController extends Controller {
 		if($request->ajax())
 		{
 			$room = $this->sanitizeString($request->get('room'));
-			$pc = $this->sanitizeString($request->get('items'));
+			$workstation = $this->sanitizeString($request->get('items'));
 			$name = $this->sanitizeString($request->get('name'));
 
-			App\Workstation::setWorkstationLocation($pc,$room);
-			$pc = App\Workstation::find($pc);
-			$pc->name = $name;
-			$pc->save();
+			App\Workstation::setWorkstationLocation($workstation,$room);
+			$workstation = App\Workstation::find($workstation);
+			$workstation->name = $name;
+			$workstation->save();
 
 			return json_encode('success');
 		}
@@ -336,13 +337,13 @@ class WorkstationController extends Controller {
 		*
 		*/
 		$room = $this->sanitizeString($request->get('room'));
-		$pc = $this->sanitizeString($request->get('items'));
+		$workstation = $this->sanitizeString($request->get('items'));
 		$name = $this->sanitizeString($request->get('name'));
 
-		App\Workstation::setWorkstationLocation($pc,$room);
-		$pc = App\Workstation::find($pc);
-		$pc->name = $name;
-		$pc->save();
+		App\Workstation::setWorkstationLocation($workstation,$room);
+		$workstation = App\Workstation::find($workstation);
+		$workstation->name = $name;
+		$workstation->save();
 
 		Session::flash('success-message','Workstation deployed');
 		return redirect('workstation/form/deployment');
@@ -350,9 +351,9 @@ class WorkstationController extends Controller {
 
 	/**
 	*
-	*	function for transfering pc to another location
+	*	function for transfering workstation to another location
 	*	@param $room accepts room name
-	*	@param $pc accepts pc id list
+	*	@param $workstation accepts workstation id list
 	*
 	*/
 	public function transfer(Request $request)
@@ -366,13 +367,13 @@ class WorkstationController extends Controller {
 		if($request->ajax())
 		{
 			$room = $this->sanitizeString($request->get('room'));
-			$pc = $this->sanitizeString($request->get('items'));
+			$workstation = $this->sanitizeString($request->get('items'));
 			$name = $this->sanitizeString($request->get('name'));
 
-			App\Workstation::setWorkstationLocation($pc,$room);
-			$pc = App\Workstation::find($pc);
-			$pc->name = $name;
-			$pc->save();
+			App\Workstation::setWorkstationLocation($workstation,$room);
+			$workstation = App\Workstation::find($workstation);
+			$workstation->name = $name;
+			$workstation->save();
 
 			return json_encode('success');
 		}
@@ -383,13 +384,13 @@ class WorkstationController extends Controller {
 		*
 		*/
 		$room = $this->sanitizeString($request->get('room'));
-		$pc = $this->sanitizeString($request->get('items'));
+		$workstation = $this->sanitizeString($request->get('items'));
 		$name = $this->sanitizeString($request->get('name'));
 
-		App\Workstation::setWorkstationLocation($pc,$room);
-		$pc = App\Workstation::find($pc);
-		$pc->name = $name;
-		$pc->save();
+		App\Workstation::setWorkstationLocation($workstation,$room);
+		$workstation = App\Workstation::find($workstation);
+		$workstation->name = $name;
+		$workstation->save();
 
 		Session::flash('success-message','Workstation transferred');
 		return redirect('workstation/view/transfer');

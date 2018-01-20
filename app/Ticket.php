@@ -4,7 +4,7 @@ namespace App;
 
 use DB;
 use Auth;
-use Carbon\Carbon;
+use Carbon;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
@@ -53,7 +53,7 @@ class Ticket extends \Eloquent{
 
 	public function getTicketTypeNameAttribute()
 	{
-		return $this->type->name;
+		return (isset($this->type) && count($this->type) > 0) ? $this->type->name : 'Not Set';
 	}
 
 	public function user()
@@ -78,12 +78,14 @@ class Ticket extends \Eloquent{
 
 	public function pc()
 	{
-		return $this->belongsToMany('App\Workstation','pc_ticket','pc_id','ticket_id');
+		return $this->belongsToMany('App\Workstation','workstation_ticket','workstation_id','ticket_id');
 	}
 
 	public function scopeFindByType($query,$value)
 	{
-		return $query->where('type','=',$value);
+		return $query->whereHas('type', function($query) use ($value){
+			$query->where('name', '=', $value);
+		});
 	}
 
 	public function scopeFindByStatus($query,$value)
@@ -126,44 +128,20 @@ class Ticket extends \Eloquent{
 		$this->attributes['type'] = ucwords($value);
 	}
 
-	public function getWorkstationTickets($id)
+	public function scopeFindAllWorkstationTickets($id)
 	{
-		return Ticket::whereIn('id',function($query) use ($id)
+		return Ticket::whereHas('workstation',function($query) use ($id)
 		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	checks if pc is in ticket
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$query->where('pc_id','=',$id)
-				->from('pc_ticket')
-				->select('ticket_id')
-				->pluck('ticket_id');
-		})->get();
+			$query->where('id','=',$id);
+		});
 	}
 
-	public function getRoomTickets($id)
+	public function scopeFindAllRoomTickets($id)
 	{
-		return Ticket::whereIn('id',function($query) use ($id)
+		return Ticket::whereHas('room',function($query) use ($id)
 		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	checks if pc is in ticket
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$query->where('room_id','=',$id)
-				->from('room_ticket')
-				->select('ticket_id')
-				->pluck('ticket_id');
-		})->get();
+			$query->where('id','=',$id);
+		});
 	}
 
 	public function getTagDetails($tag)
@@ -282,8 +260,8 @@ class Ticket extends \Eloquent{
 		$this->title = $ticket->title;
 		$this->details = $ticket->details;
 		$this->author = $ticket->author;
-		$this->staffassigned = $ticket->staffassigned;
-		$this->ticket_id = $ticket->id;
+		$this->staff_id = $ticket->staff_id;
+		$this->predecessor_id = $ticket->id;
 		$this->status = $ticket->status;
 		$this->comments = $ticket->comments;
 		$this->closed_by = $ticket->closed_by;
@@ -379,9 +357,13 @@ class Ticket extends \Eloquent{
 		$ticket = new Ticket;
 		$ticket->copyRecordFromExisting($this);
 		$ticket->comments = "";
-		$ticket->type = 'action taken';
-		$ticket->title = 'Action Taken';
-		$ticket->ticket_id = $this->id;
+	
+		$type = TicketType::firstOrCreate([
+			'name' => 'Action'
+		]);
+
+		$this->type_id = $type->id;
+		$ticket->predecessor_id = $this->id;
 		$ticket->status = 'Closed';
 		$ticket->generate();
 	}
@@ -400,12 +382,17 @@ class Ticket extends \Eloquent{
 
 	public function condemn($tag)
 	{
-		$date = Carbon::now()->toFormattedDateTimeString();
+		$date = Carbon\Carbon::now()->toDayDateTimeString();
 		$this->details = 'Item Condemned on ' . $date . 'by ' . $this->author;
-		$this->staffassigned = Auth::user()->id;
-		$this->ticket_id = null;
+		$this->staff_id = Auth::user()->id;
+		$this->predecessor_id = null;
 		$this->status = 'Closed';
-		$this->type = 'condemn';
+	
+		$type = TicketType::firstOrCreate([
+			'name' => 'Condemn'
+		]);
+
+		$this->type_id = $type->id;
 		$this->title = 'Item Condemn';
 
 		/*
@@ -416,7 +403,7 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(($item = Item::propertyNumber($tag)->first())->count() > 0) $this->generate($item->id);
+		$this->generate($tag);
 	}
 
 	public static function setTaggedStatus($tag,$status)
@@ -459,10 +446,16 @@ class Ticket extends \Eloquent{
 	public function maintenance($tag,$title,$details,$underrepair)
 	{
 
-		$this->staffassigned = Auth::user()->id;
+		$this->staff_id = Auth::user()->id;
 		$this->status = 'Open';
-		$this->ticket_id = null;
-		$this->type = 'maintenance';
+		$this->predecessor_id = null;
+	
+		$type = TicketType::firstOrCreate([
+			'name' => 'Maintenance'
+		]);
+
+		$this->type_id = $type->id;
+
 		$this->generate();
 	}
 

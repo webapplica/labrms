@@ -164,12 +164,8 @@ class ItemsController extends Controller {
 	{
 		if($request->ajax())
 		{
-
-		 	return json_encode([
-				'data' => App\Item::with('inventory')
-									->where('inventory_id','=',$id)
-									->get()
-			]);
+			$items = App\Item::with('inventory')->where('inventory_id','=',$id)->get();
+		 	return datatables($items)->toJson();
 		}
 
 		$inventory = App\Inventory::find($id);
@@ -254,39 +250,38 @@ class ItemsController extends Controller {
 		
 		if($request->ajax()){
 
-			try{
+			$id = $this->sanitizeString($id);
+			
+			/**
+			*
+			*	@param id
+			*	@return collection
+			*
+			*/
+			$itemprofile = App\Item::find($id);
 
-				/**
-				*
-				*	@param id
-				*	@return collection
-				*
-				*/
-				$itemprofile = App\Item::find($id);
+			/*
+			|--------------------------------------------------------------------------
+			|
+			| 	Checks if itemprofile is linked to a pc
+			|	return 'connected' if linked
+			|
+			|--------------------------------------------------------------------------
+			|
+			*/
+			if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
+			{
+				return json_encode('connected');
 
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	Checks if itemprofile is linked to a pc
-				|	return 'connected' if linked
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
-				{
-					return json_encode('connected');
+			}
 
-				}
-
-				/**
-				*
-				*	Call function condemn
-				*
-				*/
-				App\Inventory::condemn($id);
-				return json_encode('success');
-			} catch ( Exception $e ) {}
+			/**
+			*
+			*	Call function condemn
+			*
+			*/
+			App\Inventory::condemn($id);
+			return json_encode('success');
 		}
 
 		App\Inventory::condemn($item->inventory_id);

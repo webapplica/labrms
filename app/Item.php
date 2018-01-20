@@ -4,7 +4,7 @@ namespace App;
 
 use Auth;
 use DB;
-use Carbon\Carbon;
+use Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
@@ -81,8 +81,18 @@ class Item extends \Eloquent{
 	);
 
 	protected $appends = [
-		'location_name'
+		'location_name', 'parsed_date_received', 'parsed_date_profiled'
 	];
+
+	public function getParsedDateReceivedAttribute()
+	{
+		return Carbon\Carbon::parse($this->date_received)->toFormattedDateString();
+	}
+
+	public function getParsedDateProfiledAttribute()
+	{
+		return Carbon\Carbon::parse($this->created_at)->toFormattedDateString();
+	}
 
 	public function getLocationNameAttribute()
 	{
@@ -188,7 +198,7 @@ class Item extends \Eloquent{
 		$item->location = $room->id;
 		if($item->deployed_at == null)
 		{
-			$item->deployed_at = Carbon::now();
+			$item->deployed_at = Carbon\Carbon::now();
 			$item->deployed_by = $staff;
 			$title = 'Deployment';
 		}
@@ -277,7 +287,7 @@ class Item extends \Eloquent{
 	public static function createProfilingTicket($item_id,$datereceived)
 	{
 		$fullname = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname; 
-		$datereceived = Carbon::parse($datereceived)->toDateString();
+		$datereceived = Carbon\Carbon::parse($datereceived)->toDateString();
 		$details = "Equipment profiled on ".$datereceived. " by ". $fullname . ". ";
 		$title = 'Equipment Profiling';
 		$staff_id = Auth::user()->id;

@@ -159,24 +159,6 @@ class Inventory extends \Eloquent
 		$inventory->pivot->save();
   }
 
-
-  /**
-  *
-  * decrement profiled items
-  * decreases quantity
-  * @param $inventory_id accepts id
-  * validate before using this function
-  *
-  */
-  public static function removeProfiled($inventory_id)
-  {
-		$inventory = Inventory::find($inventory_id);
-		$inventory->quantity = $inventory->quantity - 1;
-		$inventory->profileditems = $inventory->profileditems - 1;
-		$inventory->save();
-  }
-
-
   /**
   *
   * calls remove profiled
@@ -186,21 +168,16 @@ class Inventory extends \Eloquent
   */
   public static function condemn($id)
   {
-    DB::transaction(function() use($id){
-  		$itemprofile = ItemProfile::findOrFail($id);
+    DB::beginTransaction();
 
-      /*
-      |--------------------------------------------------------------------------
-      |
-      |   Calls removeProfiled function
-      |
-      |--------------------------------------------------------------------------
-      |
-      */
-  		Inventory::removeProfiled($itemprofile->inventory_id);
-      Ticket::condemnTicket($itemprofile->propertynumber);
-  		$itemprofile->delete();
-    });
+		$itemprofile = Item::findOrFail($id);
+    
+    $ticket = new Ticket;
+    $ticket->condemn($itemprofile->propertynumber);
+
+		$itemprofile->delete();
+
+    DB::commit();
   }
 
 }

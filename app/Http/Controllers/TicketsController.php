@@ -46,7 +46,7 @@ class TicketsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$query = App\TicketView::orderBy('date','desc');
+			$query = App\Ticket::orderBy('date','desc');
 			if( Auth::user()->accesslevel == 2 )
 			{
 				$query = $query->staff(Auth::user()->id);
@@ -54,7 +54,7 @@ class TicketsController extends Controller {
 
 			if(Input::has('type'))
 			{
-				$query = $query->tickettype($this->sanitizeString(Input::get('type')));
+				$query = $query->findByType($this->sanitizeString(Input::get('type')));
 			}
 
 			if(Input::has('assigned'))
@@ -77,7 +77,7 @@ class TicketsController extends Controller {
 			*/
 			if( Auth::user()->accesslevel == 3 || Auth::user()->accesslevel == 4  )
 			{
-				$query = $query->self()->tickettype('Complaint');
+				$query = $query->self()->findByType('Complaint');
 			}
 
 			return json_encode([
@@ -94,14 +94,14 @@ class TicketsController extends Controller {
 		|
 		*/
 		$total_tickets = App\Ticket::count();
-		$complaints = App\Ticket::tickettype('complaint')
+		$complaints = App\Ticket::findByType('complaint')
 						->open()
 						->count();
 
 		$author = Auth::user()->firstname." ".Auth::user()->middlename." ".Auth::user()->lastname;
 		$authored_tickets = App\Ticket::where('author','=',$author)
 										->count();
-		$open_tickets = App\Ticket::tickettype('complaint')
+		$open_tickets = App\Ticket::findByType('complaint')
 									->open()
 									->count();
 
@@ -235,8 +235,8 @@ class TicketsController extends Controller {
 		}
 
 		$ticket = new App\Ticket;
-		$ticket->ticketname = $ticketname;
-		$ticket->tickettype = $tickettype;
+		$ticket->title = $title;
+		$ticket->type = $type;
 		$ticket->details = $details;
 		$ticket->author = $author;
 		$ticket->staffassigned;
@@ -536,8 +536,7 @@ class TicketsController extends Controller {
 		try
 		{
 
-			$ticket = App\TicketView::where('id','=',$id)
-								->first();
+			$ticket = App\Ticket::where('id','=',$id)->first();
 
 			$lastticket = App\Ticket::orderBy('created_at', 'desc')->first();
 

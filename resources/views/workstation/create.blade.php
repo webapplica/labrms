@@ -11,12 +11,6 @@ Workstation | Add
 {{ HTML::style(asset('css/animate.css')) }}
 <link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
 <style>
-  {
-    display:none;
-  }
-  #page-body,#page-two,#page-three{
-    display:none;
-  }
 
   .form-control{
     margin: 10px 0px;
@@ -130,7 +124,7 @@ Workstation | Add
 
           <div class="form-group">
             <div class="col-sm-12">
-              <button class="btn btn-primary btn-lg btn-block btn-flat" name="create" type="submit"><span class="glyphicon glyphicon-check"></span> Add</button>
+              <button class="btn btn-primary btn-lg btn-block" name="create" type="submit"><span class="glyphicon glyphicon-check"></span> Add</button>
             </div>
           </div>
         </div>

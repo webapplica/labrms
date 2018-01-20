@@ -31,9 +31,32 @@ class Activity extends \Eloquent{
     'Activity' => 'required|max:50'
   ];
 
+  public $activity_types = [
+    'P' => 'Preventive',
+    'C' => 'Corrective',
+    'U' => 'Unidentified'
+  ];
+
+  public function setTypeAttribute($value)
+  {
+    $type = ucfirst($value);
+
+    foreach($this->activity_types as $key=>$value):
+      if($value == $type) $type = $key;
+    endforeach;
+
+    $this->attributes['type'] = $type;
+  }
+
   public function getTypeAttribute($value)
   {
-    return ucwords($value);
+    $type = ucfirst($value);
+
+    foreach($this->activity_types as $key=>$value):
+      if($key == $type) $type = $value;
+    endforeach;
+
+    return $type;
   }
 
   public function scopeType($query,$type)
