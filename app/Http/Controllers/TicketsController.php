@@ -9,8 +9,7 @@ use Validator;
 use Auth;
 use App;
 use DB;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
 
 class TicketsController extends Controller {
 
@@ -24,7 +23,7 @@ class TicketsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
 
 		/*
@@ -35,7 +34,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Request::ajax())
+		if($request->ajax())
 		{
 
 			/*
@@ -52,19 +51,19 @@ class TicketsController extends Controller {
 				$query = $query->staff(Auth::user()->id);
 			}
 
-			if(Input::has('type'))
+			if($request->has('type'))
 			{
-				$query = $query->findByType($this->sanitizeString(Input::get('type')));
+				$query = $query->findByType($this->sanitizeString($request->get('type')));
+			} 
+
+			if($request->has('assigned'))
+			{
+				$assigned = $this->sanitizeString($request->get('assigned'));
 			}
 
-			if(Input::has('assigned'))
+			if($request->has('status'))
 			{
-				$assigned = $this->sanitizeString(Input::get('assigned'));
-			}
-
-			if(Input::has('status'))
-			{
-				$query = $query->status(Input::get('status'));
+				$query = $query->findByStatus($request->get('status'));
 			}
 
 			/*
@@ -77,12 +76,10 @@ class TicketsController extends Controller {
 			*/
 			if( Auth::user()->accesslevel == 3 || Auth::user()->accesslevel == 4  )
 			{
-				$query = $query->self()->findByType('Complaint');
+				$query = $query->selfAuthored()->selfAssigned()->findByType('Complaint');
 			}
 
-			return json_encode([
-				'data' => $query->get()
-		 	]);
+			return datatables($query->get())->toJson();
 		}
 
 		/*
@@ -123,7 +120,7 @@ class TicketsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		$last_generated_ticket = App\Ticket::count() + 1;
 
@@ -146,16 +143,16 @@ class TicketsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		$tag = $this->sanitizeString(Input::get('tag'));
-		$tickettype = 'complaint';
+		$tag = $this->sanitizeString($request->get('tag'));
+		$type = 'complaint';
 		$author = null;
 		$staffassigned = null;
 
-		if(Input::has('tickettype'))
+		if($request->has('tickettype'))
 		{
-			$tickettype = 'incident';
+			$type = 'incident';
 		}
 
 		/*
@@ -166,27 +163,27 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('subject'))
+		if($request->has('subject'))
 		{
-			$ticketname = $this->sanitizeString(Input::get('subject'));
+			$title = $this->sanitizeString($request->get('subject'));
 
 			/*
 			|--------------------------------------------------------------------------
 			|
-			| 	Check if ticketname has no value
+			| 	Check if title has no value
 			|	if no value, type will be automatically complaint
 			|
 			|--------------------------------------------------------------------------
 			|
 			*/
-			if($ticketname == '' || $ticketname == null)
+			if($title == '' || $title == null)
 			{
-				$ticketname = $tickettype;
+				$title = $type;
 			}
 		}
 		else
 		{
-			$ticketname = $tickettype;
+			$title = $type;
 		}
 
 		/*
@@ -197,12 +194,12 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('author'))
+		if($request->has('author'))
 		{
-			$author = $this->sanitizeString(Input::get('author'));
+			$author = $this->sanitizeString($request->get('author'));
 		}
 
-		$details = $this->sanitizeString(Input::get('description'));
+		$details = $this->sanitizeString($request->get('description'));
 
 		/*
 		|--------------------------------------------------------------------------
@@ -213,16 +210,16 @@ class TicketsController extends Controller {
 		|
 		*/
 
-		if(Auth::user()->accesslevel == 2)
+		if(Auth::user()->accesslevel <= 2)
 		{
-			if(Input::has('assign-to-staff'))
+			if($request->has('assign-to-staff'))
 			{
-				$staffassigned = $this->sanitizeString(Input::get('staffassigned'));
+				$staffassigned = $this->sanitizeString($request->get('staffassigned'));
 			}
 		}
 
 		$validator = Validator::make([
-				'Ticket Subject' => $ticketname,
+				'Ticket Subject' => $title,
 				'Details' => $details,
 				'Author' => $author,
 			],App\Ticket::$complaintRules);
@@ -234,15 +231,25 @@ class TicketsController extends Controller {
 				->withErrors($validator);
 		}
 
+		DB::beginTransaction();
+		/**
+		 * find the type in database
+		 * if found, return the type information
+		 * if not, create a new record
+		 */
+		$type = App\TicketType::firstOrCreate([
+			'name' => ucfirst($type)
+		]);
+
 		$ticket = new App\Ticket;
 		$ticket->title = $title;
-		$ticket->type = $type;
 		$ticket->details = $details;
-		$ticket->author = $author;
-		$ticket->staffassigned;
-		$ticket->staffassigned = $staffassigned;
+		$ticket->type_id = $type->id;
+		$ticket->staff_id = $staffassigned;
 		$ticket->status = 'Open';
 		$ticket->generate($tag);
+
+		DB::commit();
 
 		Session::flash('success-message','Ticket Generated');
 		return redirect('ticket');
@@ -256,7 +263,7 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 
 	}
@@ -268,7 +275,7 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
 		$ticket = App\Ticket::find($id);
 		return view('ticket.edit')
@@ -282,14 +289,14 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		$propertynumber = $this->sanitizeString(Input::get('propertynumber'));
-		$type = $this->sanitizeString(Input::get('type'));
-		$maintenancetype = $this->sanitizeString(Input::get('maintenancetype'));
-		$category = $this->sanitizeString(Input::get('category'));
-		$author = $this->sanitizeString(Input::get('author'));
-		$details = $this->sanitizeString(Input::get('description'));
+		$propertynumber = $this->sanitizeString($request->get('propertynumber'));
+		$type = $this->sanitizeString($request->get('type'));
+		$maintenancetype = $this->sanitizeString($request->get('maintenancetype'));
+		$category = $this->sanitizeString($request->get('category'));
+		$author = $this->sanitizeString($request->get('author'));
+		$details = $this->sanitizeString($request->get('description'));
 		$staffassigned = Auth::user()->id;
 		$propertynumber;
 
@@ -312,7 +319,7 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function transfer($id = null)
+	public function transfer(Request $request, $id = null)
 	{
 		/*
 		|--------------------------------------------------------------------------
@@ -322,9 +329,9 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$id = $this->sanitizeString(Input::get('id'));
-		$staffassigned = $this->sanitizeString(Input::get('transferto'));
-		$comments = $this->sanitizeString(Input::get('comment'));
+		$id = $this->sanitizeString($request->get('id'));
+		$staffassigned = $this->sanitizeString($request->get('transferto'));
+		$comments = $this->sanitizeString($request->get('comment'));
 
 		/*
 		|--------------------------------------------------------------------------
@@ -369,9 +376,9 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			$ticket = App\Ticket::find($id);
 
@@ -387,9 +394,9 @@ class TicketsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function reOpenTicket($id)
+	public function reOpenTicket(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			$ticket = App\Ticket::find($id);
 
@@ -403,9 +410,9 @@ class TicketsController extends Controller {
 		}
 	}
 
-	public function showHistory($id)
+	public function showHistory(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			$arraylist = array();
 			$cond = true;
@@ -575,7 +582,7 @@ class TicketsController extends Controller {
 	*
 	*
 	*/
-	public function resolve()
+	public function resolve(Request $request)
 	{
 		/*
 		|--------------------------------------------------------------------------
@@ -585,14 +592,14 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$id = $this->sanitizeString(Input::get('id'));
+		$id = $this->sanitizeString($request->get('id'));
 		$status = 'Open';
 		$underrepair = false;
 		$details = "";
 
-		if(Input::has('contains'))
+		if($request->has('contains'))
 		{
-			$details = $this->sanitizeString(Input::get('details'));
+			$details = $this->sanitizeString($request->get('details'));
 		}
 		else
 		{
@@ -604,7 +611,7 @@ class TicketsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$activity = $this->sanitizeString(Input::get('activity'));
+			$activity = $this->sanitizeString($request->get('activity'));
 			$maintenanceactivity = App\MaintenanceActivity::find($activity);
 			if( count($maintenanceactivity) > 0 )
 			{
@@ -626,7 +633,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('underrepair'))
+		if($request->has('underrepair'))
 		{
 			$underrepair = 'underrepair';
 		}
@@ -639,7 +646,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('working'))
+		if($request->has('working'))
 		{
 			$underrepair = 'working';
 		}
@@ -652,7 +659,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('close'))
+		if($request->has('close'))
 		{
 			$status = "Closed";
 		}
@@ -706,7 +713,7 @@ class TicketsController extends Controller {
 	*	complain process
 	*
 	*/
-	public function complaint()
+	public function complaint(Request $request)
 	{
 		return redirect('ticket/complaint');
 	}
@@ -717,9 +724,9 @@ class TicketsController extends Controller {
 	*	@return opened ticket
 	*
 	*/
-	public function complaintViewForStudentAndFaculty()
+	public function complaintViewForStudentAndFaculty(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			return json_encode([
 					'data' => App\Ticket::with('itemprofile')
@@ -737,11 +744,11 @@ class TicketsController extends Controller {
 	*	@return list of pc ticket
 	*
 	*/
-	public function getPcTicket($id)
+	public function getPcTicket(Request $request, $id)
 	{
 		$ticket = new App\Ticket;
 		$ticket->getPcTickets($id);
-		if(Request::ajax())
+		if($request->ajax())
 		{
 
 			/*
@@ -776,9 +783,9 @@ class TicketsController extends Controller {
 	*	@return list of room ticket
 	*
 	*/
-	public function getRoomTicket($id)
+	public function getRoomTicket(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 
 			/*
@@ -803,10 +810,10 @@ class TicketsController extends Controller {
 	*	@return pc information
 	*
 	*/
-	public function getTagInformation()
+	public function getTagInformation(Request $request)
 	{
 
-		$tag = $this->sanitizeString(Input::get('tag'));
+		$tag = $this->sanitizeString($request->get('tag'));
 
 		/*
 		|--------------------------------------------------------------------------
@@ -816,9 +823,9 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$tag = $this->sanitizeString(Input::get('id'));
+			$tag = $this->sanitizeString($request->get('id'));
 		}
 
 		/*
@@ -892,7 +899,7 @@ class TicketsController extends Controller {
 	*	maintenance view
 	*
 	*/
-	public function maintenanceView()
+	public function maintenanceView(Request $request)
 	{
 		$ticket = App\Ticket::orderBy('created_at', 'desc')->first();
 		$activity = MaintenanceActivity::pluck('activity','id');
@@ -922,7 +929,7 @@ class TicketsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function maintenance()
+	public function maintenance(Request $request)
 	{
 		/*
 		|--------------------------------------------------------------------------
@@ -932,7 +939,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		$tag = $this->sanitizeString(Input::get('tag'));
+		$tag = $this->sanitizeString($request->get('tag'));
 		$ticketname = "Maintenance Ticket";
 		$underrepair = false;
 		$workstation = false;
@@ -946,9 +953,9 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('contains'))
+		if($request->has('contains'))
 		{
-			$details = $this->sanitizeString(Input::get('description'));
+			$details = $this->sanitizeString($request->get('description'));
 		}
 		else
 		{
@@ -971,7 +978,7 @@ class TicketsController extends Controller {
 				|--------------------------------------------------------------------------
 				|
 				*/
-				$activity = $this->sanitizeString(Input::get('activity'));
+				$activity = $this->sanitizeString($request->get('activity'));
 				$maintenanceactivity = MaintenanceActivity::find($activity);
 				$ticketname = $maintenanceactivity->activity;
 
@@ -995,7 +1002,7 @@ class TicketsController extends Controller {
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if(Input::has('underrepair'))
+		if($request->has('underrepair'))
 		{
 			$underrepair = true;
 		}
@@ -1025,7 +1032,7 @@ class TicketsController extends Controller {
 		$author = Auth::user()->firstname . ' ' . Auth::user()->middlename . ' ' . Auth::user()->lastname;
 		$staffassigned = Auth::user()->id;
 		$status = 'Closed';
-		$item = Input::get('item');
+		$item = $request->get('item');
 
 		if(count($item) > 0)
 		{

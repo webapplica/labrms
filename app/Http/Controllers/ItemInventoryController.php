@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App;
+use Auth;
+use DB;
 use Session;
 use Validator;
 use Illuminate\Http\Request;
@@ -23,31 +25,9 @@ class ItemInventoryController extends Controller {
 			$inventory = App\Inventory::with('itemtype')->get();
 			return datatables($inventory)->toJson();
 		}
-		
-		$brand = null;
-		$model = null;
-		$itemtype = null;
-		$itemsubtype = null;
-		$units = [ null => 'None' ];
-		$receipts = [ null => 'None' ];
-
-		$itemsubtypes = App\ItemSubType::pluck('name','id');
-		$itemtypes = App\ItemType::pluck('name','id');
-		$units = $units + App\Unit::pluck('abbreviation','abbreviation')->toArray();
-		$itemtypes = App\ItemType::category('equipment')->pluck('name','id');
-		$receipts = $receipts +  App\Receipt::pluck('number','number')->toArray();
 
 		return view('inventory.item.index')
-						->with('title','Inventory')
-						->with('itemtypes',$itemtypes)
-						->with('brand',$brand)
-						->with('model',$model)
-						->with('itemtype',$itemtype)
-						->with('itemsubtype',$itemsubtype)
-						->with('itemtypes',$itemtypes)
-						->with("units",$units)
-						->with('itemsubtypes',$itemsubtypes)
-						->with('receipts',$receipts);
+						->with('title','Inventory');
 	}
 
 
@@ -58,50 +38,15 @@ class ItemInventoryController extends Controller {
 	 */
 	public function create(Request $request)
 	{
-		$brand = null;
-		$model = null;
-		$itemtype = null;
-		$itemsubtype = null;
 		$units = [ null => 'None' ];
-		$receipts = [ null => 'None' ];
 
-		$itemsubtypes = App\ItemSubType::pluck('name','id');
 		$itemtypes = App\ItemType::pluck('name','id');
 		$units = $units + App\Unit::pluck('abbreviation','abbreviation')->toArray();
-		$itemtypes = App\ItemType::category('equipment')->pluck('name','id');
-		$receipts = $receipts +  App\Receipt::pluck('number','number')->toArray();
-
-		if($request->has('brand'))
-		{
-			$brand = $this->sanitizeString($request->get('brand'));
-		}
-
-		if($request->has('model'))
-		{
-			$model = $this->sanitizeString($request->get('model'));
-		}
-
-		if($request->has('itemtype'))
-		{
-			$itemtype = $this->sanitizeString($request->get('itemtype'));
-		}
-
-		if($request->has('itemsubtype'))
-		{
-			$itemsubtype = $this->sanitizeString($request->get('itemsubtype'));
-		}
 
 		return view('inventory.item.create')
 					->with('itemtypes',$itemtypes)
-					->with('brand',$brand)
-					->with('model',$model)
-					->with('itemtype',$itemtype)
-					->with('itemsubtype',$itemsubtype)
-					->with('itemtypes',$itemtypes)
 					->with("units",$units)
-					->with('itemsubtypes',$itemsubtypes)
-					->with('receipts',$receipts)
-					->with('title','Inventory::add');
+					->with('title','Inventory');
 	}
 
 	/**
@@ -111,17 +56,40 @@ class ItemInventoryController extends Controller {
 	 */
 	public function store(Request $request)
 	{
-		//inventory
+		/**
+		 * initialize the values
+		 * fetched from user
+		 * @var [type]
+		 */
 		$brand = $this->sanitizeString($request->get('brand'));
 		$itemtype = $this->sanitizeString($request->get('itemtype'));
-		$itemsubtype = $this->sanitizeString($request->get('itemsubtype'));
 		$model = $this->sanitizeString($request->get('model'));
 		$quantity = $this->sanitizeString($request->get('quantity'));
 		$unit = $this->sanitizeString($request->get('unit'));
 		$details = $this->sanitizeString($request->get('details'));
 		$receipt = $this->sanitizeString($request->get('receipt'));
 
-		//validator
+		$receipt = new App\Receipt;
+
+		/**
+		 * validator for receipt number
+		 * @var [type]
+		 */
+		$validator = Validator::make([
+				'Receipt Number' => $receipt
+			], $receipt->inventoryRules());
+
+		if($validator->fails())
+		{
+			return redirect('inventory/item/create')
+				->withInput()
+				->withErrors($validator);
+		}
+
+		/**
+		 * validate the inventory
+		 * @var [type]
+		 */
 		$validator = Validator::make([
 				'Item Type' => $itemtype,
 				'Brand' => $brand,
@@ -139,18 +107,50 @@ class ItemInventoryController extends Controller {
 				->withErrors($validator);
 		}
 
-		$receipt = App\Receipt::findByNumber($receipt);
+		DB::beginTransaction();
+
+		/**
+		 * check if the receipt already exists,
+		 * create if not
+		 * @var [type]
+		 */
+		$receipt = App\Receipt::firstOrCreate([
+			'number' => $receipt
+		]);
+
 		$itemtype = App\ItemType::find($itemtype);
 
-		$inventory = new App\Inventory;
+		/**
+		 * check if the inventory exists in database
+		 * fetch the first item it found
+		 * @var [type]
+		 */
+		$inventory = App\Inventory::locate($brand, $model, $itemtype)->first();
+		$unit = App\Unit::findByAbbreviation($unit)->first();
+
+		/**
+		 * if the items exists, use the existing items
+		 * @var App
+		 */
+		if(count($inventory) <= 0 ) $inventory = new App\Inventory;
+
+		/**
+		 * set all the values before sending to database
+		 * @var [type]
+		 */
+		$inventory->code = App\Inventory::generateCode();
 		$inventory->brand = $brand;
-		$inventory->itemtype_id = $itemtype->id;
-		$inventory->itemsubtype_id = null;
+		$inventory->itemtype_id = $itemtype->id; 
 		$inventory->model = $model;
-		$inventory->unit = $unit;
+		$inventory->unit_name = $unit->name;
 		$inventory->details = $details;
+		$inventory->user_id = Auth::user()->id;
 		$inventory->save();
 
+		/**
+		 * insert the values in the pivot table
+		 * @var [type]
+		 */
 		$inventory->receipts()->syncWithoutDetaching(array(
 			$receipt->id => [
 				'received_quantity' => $quantity,
@@ -158,14 +158,19 @@ class ItemInventoryController extends Controller {
 			]
 		));
 
+		DB::commit();
+
 		Session::flash('success','Items added to Inventory');
 
+		/**
+		 * redirect to profiling
+		 */
 		if($request->has('redirect-profiling'))
 		{
 			return redirect("item/profile/create?id=$inventory->id");
 		}
 
-		return redirect('inventory/item');
+		return redirect('inventory');
 	}
 
 

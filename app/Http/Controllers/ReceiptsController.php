@@ -20,6 +20,14 @@ class ReceiptsController extends Controller
     {
         if($request->ajax())
         {
+
+            if($request->has('term'))
+            {
+                $term = $this->sanitizeString($request->get('term'));
+                $receipt = App\Receipt::where('number', 'like', "%$term%")->pluck('number');
+                return json_encode($receipt);
+            }
+
             $receipt = App\Receipt::all();
             return datatables($receipt)->toJson();
         }
@@ -91,7 +99,16 @@ class ReceiptsController extends Controller
     public function show(Request $request, $id)
     {
         $id = $this->sanitizeString($id);
-        return view('receipt.show');
+        $receipt = App\Receipt::with('inventory.itemtype')->find($id);
+
+        if($request->ajax())
+        {
+            $inventory = $receipt->inventory;
+            return datatables($inventory)->toJson(); 
+        }  
+
+        return view('receipt.show')
+                    ->with('receipt', $receipt);
     }
 
     /**

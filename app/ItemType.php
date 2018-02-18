@@ -56,7 +56,7 @@ class ItemType extends \Eloquent{
 	public function rules(){
 		return array(
 			'name' => 'required|min:2|max:50|unique:item_types,name',
-			'description' => 'required|min:5|max:450'
+			'description' => 'min:5|max:450'
 		);
 	}
 
@@ -69,7 +69,7 @@ class ItemType extends \Eloquent{
 		$name = $this->name;
 		return array(
 			'name' => 'required|min:2|max:50|unique:item_types,name,'. $name .',name',
-			'description' => 'required|min:5|max:450'
+			'description' => 'min:5|max:450'
 		);
 	}
 

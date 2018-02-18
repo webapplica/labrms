@@ -77,7 +77,7 @@
 					{ data: "brand" },
 					{ data: "itemtype.name" },
 					{ data: "details" },							
-					{ data: "unit" },
+					{ data: "unit_name" },
 					{ data: "quantity" },
 					{ data: "unprofiled" },
 					{ data: function(callback){

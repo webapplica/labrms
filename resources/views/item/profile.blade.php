@@ -1,25 +1,10 @@
 @extends('layouts.master-blue')
-@section('title')
-Items Profile
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-	#page-body{
-		display: none;
-	}
-</style>
-@stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="" style="background-color: white;padding: 20px;">
 		<legend><h3 class="text-muted">Items Profile</h3></legend>
-		<table class="table table-hover table-condensed table-bordered table-responsive" id="roomTable">
+		<table class="table table-hover table-striped table-condensed table-bordered table-responsive" id="roomTable">
 			<thead>
 				<th>ID</th>
 				<th>Property Number</th>
@@ -37,7 +22,6 @@ Items Profile
 </div>
 @stop
 @section('script')
-{{ HTML::script(asset('js/dataTables.select.min.js')) }}
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -50,9 +34,6 @@ Items Profile
 			table = $('#roomTable').DataTable({
 					"processing": true,
 			        ajax: "{{ url('item/profile') }}",
-			  		select: {
-			  			style: 'single'
-			  		},
 			    	columnDefs:[
 						{ targets: 'no-sort', orderable: false },
 			    	],
@@ -133,13 +114,6 @@ Items Profile
 			$('#status-name').text($(this).data('name'));
 			setFilter()
 		})
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 		function setFilter()
 		{

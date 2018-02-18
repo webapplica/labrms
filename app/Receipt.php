@@ -36,6 +36,13 @@ class Receipt extends \Eloquent{
 		);
 	}
 
+	public function inventoryRules(){
+		return	array(
+			'Receipt Number' => 'required|min:2|max:25',
+		);
+
+	}
+
 	public function scopeFindByNumber($query, $value)
 	{
 		return $query->where('number', '=', $value)->first();

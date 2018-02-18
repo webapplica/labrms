@@ -1,20 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Item History
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-  #page-body{
-    display: none;
-  }
 
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
   <div class="col-md-12">
@@ -64,9 +49,9 @@ Item History
           </tr>
         </thead>
         <tbody>
-        @forelse($itemprofile->ticket as $ticket)
+        @forelse($itemprofile->ticket->sortBy('id') as $ticket)
           <tr>
-            <td>{{ $ticket->id }}</td>
+            <td>{{ $ticket->ticket_code }}</td>
             <td>{{ $ticket->ticket_type_name }}</td>
             <td>{{ $ticket->title }}</td>
             <td>{{ $ticket->details }}</td>
@@ -85,9 +70,7 @@ Item History
 @section('script')
 <script>
   $(document).ready(function(){
-
     $('#itemProfileTable').DataTable();
-
   })
 </script>
 @stop

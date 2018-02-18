@@ -15,23 +15,31 @@ class CreateInventoriesTable extends Migration {
 		Schema::create('inventories', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('itemtype_id')->unsigned();
-			$table->foreign('itemtype_id')
-					->references('id')
-					->on('item_types')
-					->onUpdate('cascade')
-					->onDelete('cascade');
-			$table->integer('itemsubtype_id')->unsigned()->nullable();
-			$table->foreign('itemsubtype_id')
-					->references('id')
-					->on('item_subtypes')
-					->onUpdate('cascade')
-					->onDelete('cascade');
+            $table->string('code')->unique();
 			$table->string('brand',100)->nullable();
 			$table->string('model',100)->nullable();
 			$table->string('details',1000)->nullable();
-			$table->string('unit',20);
-			$table->string('created_by')->nullable();
+
+            $table->string('unit_name')->nullable();
+            $table->foreign('unit_name')
+                    ->references('name')
+                    ->on('units') 
+                    ->onUpdate('cascade')
+                    ->onDelete('set null');
+
+            $table->integer('itemtype_id')->unsigned();
+            $table->foreign('itemtype_id')
+                    ->references('id')
+                    ->on('item_types')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
+
+			$table->integer('user_id')->unsigned();
+			$table->foreign('user_id')
+					->references('id')
+					->on('users')
+					->onUpdate('cascade')
+					->onDelete('cascade');
 			$table->timestamps();
 		});
 	}

@@ -1,5 +1,5 @@
 @extends('layouts.master-blue')
-@section('title',isset($title) ? $title : config('app.name','LabRMS'))
+
 @section('content')
 @include('modal.receipt.create')
 <div class="container-fluid" id="page-body">
@@ -8,18 +8,19 @@
 			<legend><h3 class="text-muted">Receipts</h3></legend>
 			<table class="table table-hover table-condensed table-bordered table-striped" id="receiptTable">
 				<thead>
-					<th class="col-sm-1">ID</th>
-					<th class="col-sm-1">Number</th>
-					<th class="col-sm-1">Purchase Order</th>
-					<th class="col-sm-1">Invoice</th>
-					<th class="col-sm-1">Fund Cluster</th>
-					<th class="no-sort col-sm-1"></th>
+					<th class="">ID</th>
+					<th class="">Number</th>
+					<th class="">Purchase Order</th>
+					<th class="">Invoice</th>
+					<th class="">Fund Cluster</th>
+					<th class="no-sort"></th>
 				</thead>
 			</table>
 		</div>
 	</div>
 </div>
 @endsection
+
 @section('script')
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -30,7 +31,7 @@
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
-	    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
@@ -43,7 +44,7 @@
 	            { data: "fund_code" },
 	            { data: function(callback){
 	            	return `
-	            		<a href="` + '{{ url('receipt') }}' + '/' + callback.id +`" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-th-list"></span> View</a>
+	            		<a href="` + '{{ url('receipt') }}' + '/' + callback.id +`" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> View</a>
  						<a href="` + '{{ url('receipt') }}' + '/' + callback.id +`/edit" class="edit btn btn-sm btn-warning"><span class="glyphicon glyphicon-pencil"></span>  Edit</a>
  						<button class="delete btn btn-sm btn-danger" data-id="` + callback.id + `"><span class="glyphicon glyphicon-trash"></span> Remove</button>
 	            	`;

@@ -240,14 +240,12 @@ class Item extends \Eloquent{
 		$inventory = Inventory::find($this->inventory_id);
 
 		$itemtype = isset($inventory->itemtype->id) ? "-" . $inventory->itemtype->id : "";
-		$itemsubtype = isset($inventory->itemsubtype->id) ? "-" . $inventory->itemsubtype->id : "";
 
 		$local =  Item::whereHas('inventory',function($query) use ($inventory){
-			$query->where('itemtype_id','=',$inventory->itemtype_id)
-			->where('itemsubtype_id','=',$inventory->itemsubtype_id);
+			$query->where('itemtype_id','=',$inventory->itemtype_id);
 		})->count();
 
-		$this->local_id =  $_org . $itemtype . $itemsubtype . "-" . ($local + 1);
+		$this->local_id =  $_org . $itemtype . "-" . ($local + 1);
 
 		$this->status = 'working';
 		$this->profiled_by = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;

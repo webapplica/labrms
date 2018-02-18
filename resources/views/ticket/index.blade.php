@@ -1,42 +1,20 @@
 @extends('layouts.master-blue')
-@section('title')
-Tickets
-@stop
-@section('navbar')
-@include('layouts.navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 {{ HTML::style(asset('css/font-awesome.min.css')) }}
-<link rel="stylesheet" href="{{ url('css/style.css') }}"  />
-<style>
-	#page-body,#assign,#resolve,#close,#reopen{
-		display: none;
-	}
+@endsection
 
-	.toolbar {
-    	float:left;
-	}
-
-	textarea{
-		resize:none;
-		overflow-y:hidden;
-	}
-
-	.overlay{
-		margin-bottom: 10px;
-		width:fit-content;
-	}
-
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
-@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-@include('modal.ticket.transfer')
-@include('modal.ticket.resolve')
-@endif
+
+	@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+
+	@include('modal.ticket.transfer')
+	@include('modal.ticket.resolve')
+
+	@endif
+
 	<div class="col-md-12" id="workstation-info">
 		<div class="panel panel-body table-responsive" style="padding: 25px 30px;">
 			<legend class="text-muted">Tickets</legend>
@@ -79,19 +57,18 @@ Tickets
 	                </div><!-- End off container -->
 	            </div><!-- End off overlay -->
         	</section><!-- End off Counter section -->
+
 			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
-			<table class="table table-hover table-bordered table-condensed" id="ticketTable">
+			<table class="table table-hover table-bordered table-striped table-condensed" id="ticketTable">
 				<thead>
 					<th>ID</th>
 					<th>Date</th>
-					<th>Tag</th>
 					<th>Title</th>
-					<th>Details</th>
 					<th>Type</th>
 					<th>Assigned To</th>
 					<th>Author</th>
 					<th>Status</th>
-					<th></th>
+					<th class="no-sort"></th>
 				</thead>
 				<tbody>
 				</tbody>
@@ -100,6 +77,7 @@ Tickets
 	</div>
 </div>
 @stop
+
 @section('script')
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript" src="{{ asset('js/jquery.waypoints.min.js') }}"></script>
@@ -107,113 +85,102 @@ Tickets
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
+
 
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 		url = `?type=Complaint&status=Open`
 		@else
 		url = `?type=Complaint`
 		@endif
+
 	  	var table = $('#ticketTable').DataTable({
+	  		serverSide: true,
+	  		processing: true,
   		    order: [[ 0, "desc" ]],
-	  		select: {
-	  			style: 'single'
-	  		},
 		    language: {
 		        searchPlaceholder: "Search..."
 		    },
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
-	    	"dom": "<'row'<'col-sm-5'l><'col-sm-4 text-center'<'filter'>><'col-sm-3'f>><<'toolbar'>>" +
+	    	"dom": "<'row'<'col-sm-2'l><'col-sm-3'<'toolbar'>><'col-sm-4'<'filter'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 				"processing": true,
 	      ajax: url,
 	      columns: [
 	          { data: "id" },
-	          {
-            	data: function(callback){
-            		return moment(callback.date).format("dddd, MMMM Do YYYY, h:mm a");
-            	}
-	           },
-	          { data: "tag" },
+	          { data: "parsed_date" },
 	          { data: "title" },
-	          { data: "details" },
-	          { data: "tickettype" },
-	          { data: "staffassigned" },
+	          { data: "type.name" },
+	          { data: "staff_name" },
 	          { data: "author" },
 	          { data: "status"},
 	          { data: function(callback){
-	          	return "<a href='{{ url("ticket/history") }}" + '/' +  callback.id + "' class='btn btn-sm btn-default btn-block'>View More</a>"
+
+	          	status = callback.status
+	          	left_button_list = `
+					<div class="pull-left">
+		          		<a href='{{ url("ticket/history") }}" + '/' +  callback.id + "' class='btn btn-md btn-default'>View More
+		          		</a>
+		          	</div>
+		         `
+
+	          	right_button_list = `
+						@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+						<button class="assign btn btn-success btn-md">
+							<span class="glyphicon glyphicon-share-alt"></span> Assign 
+						</button>
+						<button class="resolve btn btn-warning btn-md">
+							<span class="glyphicon glyphicon-check"></span> Create an Action
+						</button>
+						@endif	
+
+	          	`;
+
+				@if(Auth::user()->accesslevel == 0)
+
+	          	if(status == 'Open' || status == 'open')
+		          	right_button_list += `
+						<button class="close-ticket btn btn-danger btn-md">
+							<span class="glyphicon glyphicon-off"></span> Close
+						</button>
+
+		          	`
+		        else if(status == 'Reopen' || status == 'reopen')
+		          	right_button_list += `
+
+						<button class="reopen btn btn-info btn-md">
+							<span class="glyphicon glyphicon-off"></span> Reopen
+						</button>
+
+		          	`
+				@endif
+
+				button_list = left_button_list + `<div class="pull-right">` + right_button_list + '</div>'
+
+	          	return button_list;
 	          } }
 	    	],
 	  	});
 
-    table
-        .on( 'select', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
-            if(table.row('.selected').data().status == 'Open')
-            {
-	            $('#assign').show()
-	            $('#resolve').show()
-            	$('#close').show()
-            }
-            if(table.row('.selected').data().status == 'Closed' && table.row('.selected').data().tickettype == 'Complaint')
-            {
-            	$('#reopen').show()
-            }
-        } )
-        .on( 'deselect', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
-            $('#assign').hide()
-            $('#resolve').hide()
-            $('#close').hide()
-            $('#reopen').hide()
-        } );
-
-
-
-	    $('#table tbody').on( 'click', 'tr', function () {
-	      if ( $(this).hasClass('selected') ) {
-	          $(this).removeClass('selected');
-	      }
-	      else {
-	          table.$('tr.selected').removeClass('selected');
-	          $(this).addClass('selected');
-	      }
-	    } );
-
 	 	$("div.toolbar").html(`
-			<button id="add" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-plus"></span>  Create</button>
-			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-			<button id="maintenance" class="btn btn-warning btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-wrench"></span>  Maintenance</button>
-			<button id="assign" class="btn btn-success btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
-			<button id="resolve" class="btn btn-default btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
-			@endif
-			@if(Auth::user()->accesslevel == 0)
-			<button id="close" class="btn btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-off"></span> Close</button>
-			<button id="reopen" class="btn btn-info btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-off"></span> Reopen</button>
-			@endif
+			<a id="add" href = '{{ url('ticket/create') }}' class="btn btn-primary btn-sm">
+				<span class="glyphicon glyphicon-plus"></span>  Create
+			</a>
 		`);
 
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+
 		$('div.filter').html(`
 			<span class='text-muted'>Type:</span><div class="btn-group">
 			  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="tickettype-filter" style="padding: 7px 7px"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="tickettype-button"></span> <span class="caret"></span>
 			  </button>
 			  <ul class="dropdown-menu" id="tickettype-button">
 		   		@foreach($tickettype as $tickettype)
-		   		@if($tickettype->type != "Action Taken")
+		   		@if($tickettype->name != "Action Taken")
 				<li role="presentation">
-					<a class="tickettype"  data-name='{{ $tickettype->type }}'>{{ $tickettype->type }}</a>
+					<a class="tickettype"  data-name='{{ $tickettype->name }}'>{{ $tickettype->name }}</a>
 				</li>
 				@endif
 			    @endforeach
@@ -248,181 +215,132 @@ Tickets
 			url = "{{ url('ticket') }}" + '?status=' + $('#ticketstatus-button').text() + '&type=' + $('#tickettype-button').text()
 			table.ajax.url(url).load();
 		})
-		@endif
 
-		$('#add').on('click',function(){
-			window.location.href = '{{ url('ticket/create') }}';
-		});
-
-		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-		$('#maintenance').on('click',function(){
-			window.location.href = '{{ url('ticket/maintenance') }}';
-		});
-
-	    $('#assign').click( function () {
-			try
-			{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					$('#transfer-id').val(table.row('.selected').data().id)
-					$('#transfer-date').text(moment(table.row('.selected').data().date).format("dddd, MMMM Do YYYY, h:mm a"))
-					$('#transfer-tag').text(table.row('.selected').data().tag)
-					$('#transfer-title').text(table.row('.selected').data().title)
-					$('#transfer-details').text(table.row('.selected').data().details)
-					$('#transfer-author').text(table.row('.selected').data().author)
-					$('#transfer-staffid').val(table.row('.selected').data().staff_id)
-					$('#transfer-assigned').text(table.row('.selected').data().staffassigned)
-					$('#transferTicketModal').modal('show')
-				}
-			}
-			catch( error )
-			{
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+	    $('.assign').click( function () {
+			id = $(this).data('id')
+			$('#transfer-id').val(id)
 	    } );
 
-	    $('#resolve').click( function () {
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
+	    $('.resolve').click( function () {
+			if(table.row('.selected').data().tickettype == 'Complaint' || table.row('.selected').data().tickettype == 'Maintenance')
+			{
+				$('#resolve-id').val(table.row('.selected').data().id);
+				tag = table.row('.selected').data().tag
+				if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
 				{
-					if(table.row('.selected').data().tickettype == 'Complaint' || table.row('.selected').data().tickettype == 'Maintenance')
+					if(tag.indexOf('PC') !== -1)
 					{
-						$('#resolve-id').val(table.row('.selected').data().id);
-	    				tag = table.row('.selected').data().tag
-						if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
-						{
-							if(tag.indexOf('PC') !== -1)
-							{
-								$('#item-tag').val(tag.substr(4))
-							}
-
-							if(tag.indexOf('Item') !== -1)
-							{
-								$('#item-tag').val(tag.substr(6))
-							}
-
-							$('#resolve-equipment').show()
-						}
-						else
-						{
-							$('#item-tag').val("")
-							$('#resolve-equipment').hide()
-						}
-
-						$('#resolveTicketModal').modal('show')
+						$('#item-tag').val(tag.substr(4))
 					}
-					else
+
+					if(tag.indexOf('Item') !== -1)
 					{
-						swal('Error!','Only complaints can be resolved','error')
+						$('#item-tag').val(tag.substr(6))
 					}
+
+					$('#resolve-equipment').show()
 				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
+				else
+				{
+					$('#item-tag').val("")
+					$('#resolve-equipment').hide()
+				}
+
+				$('#resolveTicketModal').modal('show')
 			}
+			else
+			{
+				swal('Error!','Only complaints can be resolved','error')
+			}
+
 	    } );
 	    @endif
 
 		@if(Auth::user()->accesslevel == 0)
-	    $('#close').click( function () {
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					// do other things for a valid form
-			        swal({
-			          title: "Are you sure?",
-			          text: "Do you really want to close the ticket?",
-			          type: "warning",
-			          showCancelButton: true,
-			          confirmButtonText: "Yes, close it!",
-			          cancelButtonText: "No, cancel it!",
-			          closeOnConfirm: false,
-			          closeOnCancel: false
-			        },
-			        function(isConfirm){
-		         		if (isConfirm) {
-							$.ajax({
-		                        headers: {
-		                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-		                        },
-								type: 'delete',
-								url: '{{ url("ticket") }}' + "/" + table.row('.selected').data().id,
-								data: {
-									'id': table.row('.selected').data().id
-								},
-								dataType: 'json',
-								success: function(response){
-									if(response.length > 0){
-										swal('Operation Successful','Ticket has been closed','success')
-						        		table.ajax.reload().order([ 0, "desc" ]);
-									}else{
-										swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
-									}
-								},
-								error: function(){
-									swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
-								}
-							});
-				          } else {
-				            swal("Cancelled", "Operation Cancelled", "error");
-			          	}
-			        })
-				}
-			}
-			catch( error )
-			{
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+
+	    $('.close-ticket').click( function () {
+	    	id = $(this).data('id')
+	        swal({
+	          title: "Are you sure?",
+	          text: "Do you really want to close the ticket?",
+	          type: "warning",
+	          showCancelButton: true,
+	          confirmButtonText: "Yes, close it!",
+	          cancelButtonText: "No, cancel it!",
+	          closeOnConfirm: false,
+	          closeOnCancel: false
+	        },
+	        function(isConfirm){
+         		if (isConfirm) {
+					$.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+						type: 'delete',
+						url: '{{ url("ticket") }}' + "/" + id,
+						data: {
+							'id': id
+						},
+						dataType: 'json',
+						success: function(response){
+							if(response.length > 0){
+								swal('Operation Successful','Ticket has been closed','success')
+							}else{
+								swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
+							}
+
+							table.ajax.reload()
+						},
+						error: function(){
+							swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
+						}
+					});
+		          } else {
+		            swal("Cancelled", "Operation Cancelled", "error");
+	          	}
+	        })
 	    } );
 
-	    $('#reopen').click( function () {
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-			        // do other things for a valid form
-			        swal({
-			          title: "Are you sure?",
-			          text: "Do you really want to reopen the ticket.",
-			          type: "warning",
-			          showCancelButton: true,
-			          confirmButtonText: "Yes, reopen it!",
-			          cancelButtonText: "No, cancel it!",
-			          closeOnConfirm: false,
-			          closeOnCancel: false
-			        },
-			        function(isConfirm){
-			          if (isConfirm) {
-						$.ajax({
-	                        headers: {
-	                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	                        },
-							type: 'post',
-							url: '{{ url("ticket") }}' + "/" + table.row('.selected').data().id + '/reopen',
-							data: {
-								'id': table.row('.selected').data().id
-							},
-							dataType: 'json',
-							success: function(response){
-								if(response.length > 0){
-									swal('Operation Successful','Ticket has been reopened','success')
-					        		table.ajax.reload().order([ 0, "desc" ]);
-								}else{
-									swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
-								}
-							},
-							error: function(){
-								swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
-							}
-						});
-			          } else {
-			            swal("Cancelled", "Operation Cancelled", "error");
-			          }
-			        })
-				}
-			}
-			catch( error )
-			{
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+	    $('.reopen').click( function () {
+	    	id = $(this).data('id')
+	        swal({
+	          title: "Are you sure?",
+	          text: "Do you really want to reopen the ticket.",
+	          type: "warning",
+	          showCancelButton: true,
+	          confirmButtonText: "Yes, reopen it!",
+	          cancelButtonText: "No, cancel it!",
+	          closeOnConfirm: false,
+	          closeOnCancel: false
+	        },
+	        function(isConfirm){
+	          if (isConfirm) {
+				$.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+					type: 'post',
+					url: '{{ url("ticket") }}' + "/" + id + '/reopen',
+					data: {
+						'id': id
+					},
+					dataType: 'json',
+					success: function(response){
+						if(response.length > 0){
+							swal('Operation Successful','Ticket has been reopened','success')
+			        		table.ajax.reload().order([ 0, "desc" ]);
+						}else{
+							swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
+						}
+					},
+					error: function(){
+						swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
+					}
+				});
+	          } else {
+	            swal("Cancelled", "Operation Cancelled", "error");
+	          }
+	        })
 	    } );
 	    @endif
 
@@ -431,8 +349,6 @@ Tickets
             delay: 10,
             time: 2000
         });
-
-		$('#page-body').show();
     });
 </script>
 @stop

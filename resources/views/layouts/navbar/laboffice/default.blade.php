@@ -110,7 +110,6 @@
             <li>{{ link_to('event','Event') }}</li>
             @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
             <li>{{ link_to('item/type','Item Types') }}</li>
-            <li>{{ link_to('item/subtype','Item Sub Types') }}</li>
             <li>{{ link_to('room/category','Laboratory Room Category') }}</li>
             <li>{{ HTML::link('schedule','Laboratory Schedule') }}</li>
             <li>{{ link_to('room','Laboratory Room') }}</li>
@@ -137,31 +136,12 @@
               <ul class="dropdown-menu">
                 <!-- create tab -->
                 <li>{{ link_to('reservation/create','Item') }}</li>
-                @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
-{{--                 <!-- ticket dropdown tab -->
-                <li>
-                  <a href="{{ url('room/scheduling') }}">Room</a>
-                </li> <!-- end of ticket dropdown tab --> --}}
-                @endif
                 <!-- view all reservation -->
                 <li>{{ HTML::link('reservation/','List') }}</li>
                 <!-- view all reservation items -->
                 <li>{{ HTML::link('reservation/items/list','Item Filter') }}</li>
               </ul> <!-- end of dropdown items -->
             </li> <!-- end of reservation dropdown tab -->
-
-            <!-- inventory dropdown tab -->
-            {{-- <li class="dropdown-submenu">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Ticketing
-              </a>
-              <!-- dropdown items -->
-              <ul class="dropdown-menu">
-                <!-- tenant inventory tab -->
-                <li>{{ link_to('ticket','Complaints') }}</li>
-                <li>{{ link_to('ticket/maintenance','Maintenance') }}</li>
-                <li>{{ HTML::link('ticket/incident','Incident') }}</li>
-              </ul> <!-- end of dropdown items -->
-            </li> <!-- end of inventory dropdown tab -->   --}}
 
             <!-- ticket dropdown tab -->
             <li>

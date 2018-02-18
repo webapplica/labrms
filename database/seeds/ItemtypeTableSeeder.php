@@ -26,6 +26,21 @@ class ItemTypeTableSeeder extends Seeder {
 			 'category' => 'equipment'
 			],
 			[
+			 'name' => 'TV',
+			 'description' => '',
+			 'category' => 'equipment'
+			],
+			[
+			 'name' => 'Keyboard',
+			 'description' => '',
+			 'category' => 'equipment'
+			],
+			[
+			 'name' => 'Mouse',
+			 'description' => '',
+			 'category' => 'equipment'
+			],
+			[
 			 'name' => 'AVR',
 			 'description' => 'Power Regulator',
 			 'category' => 'equipment'

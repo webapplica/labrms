@@ -4,6 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use DB;
+use Auth;
 use App\Ticket;
 use App\ItemProfile;
 use Illuminate\Database\Eloquent\Model;
@@ -92,11 +93,6 @@ class Inventory extends \Eloquent
     return $this->receipts->sum('pivot.received_quantity') - $this->receipts->sum('pivot.profiled_items');
   }
 
-  public function items()
-  {
-    return $this->hasMany('App\Item','inventory_id','id');
-  }
-
   public function getBrandAttribute($value)
   {
     return ucwords($value);
@@ -117,6 +113,13 @@ class Inventory extends \Eloquent
     return $query->where('itemtype_id','=',$id);
   }
 
+  public function scopeLocate($query, $brand, $model, $itemtype)
+  {
+    return $query->where('brand', '=', $brand)
+                ->where('model', '=', $model)
+                ->where('itemtype_id', '=', $itemtype);
+  }
+
   public function scopeBrand($query,$brand)
   {
     return $query->where('brand','=',$brand);
@@ -127,14 +130,19 @@ class Inventory extends \Eloquent
     return $query->where('model','=',$model);
   }
 
+  public function items()
+  {
+    return $this->hasMany('App\Item','inventory_id','id');
+  }
+
   public function itemtype()
   {
     return $this->belongsTo('App\ItemType','itemtype_id','id');
   }
 
-  public function itemsubtype()
+  public function unit()
   {
-    return $this->belongsTo('App\ItemSubType','itemsubtype_id','id');
+    return $this->belongsTo('App\Unit','unit_name','name');
   }
 
   public function receipts()
@@ -142,6 +150,13 @@ class Inventory extends \Eloquent
     return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id')
             ->withPivot('received_quantity', 'received_unitcost', 'profiled_items')
             ->withTimestamps();
+  }
+
+  public static function generateCode()
+  {
+    $value = count(Inventory::pluck('id')) + 1;
+    $code = 'INV' . str_pad($value, 6, '0', STR_PAD_LEFT);
+    return $code;
   }
 
   /**

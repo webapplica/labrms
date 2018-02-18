@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends \Eloquent{
 
-
 	protected $table = 'tickets';
 	public $timestamps = true;
 	public $underrepair = "";
@@ -25,7 +24,7 @@ class Ticket extends \Eloquent{
 		'Ticket Type' => 'required|min:2|max:100',
 		'Ticket Name' => 'required|min:2|max:100',
 		'Details' => 'required|min:2|max:500',
-		'Ticket Id' => 'exists:ticket,id',
+		'Ticket Id' => 'exists:tickets, id',
 		'Status' => 'boolean'
 	);
 
@@ -43,22 +42,45 @@ class Ticket extends \Eloquent{
 	);
 
 	public static $transferRules = array(
-		'Ticket ID' => 'required|exists:ticket,id',
-		'Staff Assigned' => 'required|exists:user,id',
+		'Ticket ID' => 'required|exists:tickets, id',
+		'Staff Assigned' => 'required|exists:users, id',
 	);
 
 	protected $appends = [
-		'ticket_type_name'
+		'ticket_type_name', 'ticket_code', 'tag_list', 'staff_name', 'parsed_date'
 	];
+
+	public function getParsedDateAttribute()
+	{
+		return Carbon\Carbon::parse($this->date)->diffForHumans();
+	}
+
+	public function getStaffNameAttribute()
+	{
+		if(isset($this->staff) && count($this->staff) > 0)
+			return $this->staff->firstname . " " . $this->staff->middlename . " " . $this->staff->lastname;
+		return 'None';
+	}
+
+	public function getTagListAttribute()
+	{
+		return implode( $this->tags->pluck('name')->toArray(), ',');
+	}
 
 	public function getTicketTypeNameAttribute()
 	{
 		return (isset($this->type) && count($this->type) > 0) ? $this->type->name : 'Not Set';
 	}
 
-	public function user()
+	public function getTicketCodeAttribute()
 	{
-		return $this->hasOne('App\User','id','staffassigned');
+		$date = Carbon\Carbon::now();
+		return $date->format('y') . '-' . $date->format('m') . '-' . $this->id;
+	}
+
+	public function staff()
+	{
+		return $this->belongsTo('App\User', 'staff_id', 'id');
 	}
 
 	public function type()
@@ -69,6 +91,11 @@ class Ticket extends \Eloquent{
 	public function item()
 	{
 		return $this->belongsToMany('App\Item','item_ticket','item_id','ticket_id');
+	}
+
+	public function tags()
+	{
+		return $this->belongsToMany('App\Tag','tag_ticket','tag_id','ticket_id');
 	}
 
 	public function room()
@@ -101,6 +128,18 @@ class Ticket extends \Eloquent{
 	public function scopeOpen($query)
 	{
 		return $query->where('status','=','Open');
+	}
+
+	public function scopeSelfAuthored($query)
+	{
+		$user = Auth::user();
+		return $query->where('user_id', '=', $user->id);
+	}
+
+	public function scopeSelfAssigned($query)
+	{
+		$user = Auth::user();
+		return $query->where('staff_id', '=', $user->id);
 	}
 
 	public function scopeClosed($query)
@@ -200,7 +239,7 @@ class Ticket extends \Eloquent{
 	public function generate($tag = null)
 	{
 		
-		if( $this->author == null || !isset($this->author))
+		if(!isset($this->author) || $this->author == null)
 		{
 			$user = Auth::user();
 			$author = $user->firstname . " " . $user->middlename . " " . $user->lastname;

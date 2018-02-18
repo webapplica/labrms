@@ -20,7 +20,7 @@
             <li>
                 <a href="{{ url('item/type') }}">Item Type</a>
             </li>
-            <li>{{ $itemtype->id }}</li>
+            <li>{{ $itemtype->name }}</li>
             <li class="active">Edit</li>
         </ol>
         @include('item.type.form')

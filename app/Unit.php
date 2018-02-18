@@ -22,4 +22,14 @@ class Unit extends Model
 		'Description' => ''
 	);
 
+	public function scopeFindByName($query, $value)
+	{
+		return $query->where('name', '=', $value);
+	}
+
+	public function scopeFindByAbbreviation($query, $value)
+	{
+		return $query->where('abbreviation', '=', $value);
+	}
+
 }

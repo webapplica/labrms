@@ -41,7 +41,7 @@ class ItemsController extends Controller {
 				else
 				{
 
-					$itemtype_id = App\ItemType::type($id)->pluck('id');
+					$itemtype_id = App\ItemType::findByType($id)->pluck('id');
 					return json_encode([
 						'data' => App\Item::whereIn('inventory_id',App\Inventory::type($itemtype_id)->pluck('id'))
 												->where('status','=',$status)
@@ -116,6 +116,7 @@ class ItemsController extends Controller {
 		$serial_number = "";
 
 		DB::beginTransaction();
+
 		foreach($request->get('item') as $item)
 		{
 
