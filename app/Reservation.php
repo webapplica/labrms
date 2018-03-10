@@ -89,24 +89,23 @@ class Reservation extends \Eloquent{
 	public function scopeUnclaimed($query)
 	{
 		return $query->where(function($query){
-			$query->whereNull('status')
-					->orWhere('status','=','unclaimed');
+			$query->whereNull('is_claimed');
 		});
 	}
 
 	public function scopeApproved($query)
 	{
-		return $query->where('approval','=',1);
+		return $query->where('is_approved','=',1);
 	}
 
 	public function scopeDisapproved($query)
 	{
-		return $query->where('approval','=',2);
+		return $query->where('is_approved','=',2);
 	}
 
 	public function scopeUndecided($query)
 	{
-		return $query->where('approval','=',0);
+		return $query->where('is_approved','=',0);
 	}
 
 	public function scopeWithInfo($query)
@@ -137,7 +136,7 @@ class Reservation extends \Eloquent{
 	public static function approve($id)
 	{
 		$reservation = Reservation::find($id);
-		$reservation->approval =  1;
+		$reservation->is_approved =  1;
 		$reservation->save();
 
 		return $reservation;
@@ -152,7 +151,7 @@ class Reservation extends \Eloquent{
 	public static function disapprove($id,$reason)
 	{
 		$reservation = Reservation::find($id);
-		$reservation->approval = 2;
+		$reservation->is_approved = 2;
 		$reservation->remark = $reason;
 		$reservation->save();
 		
@@ -272,7 +271,7 @@ class Reservation extends \Eloquent{
 		*/
 		if(count($reservation) > 0)
 		{
-			$reservation->status = 'Claimed';
+			$reservation->remarks = 'Claimed';
 			$reservation->save();
 		}
 

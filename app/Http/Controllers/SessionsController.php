@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Session;
 use Auth;
 use Validator;
+use App;
 use App\User;
 use App\Reservation;
 use App\TicketView;
@@ -104,14 +105,14 @@ class SessionsController extends Controller {
 	 */
 	public function show()
 	{
-		$person = Auth::user();
-		$reservation = Reservation::withInfo()->user(Auth::user()->id)->get()->count();
-		$approved = Reservation::withInfo()->approved()->user(Auth::user()->id)->get()->count();
-		$disapproved = Reservation::withInfo()->disapproved()->user(Auth::user()->id)->get()->count();
-		$claimed = Reservation::where('status','=','claimed')->user(Auth::user()->id)->get()->count();
-		$tickets = TicketView::self()->get()->count();
-		$assigned = TicketView::staff(Auth::user()->id)->tickettype('Complaint')->count();
-		$complaints = TicketView::self()->tickettype('Complaint')->count();
+		$person = Auth::user(); 
+		$reservation = App\Reservation::withInfo()->user(Auth::user()->id)->get()->count();
+		$approved = App\Reservation::withInfo()->approved()->user(Auth::user()->id)->get()->count();
+		$disapproved = App\Reservation::withInfo()->disapproved()->user(Auth::user()->id)->get()->count();
+		$claimed = App\Reservation::unclaimed()->user(Auth::user()->id)->get()->count();
+		$tickets = App\Ticket::selfAuthored()->get()->count();
+		$assigned = App\Ticket::selfAssigned(Auth::user()->id)->findByType('Complaint')->count();
+		$complaints = App\Ticket::selfAuthored()->findByType('Complaint')->count();
 		return view('user.index')
 			->with('person',$person)
 			->with('reservation',$reservation)

@@ -127,7 +127,7 @@ class Ticket extends \Eloquent{
 
 	public function scopeStaffassigned($query,$value)
 	{
-		return $query->where('staffassigned','=',$value);
+		return $query->where('staff_id','=',$value);
 	}
 
 	public function scopeOpen($query)
