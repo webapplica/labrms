@@ -18,6 +18,12 @@ class CreateItemTypesTable extends Migration {
 			$table->string('name',50)->unique();
 			$table->string('description',450)->nullable();
 			$table->string('category',450)->nullable();
+			$table->integer('parent_id')->unsigned()->nullable();
+			$table->foreign('parent_id')
+					->references('id')
+					->on('item_types')
+					->onUpdate('cascade')
+					->onDelete('set null');
 			$table->timestamps();
 			$table->softDeletes();
 		});

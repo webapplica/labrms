@@ -18,65 +18,72 @@ class RoomTableSeeder extends Seeder {
    	App\Room::insert(array(
        [
         'name' => 'S501',
-        'category' => 'Web Development',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S502',
-        'category' => 'Networking',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S503',
-        'category' => 'Networking',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S504',
-        'category' => 'Hardware,Networking',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'Consultation Room',
-        'category' => 'Consultation,Meeting',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'Faculty Room',
-        'category' => 'Faculty Area',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'Server',
-        'category' => '',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S508',
-        'category' => 'Programming,Web Development',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S510',
-        'category' => 'Database,Web Development,Multimedia',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ],
        [
         'name' => 'S511',
-        'category' => 'Multimedia',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
        ]
     ));
+
+    DB::table('room_category')->insert([
+      [ 'room_id' => 1, 'category_id' => 6],
+      [ 'room_id' => 2, 'category_id' => 7],
+      [ 'room_id' => 3, 'category_id' => 7],
+      [ 'room_id' => 4, 'category_id' => 5],
+      [ 'room_id' => 4, 'category_id' => 7],
+      [ 'room_id' => 5, 'category_id' => 8],
+      [ 'room_id' => 8, 'category_id' => 1],
+      [ 'room_id' => 8, 'category_id' => 4],
+      [ 'room_id' => 10, 'category_id' => 4],
+      [ 'room_id' => 10, 'category_id' => 6],
+      [ 'room_id' => 10, 'category_id' => 9],
+      [ 'room_id' => 11, 'category_id' => 10],
+
+
+    ]);
 
 	}
 

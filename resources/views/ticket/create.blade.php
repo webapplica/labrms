@@ -233,68 +233,65 @@ Create Ticket
                 url: "{{ url('get/ticket/tag') }}" + '?id=' + $('#tag').val(),
                 dataType: 'json',
                 success: function(response){
-					if(response == 'error')
+
+					if(response.propertynumber)
+					{
+
+						$('#tickettag').html(`
+							<div class="panel panel-info">
+								<div class="panel-heading">
+									Item Profile
+								</div>
+								<ul class="list-group">
+								  <li class="list-group-item">Property Number:  `+response.property_number+`<span id="transfer-date"></span></li>
+								  <li class="list-group-item">Serial Number: `+response.serial_number+` <span id="transfer-tag"></span></li>
+								  <li class="list-group-item">Status: `+response.status+`<span id="transfer-title"></span></li>
+								</ul>
+							</div>
+						`)
+					}
+					else if(response.systemunit_id)
+					{
+
+						$('#tickettag').html(`
+							<div class="panel panel-info">
+								<div class="panel-heading">
+									Workstation Information
+								</div>
+								<ul class="list-group">
+								  <li class="list-group-item">Workstation Name:  `+response.name+`</li>
+								  <li class="list-group-item">System Unit:  `+response.systemunit.local+`</li>
+								  <li class="list-group-item">Monitor:  `+response.monitor.local+`</li>
+								  <li class="list-group-item">AVR: `+response.avr.local+`</li>
+								  <li class="list-group-item">Keyboard:  `+response.keyboard.local+`</li>
+								  <li class="list-group-item">Mouse:  `+response.mouse+`</li>
+								  <li class="list-group-item">Status: `+response.systemunit.status+`</li>
+								</ul>
+							</div>
+						`)
+					}
+					else if(response.name)
+					{
+
+						$('#tickettag').html(`
+							<div class="panel panel-info">
+								<div class="panel-heading">
+									Room Information
+								</div>
+								<ul class="list-group">
+								  <li class="list-group-item">Room Name:  `+response.name+`</li>
+								  <li class="list-group-item">Category:  `+response.description+`</li>
+								</ul>
+							</div>
+						`)
+					}
+					else
 					{
 						$('#tickettag').html(`
 							<div class="alert alert-warning alert-dismissible" role="alert">
 	  							<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	  							<strong>Warning!</strong> Tag inputted doesnt match any record.This wont be linked to any equipment,workstation,or room
 							</div>`)
-					}
-					else
-					{
-
-						if(response.propertynumber)
-						{
-
-							$('#tickettag').html(`
-								<div class="panel panel-info">
-									<div class="panel-heading">
-										Item Profile
-									</div>
-									<ul class="list-group">
-									  <li class="list-group-item">Property Number:  `+response.propertynumber+`<span id="transfer-date"></span></li>
-									  <li class="list-group-item">Serial Number: `+response.serialnumber+` <span id="transfer-tag"></span></li>
-									  <li class="list-group-item">Status: `+response.status+`<span id="transfer-title"></span></li>
-									</ul>
-								</div>
-							`)
-						}
-						else if(response.systemunit_id)
-						{
-
-							$('#tickettag').html(`
-								<div class="panel panel-info">
-									<div class="panel-heading">
-										Workstation Information
-									</div>
-									<ul class="list-group">
-									  <li class="list-group-item">Workstation Name:  `+response.name+`</li>
-									  <li class="list-group-item">System Unit:  `+response.systemunit.propertynumber+`</li>
-									  <li class="list-group-item">Monitor:  `+response.monitor.propertynumber+`</li>
-									  <li class="list-group-item">AVR: `+response.avr.propertynumber+`</li>
-									  <li class="list-group-item">Keyboard:  `+response.keyboard.propertynumber+`</li>
-									  <li class="list-group-item">Mouse:  `+response.mouse+`</li>
-									  <li class="list-group-item">Status: `+response.systemunit.status+`</li>
-									</ul>
-								</div>
-							`)
-						}
-						else if(response.name)
-						{
-
-							$('#tickettag').html(`
-								<div class="panel panel-info">
-									<div class="panel-heading">
-										Room Information
-									</div>
-									<ul class="list-group">
-									  <li class="list-group-item">Room Name:  `+response.name+`</li>
-									  <li class="list-group-item">Category:  `+response.description+`</li>
-									</ul>
-								</div>
-							`)
-						}
 					}
 				}
 			})

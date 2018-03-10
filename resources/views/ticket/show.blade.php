@@ -1,19 +1,9 @@
 @extends('layouts.master-blue')
-@section('title')
-Ticket History
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-  #page-body{
-    display: none;
-  }
-</style>
-@stop
+<link href="{{ asset('css/select.bootstrap.min.css') }}" rel="stylesheet" />
+@endsection
+
 @section('content')
 @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 @include('modal.ticket.transfer')
@@ -24,16 +14,9 @@ Ticket History
 <div class="container-fluid" id="page-body">
   <div class="col-md-12">
     <div class="panel panel-body ">
-        @if (count($errors) > 0)
-           <div class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <ul class="list-unstyled" style='margin-left: 10px;'>
-                    @foreach ($errors->all() as $error)
-                        <li class="text-capitalize">{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+  
+      @include('errors.alert')
+
       <div class='col-md-12'>
           <legend><h3 class="text-muted">Ticket {{ $ticket->id }} History</h3></legend>
           <ol class="breadcrumb">
@@ -76,16 +59,10 @@ Ticket History
 </div><!-- Container -->
 @stop
 @section('script')
-{{ HTML::script(asset('js/moment.min.js')) }}
+<script src="{{ asset('js/moment.min.js') }}"></script>
+<script src="{{ asset('js/dataTables.select.min.js') }}"></script>
 <script>
   $(document).ready(function(){
-    @if( Session::has("success-message") )
-      swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-    @if( Session::has("error-message") )
-      swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
-
 
     var table = $('#ticketTable').DataTable({
       select: {
@@ -99,10 +76,10 @@ Ticket History
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-5'i><'col-sm-7'p>>",
      "processing": true,
-      ajax: "{{ url('ticket/history') }}" + '/' + {{ $id }},
+      ajax: "{{ url('ticket') }}/" + {{ $id }},
       columns: [
           { data: "id" },
-          { data: "tickettype" },
+          { data: "type.name" },
           { data: "details" },
           { data: function(callback){
             if(callback.user)
@@ -121,10 +98,10 @@ Ticket History
 
     $('.toolbar').html(`
       @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-      <button id="assign" class="btn btn-success btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
-      @if($ticket->tickettype == 'Complaint')
-      <button id="resolve" class="btn btn-default btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
-      @endif
+      <button id="assign" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
+        @if($ticket->type->name == 'Complaint')
+        <button id="resolve" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
+        @endif
       @endif
     `)
 
@@ -140,38 +117,37 @@ Ticket History
           $('#transfer-assigned').text('{{ $ticket->staffassigned }}')
           $('#transferTicketModal').modal('show')
       } );
-     @if($ticket->tickettype == 'Complaint')
 
-      $('#resolve').click( function () {
-            $('#resolve-id').val('{{ $ticket->id }}');
-              tag = '{{ $ticket->tag }}' 
-            if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
-            {
-              if(tag.indexOf('PC') !== -1)
+     @if($ticket->type->name == 'Complaint')
+
+        $('#resolve').click( function () {
+              $('#resolve-id').val('{{ $ticket->id }}');
+                tag = '{{ $ticket->tag }}' 
+              if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
               {
-                $('#item-tag').val(tag.substr(4))
+                if(tag.indexOf('PC') !== -1)
+                {
+                  $('#item-tag').val(tag.substr(4))
+                }
+
+                if(tag.indexOf('Item') !== -1)
+                {
+                  $('#item-tag').val(tag.substr(6))
+                }
+
+                $('#resolve-equipment').show()
+              }
+              else
+              {
+                $('#item-tag').val("")
+                $('#resolve-equipment').hide()
               }
 
-              if(tag.indexOf('Item') !== -1)
-              {
-                $('#item-tag').val(tag.substr(6))
-              }
-
-              $('#resolve-equipment').show()
-            }
-            else
-            {
-              $('#item-tag').val("")
-              $('#resolve-equipment').hide()
-            }
-
-            $('#resolveTicketModal').modal('show')
-      } );
+              $('#resolveTicketModal').modal('show')
+        } );
+        
       @endif
       @endif
-
-
-    $('#page-body').show()
   })
 </script>
 @stop

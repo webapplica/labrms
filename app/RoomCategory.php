@@ -7,17 +7,31 @@ use Illuminate\Database\Eloquent\Model;
 class RoomCategory extends Model
 {
     protected $table = 'room_categories';
-	
-	public $timestamps = false;
+	protected $primaryKey = 'id';
+	public $timestamps = true;
+	public $incrementing = true;
+	public $fillable = ['name'];
 
-	public $fillable = ['category'];
-	public $incrementing = false;
-	protected $primaryKey = 'category';
-	public static $rules = array(
-		'Category' => 'required|string|min:5|max:100'
-	);
+	public function rules()
+	{
+		return array(
+			'Category Name' => 'required|string|min:5|max:100'
+		);
+	}
 
-	public static $updateRules = array(
-		'Category' => 'string|min:5|max:100'
-	);
+	public function updateRules()
+	{
+		$name = $this->name;
+		return array(
+			'Category' => 'required|exists:room_categories,id',
+			'Category Name' => 'required|string|min:5|max:100|unique:room_categories,name,' . $name . ',name'
+		);
+	}
+
+	public function deleteRules()
+	{
+		return array(
+			'Category' => 'required|exists:room_categories,id'
+		);
+	}
 }

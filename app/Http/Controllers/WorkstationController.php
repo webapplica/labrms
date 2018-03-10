@@ -396,4 +396,28 @@ class WorkstationController extends Controller {
 		return redirect('workstation/view/transfer');
 	}
 
+	/**
+	*
+	*	@param $id requires pc id
+	*	@return list of pc ticket
+	*
+	*/
+	public function getWorkstationTicket(Request $request, $id)
+	{
+		$ticket = new App\Ticket;
+		$ticket->getPcTickets($id);
+		if($request->ajax())
+		{
+
+			
+			return json_encode([
+				'data' => $ticket
+			]);
+		}
+
+		return json_encode([
+			'data' => $ticket
+		]);
+	}
+
 }

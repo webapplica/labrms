@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use Validator;
 use Session;
 use App;
-use App\Room;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
 
 class RoomsController extends Controller {
 
@@ -17,19 +15,21 @@ class RoomsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
 
-		if(Request::ajax())
+		$rooms = App\Room::all();
+
+		if($request->ajax())
 		{
-			return json_encode([
-					'data'=> Room::all()
-				]);
+			return datatables($rooms)->toJson();
 		}
 
-		$rooms = Room::all();
+		$categories = App\RoomCategory::pluck('name', 'id');	
+
 		return view('room.index')
-			->with('rooms',$rooms);
+			->with('rooms',$rooms)
+			->with('categories', $categories);
 	}
 
 
@@ -40,7 +40,9 @@ class RoomsController extends Controller {
 	 */
 	public function create()
 	{
-		return view('room.create');
+		$categories = App\RoomCategory::pluck('name', 'id');	
+		return view('room.create')
+				->with('categories', $categories);
 	}
 
 	/**
@@ -48,33 +50,36 @@ class RoomsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		$name = $this->sanitizeString(Input::get("name"));
-		$description = $this->sanitizeString(Input::get('description'));
-		$category = $this->sanitizeString(implode(Input::get('category'),","));
+		$name = $this->sanitizeString($request->get("name"));
+		$description = $this->sanitizeString($request->get('description'));
+		$categories = $request->get('category');
+		$room = new App\Room;
 
-		$validator = Validator::make([
-
-			'Name' => $name,
-			'Description' => $description,
-			'Category' => $category
-
-		],Room::$rules);
-
-		if($validator->fails())
+		foreach($categories as $category)
 		{
-			return redirect('room/create')
-				->withInput()
-				->withErrors($validator);
+			$validator = Validator::make([
+				'Name' => $name,
+				'Description' => $description,
+				'Category' => $category
+			], $room->rules());
+
+			if($validator->fails())
+			{
+				return redirect('room/create')
+					->withInput()
+					->withErrors($validator);
+			}
+
 		}
 
-		$room = new Room;
 		$room->name = $name;
 		$room->description = $description;
-		$room->category = $category;
-		$room->status = 'working';
+		$room->status = 0;
 		$room->save();
+
+		$room->categories()->sync($categories);
 
 		Session::flash('success-message','Room information created!');
 		return redirect('room');
@@ -91,19 +96,10 @@ class RoomsController extends Controller {
 	{
 		$id = $this->sanitizeString($id);
 
-		$room = Room::find($id);
-
-		$roominventory = [];
-
-		$roominventory = App\RoomInventoryView::where('room','=',$room->name)
-							->get()
-							->groupBy('type');
-
-		// return json_encode($roominventory);
+		$room = App\Room::find($id);
 
 		return view('room.show')
-				->with('room',$room)
-				->with('roominventory',$roominventory);
+				->with('room',$room);
 	}
 
 
@@ -116,8 +112,10 @@ class RoomsController extends Controller {
 	public function edit($id)
 	{
 		$room = Room::find($id);
+		$categories = App\RoomCategory::pluck('name', 'id');	
 		return view('room.update')
-			->with('room',$room);
+			->with('room',$room)
+			->with('categories', $categories);
 	}
 
 
@@ -129,15 +127,13 @@ class RoomsController extends Controller {
 	 */
 	public function update($id)
 	{
-		$name = $this->sanitizeString(Input::get("name"));
-		$description = $this->sanitizeString(Input::get('description'));
-		$category = $this->sanitizeString(implode(Input::get('category'),","));
+		$name = $this->sanitizeString($request->get("name"));
+		$description = $this->sanitizeString($request->get('description'));
 
 		$validator = Validator::make([
 
 			'Name' => $name,
-			'Description' => $description,
-			'Category' => $category
+			'Description' => $description
 
 		],Room::$updateRules);
 
@@ -168,7 +164,7 @@ class RoomsController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		if(Request::ajax()){
+		if($request->ajax()){
 			try{
 				$room = Room::find($id);
 				$room->delete();
@@ -182,22 +178,29 @@ class RoomsController extends Controller {
 		return redirect('room');
 	}
 
-	public function restoreView(){
-		return view('room.restore')
-			->with('rooms',Room::onlyTrashed()->get())
-			->with('active_tab','restore');
-	}
-
-	public function restore($id){
-		$room = Room::onlyTrashed()->where('id',$id)->first();
-		$room->restore();
-		return redirect('room/view/restore');
-	}
-
-	public function getRoomName($id)
+	/**
+	 * returns list of room tickets
+	 * the url required for this is 
+	 * ticket/room/{id}
+	 * @param id as room id
+	 * @return list of tickets based on the room
+	 */
+	public function getRoomTickets(Request $request, $id)
 	{
-		$room = Room::find($id);
-		return json_encode($room->name);
+		$validator = Validator::make([
+			'Room' => $id
+		], [ 'Room' => 'required|exists:rooms,id']);
+
+		if($validator->fails())
+		{
+			return response()->json([
+				'Operation' => false,
+				'errors' => $validator
+			], 200);
+		}
+
+		$rooms = App\Room::with('tickets')->find($id);
+		return datatables($rooms->tickets)->toJson();
 	}
 
 }

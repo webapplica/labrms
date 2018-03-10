@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\RoomCategory;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use App;
+use Illuminate\Http\Request;
 
 class RoomCategoryController extends Controller
 {
@@ -16,13 +15,12 @@ class RoomCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Request::ajax())
+        if($request->ajax())
         {
-            return json_encode([
-                'data' => RoomCategory::all()
-            ]);
+            $category = App\RoomCategory::all();
+            return datatables($category)->toJson();
         }
 
         return view('room.category.index');
@@ -33,7 +31,7 @@ class RoomCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         return view('room.category.create');
     }
@@ -44,14 +42,16 @@ class RoomCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store(Request $request)
     {
 
-        $category = $this->sanitizeString(Input::get('name'));
+        $name = $this->sanitizeString($request->get('name'));
+
+        $category = new App\RoomCategory;
 
         $validator = Validator::make([
-            'Category' => $category
-        ],RoomCategory::$rules);
+            'Category Name' => $name
+        ], $category->rules());
 
         if($validator->fails())
         {
@@ -60,9 +60,8 @@ class RoomCategoryController extends Controller
                     ->withErrors($validator);
         }
 
-        $roomcategory = new RoomCategory;
-        $roomcategory->category = $category;
-        $roomcategory->save();
+        $category->name = $name;
+        $category->save();
 
         Session::flash('success-message','Room Category added');
         return redirect('room/category');
@@ -74,7 +73,7 @@ class RoomCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         return view('room.category.show');
     }
@@ -85,7 +84,7 @@ class RoomCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         return view('room.category.edit');
     }
@@ -99,45 +98,39 @@ class RoomCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(Request::ajax())
-        {
-            $category = $this->sanitizeString(Input::get('name'));
-            $id = $this->sanitizeString($id);
 
-            $validator = Validator::make([
-                'Category' => $category
-            ],RoomCategory::$updateRules);
-
-            if($validator->fails())
-            {
-                return redirect('room/category')
-                        ->withInput()
-                        ->withErrors($validator);
-            }
-
-            $roomcategory = RoomCategory::find($id);
-            $roomcategory->category = $category;
-            $roomcategory->save();
-
-            return json_encode('success');
-        }
-
-        $category = $this->sanitizeString(Input::get('name'));
+        $name = $this->sanitizeString($request->get('name'));
+        $category = App\RoomCategory::find($id);
 
         $validator = Validator::make([
-            'Category' => $category
-        ],RoomCategory::$rules);
+            'Category' => $id,
+            'Category Name' => $name
+        ], $category->updateRules());
 
         if($validator->fails())
         {
+            if($request->ajax())
+            {
+                return response()->json([
+                    'Operation' => false,
+                    'errors' => $validator
+                ], 200);
+            }
+
             return redirect('room/category')
                     ->withInput()
                     ->withErrors($validator);
         }
 
-        $roomcategory = RoomCategory::find($category);
-        $roomcategory->category = $category;
-        $roomcategory->save();
+        $category->name = $name;
+        $category->save();
+
+        if($request->ajax())
+        {
+            return response()->json([
+                'Operation' => true
+            ], 200);
+        }
 
         Session::flash('success-message','Room Category updated');
         return redirect('room/category');
@@ -149,17 +142,38 @@ class RoomCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if(Request::ajax())
+
+        $category = App\RoomCategory::find($id);
+
+        $validator = Validator::make([
+            'Category' => $id
+        ], $category->deleteRules());
+
+        if($validator->fails())
         {
-            $roomcategory = RoomCategory::find($id);
-            $roomcategory->delete();
-            return json_encode('success');
+            if($request->ajax())
+            {
+                return response()->json([
+                    'Operation' => false,
+                    'errors' => $validator
+                ], 200);
+            }
+
+            return redirect('room/category')
+                    ->withInput()
+                    ->withErrors($validator);
         }
 
-        $roomcategory = RoomCategory::find($id);
-        $roomcategory->delete();
+        $category->delete();
+
+        if($request->ajax())
+        {
+            return response()->json([
+                'Operation' => true
+            ], 200);
+        }
 
         Session::flash('success-message','Room Category removed');
         return redirect('room/category');

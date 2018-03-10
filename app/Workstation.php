@@ -54,7 +54,7 @@ class Workstation extends \Eloquent{
 					->withTimestamps();
 	}
 
-	public function ticket()
+	public function tickets()
 	{
 		return $this->belongsToMany('App\Ticket','pc_ticket','pc_id','ticket_id');
 	}

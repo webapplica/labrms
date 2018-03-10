@@ -16,7 +16,6 @@ class CreateRoomsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('name',50)->unique();
-			$table->string('category',100)->nullable();
 			$table->string('description',100)->nullable();
 			$table->string('status',100)->nullable();
 			$table->boolean('is_default')->default(0);

@@ -23,7 +23,7 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('category','Room Category') }}
-    {{ Form::select('category[]',isset($category) ? $category : ['Empty list'=>'Empty list'],Input::old('category'),[
+    {{ Form::select('category[]',isset($categories) ? $categories : ['Empty list'=>'Empty list'],Input::old('category'),[
       'id' => 'category',
       'class'=>'form-control',
       'multiple' => 'multiple'

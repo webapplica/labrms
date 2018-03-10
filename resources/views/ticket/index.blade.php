@@ -121,7 +121,7 @@
 	          	status = callback.status
 	          	left_button_list = `
 					<div class="pull-left">
-		          		<a href='{{ url("ticket/history") }}" + '/' +  callback.id + "' class='btn btn-md btn-default'>View More
+		          		<a href='{{ url("ticket") }}/` +  callback.id + `'' class='btn btn-md btn-default'>View More
 		          		</a>
 		          	</div>
 		         `

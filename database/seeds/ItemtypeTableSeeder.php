@@ -11,10 +11,10 @@ class ItemTypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-		App\Itemtype::truncate();
+		App\ItemType::truncate();
 
 		//insert some dummy records
-		App\Itemtype::insert(array(
+		App\ItemType::insert(array(
 			[
 			   'name' => 'System Unit',
 			   'description' => 'Computer set',

@@ -1,36 +1,16 @@
 @extends('layouts.master-blue')
-@section('title')
-Room Category
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-	#page-body{
-		display: none;
-	}
-</style>
-@stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-sm-offset-2 col-sm-8" id="room-info">
 		<div class="panel panel-body table-responsive">
 			<legend><h3 class="text-muted">Laboratory Room Categories</h3></legend>
-	        @if (count($errors) > 0)
-	            <div class="alert alert-danger alert-dismissible" role="alert">
-	            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	                <ul style='margin-left: 10px;'>
-	                    @foreach ($errors->all() as $error)
-	                        <li>{{ $error }}</li>
-	                    @endforeach
-	                </ul>
-	            </div>
-	        @endif
+	        
+			@include('errors.alert')
+
 			<table class="table table-hover table-condensed table-bordered table-striped" id="roomTable">
 				<thead>
+					<th>ID</th>
 					<th>Category</th>
 					<th class="col-sm-2 no-sort"></th>
 				</thead>
@@ -39,10 +19,13 @@ Room Category
 	</div>
 </div>
 @stop
+
 @section('script')
 <script type="text/javascript">
 	$(document).ready(function() {
 		var table = $('#roomTable').DataTable( {
+			serverSide: true,
+			processing: true,
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
@@ -56,11 +39,12 @@ Room Category
 			"processing": true,
 	        ajax: "{{ url('room/category') }}",
 	        columns: [
-	            { data: "category" },
+	            { data: "id" },
+	            { data: "name" },
 	            { data: function(callback){
 	            	return `
-	            		<button type="button" data-category="`+callback.category+`" class="btn btn-sm btn-default edit">Edit</button>
-	            		<button type="button" data-category="`+callback.category+`" class="btn btn-sm btn-danger delete">Delete</button>
+	            		<button type="button" data-name="`+ callback.name + `" data-id="`+callback.id+`" class="btn btn-sm btn-default edit">Edit</button>
+	            		<button type="button" data-name="`+ callback.name + `" data-id="`+callback.id+`" class="btn btn-sm btn-danger delete">Delete</button>
 	            	`;
 	            } }
 	        ],
@@ -97,7 +81,8 @@ Room Category
 		})
 
 		$('#roomTable').on('click','.edit',function(){
-	    	category = $(this).data('category')
+	    	name = $(this).data('name')
+	    	id = $(this).data('id')
 	    	swal({
 			  title: "Input Category!",
 			  text: "Input the new category you want to update it to",
@@ -105,7 +90,7 @@ Room Category
 			  showCancelButton: true,
 			  closeOnConfirm: false,
 			  animation: "slide-from-top",
-			  inputValue: category
+			  inputValue: name
 			},
 			function(inputValue){
 			  if (inputValue === false) return false;
@@ -120,18 +105,13 @@ Room Category
 			        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 			    },
 			  	type: 'put',
-			  	url: '{{ url("room/category") }}' + '/' + category,
+			  	url: '{{ url("room/category") }}' + '/' + id,
 			  	dataType: 'json',
 			  	data: {
 			  		'name': inputValue
 			  	},
 			  	success: function(response){
-			  		if(response == 'success')
-			  		{
-			  			swal('Success','Information Updated','success')	
-			  		}
-			  		else
-			  		swal('Error','Problem Occurred while processing your data','error')
+		  			swal('Success','Information Updated','success')	
 			  		table.ajax.reload();
 			  	},
 			  	error: function(){
@@ -142,7 +122,8 @@ Room Category
 		});
 
 	    $('#roomTable').on('click','.delete',function(){
-	    	category = $(this).data('category')
+	    	id = $(this).data('id')
+	    	name = $(this).data('name')
 	        swal({
 	          title: "Are you sure?",
 	          text: "This room will be removed from database?",
@@ -160,18 +141,15 @@ Room Category
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
 					type: 'delete',
-					url: '{{ url("room/category") }}' + "/" + category,
+					url: '{{ url("room/category") }}' + "/" + id,
 					data: {
-						'id': category
+						'id': id,
+						'name': name
 					},
 					dataType: 'json',
 					success: function(response){
-						if(response == 'success'){
-							swal('Operation Successful','Room Category removed','success')
-			        		table.ajax.reload();
-			        	}else{
-							swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-						}
+						swal('Operation Successful','Room Category removed','success')
+		        		table.ajax.reload();
 					},
 					error: function(){
 						swal('Operation Unsuccessful','Error occurred while deleting a record','error')
@@ -182,15 +160,6 @@ Room Category
 	          }
 	        })
 	    });
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-		$('#page-body').show();
 	} );
 </script>
 @stop

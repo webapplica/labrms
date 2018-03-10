@@ -26,25 +26,10 @@ class TicketsController extends Controller {
 	public function index(Request $request)
 	{
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if request is made through ajax
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
 		if($request->ajax())
 		{
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Laboratory Staff
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
+			// laboratory staff
 			$query = App\Ticket::orderBy('date','desc');
 			if( Auth::user()->accesslevel == 2 )
 			{
@@ -66,14 +51,8 @@ class TicketsController extends Controller {
 				$query = $query->findByStatus($request->get('status'));
 			}
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Laboratory Users
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
+			
+			// laboratory clients
 			if( Auth::user()->accesslevel == 3 || Auth::user()->accesslevel == 4  )
 			{
 				$query = $query->selfAuthored()->selfAssigned()->findByType('Complaint');
@@ -82,14 +61,7 @@ class TicketsController extends Controller {
 			return datatables($query->get())->toJson();
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Total Ticket Count
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// total tickets
 		$total_tickets = App\Ticket::count();
 		$complaints = App\Ticket::findByType('complaint')
 						->open()
@@ -155,27 +127,10 @@ class TicketsController extends Controller {
 			$type = 'incident';
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Verifies if the user inputs  a title
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
 		if($request->has('subject'))
 		{
 			$title = $this->sanitizeString($request->get('subject'));
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Check if title has no value
-			|	if no value, type will be automatically complaint
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
 			if($title == '' || $title == null)
 			{
 				$title = $type;
@@ -186,29 +141,12 @@ class TicketsController extends Controller {
 			$title = $type;
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Verifies if the user inputs an author
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
 		if($request->has('author'))
 		{
 			$author = $this->sanitizeString($request->get('author'));
 		}
 
 		$details = $this->sanitizeString($request->get('description'));
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Verifies if the user inputs an author
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
 
 		if(Auth::user()->accesslevel <= 2)
 		{
@@ -265,153 +203,6 @@ class TicketsController extends Controller {
 	 */
 	public function show(Request $request, $id)
 	{
-
-	}
-
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit(Request $request, $id)
-	{
-		$ticket = App\Ticket::find($id);
-		return view('ticket.edit')
-				->with('ticket',$ticket);
-	}
-
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update(Request $request, $id)
-	{
-		$propertynumber = $this->sanitizeString($request->get('propertynumber'));
-		$type = $this->sanitizeString($request->get('type'));
-		$maintenancetype = $this->sanitizeString($request->get('maintenancetype'));
-		$category = $this->sanitizeString($request->get('category'));
-		$author = $this->sanitizeString($request->get('author'));
-		$details = $this->sanitizeString($request->get('description'));
-		$staffassigned = Auth::user()->id;
-		$propertynumber;
-
-		$ticket = App\Ticket::find($id);
-		$ticket->item_id = $propertynumber;
-		$ticket->ticketname = $category;
-		$ticket->tickettype = $type;
-		$ticket->details = $maintenancetype . $details;
-		$ticket->author = $author;
-		$ticket->save();
-
-		Session::flash('success-message','Ticket Generated');
-		return redirect('ticket');
-
-	}
-
-	/**
-	 * Transfer ticket to another user.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function transfer(Request $request, $id = null)
-	{
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Initialize
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$id = $this->sanitizeString($request->get('id'));
-		$staffassigned = $this->sanitizeString($request->get('transferto'));
-		$comments = $this->sanitizeString($request->get('comment'));
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Validation
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$validator = Validator::make([
-				'Ticket ID' => $id,
-				'Staff Assigned' => $staffassigned
-			], App\Ticket::$transferRules );
-
-		if($validator->fails())
-		{
-			Session::flash('error-message','Problem encountered while processing your request');
-			return redirect()->back();
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Transfer....
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$ticket = App\Ticket::find($id);
-		$ticket->status = 'Open';
-		$ticket->comments = $comments;
-		$ticket->staffassigned = $staffassigned;
-		$ticket->transfer();
-
-		Session::flash('success-message','Ticket Transferred');
-		return redirect()->back();
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy(Request $request, $id)
-	{
-		if($request->ajax())
-		{
-			$ticket = App\Ticket::find($id);
-
-			if(count($ticket) <= 0) return json_encode('error');
-			$ticket->close($id);
-			return json_encode('success');
-		}
-	}
-
-	/**
-	 * Restore the specified resource
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function reOpenTicket(Request $request, $id)
-	{
-		if($request->ajax())
-		{
-			$ticket = App\Ticket::find($id);
-
-			if(count($ticket) > 0)
-			{
-				$ticket->reopen();
-				return json_encode('success');
-			}
-			
-			return json_encode('error');
-		}
-	}
-
-	public function showHistory(Request $request, $id)
-	{
 		if($request->ajax())
 		{
 			$arraylist = array();
@@ -442,7 +233,7 @@ class TicketsController extends Controller {
 					|--------------------------------------------------------------------------
 					|
 					*/
-					$ticket =  App\Ticket::where('ticket_id','=',$id)
+					$ticket =  App\Ticket::where('parent_id','=',$id)
 								->orderBy('id','desc')
 								->with('user')
 								->whereNotIn('id',array_pluck($arraylist,'id'))
@@ -490,7 +281,7 @@ class TicketsController extends Controller {
 						*/
 						if($start == 1)
 						{
-							$id = $ticket->ticket_id;
+							$id = $ticket->parent_id;
 						}
 
 						array_push($arraylist,$ticket);
@@ -573,8 +364,129 @@ class TicketsController extends Controller {
 			return redirect('ticket');
 
 		}
+
 	}
 
+
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function edit(Request $request, $id)
+	{
+		$ticket = App\Ticket::find($id);
+		return view('ticket.edit')
+				->with('ticket',$ticket);
+	}
+
+
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function update(Request $request, $id)
+	{
+		$propertynumber = $this->sanitizeString($request->get('propertynumber'));
+		$type = $this->sanitizeString($request->get('type'));
+		$maintenancetype = $this->sanitizeString($request->get('maintenancetype'));
+		$category = $this->sanitizeString($request->get('category'));
+		$author = $this->sanitizeString($request->get('author'));
+		$details = $this->sanitizeString($request->get('description'));
+		$staffassigned = Auth::user()->id;
+		$propertynumber;
+
+		$ticket = App\Ticket::find($id);
+		$ticket->item_id = $propertynumber;
+		$ticket->ticketname = $category;
+		$ticket->tickettype = $type;
+		$ticket->details = $maintenancetype . $details;
+		$ticket->author = $author;
+		$ticket->save();
+
+		Session::flash('success-message','Ticket Generated');
+		return redirect('ticket');
+
+	}
+
+	/**
+	 * Transfer ticket to another user.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function transfer(Request $request, $id = null)
+	{
+
+		$id = $this->sanitizeString($request->get('id'));
+		$staffassigned = $this->sanitizeString($request->get('transferto'));
+		$comments = $this->sanitizeString($request->get('comment'));
+
+	
+		$validator = Validator::make([
+				'Ticket ID' => $id,
+				'Staff Assigned' => $staffassigned
+			], App\Ticket::$transferRules );
+
+		if($validator->fails())
+		{
+			Session::flash('error-message','Problem encountered while processing your request');
+			return redirect()->back();
+		}
+
+		$ticket = App\Ticket::find($id);
+		$ticket->status = 'Open';
+		$ticket->comments = $comments;
+		$ticket->staffassigned = $staffassigned;
+		$ticket->transfer();
+
+		Session::flash('success-message','Ticket Transferred');
+		return redirect()->back();
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function destroy(Request $request, $id)
+	{
+		if($request->ajax())
+		{
+			$ticket = App\Ticket::find($id);
+
+			if(count($ticket) <= 0) return json_encode('error');
+			$ticket->close($id);
+			return json_encode('success');
+		}
+	}
+
+	/**
+	 * Restore the specified resource
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function reOpenTicket(Request $request, $id)
+	{
+		if($request->ajax())
+		{
+			$ticket = App\Ticket::find($id);
+
+			if(count($ticket) > 0)
+			{
+				$ticket->reopen();
+				return json_encode('success');
+			}
+			
+			return json_encode('error');
+		}
+	}
+	
 	/**
 	*
 	*	@return ajax: 'success' or 'error'
@@ -603,14 +515,7 @@ class TicketsController extends Controller {
 		}
 		else
 		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get the activity field
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
+			
 			$activity = $this->sanitizeString($request->get('activity'));
 			$maintenanceactivity = App\MaintenanceActivity::find($activity);
 			if( count($maintenanceactivity) > 0 )
@@ -740,325 +645,18 @@ class TicketsController extends Controller {
 
 	/**
 	*
-	*	@param $id requires pc id
-	*	@return list of pc ticket
-	*
-	*/
-	public function getPcTicket(Request $request, $id)
-	{
-		$ticket = new App\Ticket;
-		$ticket->getPcTickets($id);
-		if($request->ajax())
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	return ticket with pc information
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			return json_encode([
-				'data' => $ticket
-			]);
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	return ticket with pc information
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		return json_encode([
-			'data' => $ticket
-		]);
-	}
-
-	/**
-	*
-	*	@param $id requires pc id
-	*	@return list of room ticket
-	*
-	*/
-	public function getRoomTicket(Request $request, $id)
-	{
-		if($request->ajax())
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	return ticket with room information
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			return json_encode([
-				'data' => App\Ticket::getRoomTickets($id)
-			]);
-		}
-	}
-
-	/**
-	*
 	*	@param $tag
 	*	@return item information
 	*	@return is existing room
 	*	@return pc information
 	*
 	*/
-	public function getTagInformation(Request $request)
+	public function getTagInformation(Request $request, App\Ticket $ticket)
 	{
 
-		$tag = $this->sanitizeString($request->get('tag'));
+		$tag = $this->sanitizeString($request->get('id'));
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	uses ajax request
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->ajax())
-		{
-			$tag = $this->sanitizeString($request->get('id'));
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the tag is equipment
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if( count($itemprofile = App\ItemProfile::propertyNumber($tag)->first()) > 0)
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Check if the equipment is connected to pc
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			if(count($pc = App\Pc::isPc($tag)) > 0)
-			{
-				return $pc;
-			}
-			else
-			{
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	Create equipment ticket
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				return $itemprofile;
-			}
-
-		}
-		else
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	Check if the tag is room
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			if( count($room = App\Room::location($tag)->first()) > 0 )
-			{
-				return $room;
-			}
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	return false if no item found
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		return json_encode('error');
-	}
-
-	/**
-	*
-	*	maintenance view
-	*
-	*/
-	public function maintenanceView(Request $request)
-	{
-		$ticket = App\Ticket::orderBy('created_at', 'desc')->first();
-		$activity = MaintenanceActivity::pluck('activity','id');
-
-		if (count($ticket) == 0 )
-		{
-			$ticket = 1;
-		}
-		else if ( count($ticket) > 0 )
-		{
-			$ticket = $ticket->id + 1;
-		}
-
-		if(count($activity) == 0)
-		{
-			$activity = [ 'None' => 'No suggestion available' ];
-		}
-
-		return view('ticket.maintenance')
-				->with('lastticket',$ticket)
-				->with('activity',$activity);
-	}
-
-
-	/**
-	 * Maintenance function.
-	 *
-	 * @return Response
-	 */
-	public function maintenance(Request $request)
-	{
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	init ...
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$tag = $this->sanitizeString($request->get('tag'));
-		$ticketname = "Maintenance Ticket";
-		$underrepair = false;
-		$workstation = false;
-		$details = "";
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if item is not in the field list
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->has('contains'))
-		{
-			$details = $this->sanitizeString($request->get('description'));
-		}
-		else
-		{
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	use maintenance activity
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			try
-			{
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	get the activity field
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				$activity = $this->sanitizeString($request->get('activity'));
-				$maintenanceactivity = MaintenanceActivity::find($activity);
-				$ticketname = $maintenanceactivity->activity;
-
-				if(isset($maintenanceactivity->details) && $maintenanceactivity->details != "")
-				{
-					$details =  $maintenanceactivity->details;
-				}
-				else
-				{
-					$details = "No specified details";
-				}
-
-			} catch (Exception $e) {}
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if item will be set to underrepair
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->has('underrepair'))
-		{
-			$underrepair = true;
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	validates
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$validator = Validator::make([
-				'Details' => $details
-		],App\Ticket::$maintenanceRules);
-
-		if($validator->fails())
-		{
-			return redirect('ticket/maintenance')
-				->withInput()
-				->withErrors($validator);
-		}
-
-		DB::beginTransaction();
-
-		$tickettype = 'Maintenance';
-		$author = Auth::user()->firstname . ' ' . Auth::user()->middlename . ' ' . Auth::user()->lastname;
-		$staffassigned = Auth::user()->id;
-		$status = 'Closed';
-		$item = $request->get('item');
-
-		if(count($item) > 0)
-		{
-
-			foreach($item as $item)
-			{
-
-				$ticket = new App\Ticket;
-				$ticket->ticketname = $ticketname;
-				$ticket->tickettype = $tickettype;
-				$ticket->details = $details;
-				$ticket->author = $author;
-				$this->undermaintenance = $underrepair;
-				$ticket->staffassigned = $staffassigned;
-				$ticket->status = $status;
-				$ticket->generate($tag);
-				
-			}
-
-		}
-
-		DB::commit();
-
-		Session::flash('success-message','Ticket Generated');
-		return redirect('ticket');
-
+		return response()->json( $ticket->getTagDetails($tag) , 200);
 	}
 
 }

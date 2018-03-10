@@ -5,12 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\Room;
-use App\RoomSoftware;
-use App\Software;
-use App\SoftwareLicense;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use App;
+use DB;
+use Illuminate\Http\Request;
 
 class SoftwareController extends Controller {
 
@@ -19,14 +16,13 @@ class SoftwareController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
 
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			return json_encode(['data'=>Software::with('roomsoftware.room')
-													->get()
-							]);
+			$software = App\Software::with('rooms')->get();
+			return datatables($software)->toJson();
 		}
 
 		return view('software.index');
@@ -38,7 +34,7 @@ class SoftwareController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		return view('software.create');
 	}
@@ -49,14 +45,14 @@ class SoftwareController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		$name = $this->sanitizeString(Input::get('name'));
-		$company = $this->sanitizeString(Input::get('company'));
-		$licensetype = $this->sanitizeString(Input::get('licensetype'));
-		$softwaretype = $this->sanitizeString(Input::get('softwaretype'));
-		$minrequirement = $this->sanitizeString(Input::get('minrequirement'));
-		$maxrequirement = $this->sanitizeString(Input::get('maxrequirement'));
+		$name = $this->sanitizeString($request->get('name'));
+		$company = $this->sanitizeString($request->get('company'));
+		$licensetype = $this->sanitizeString($request->get('licensetype'));
+		$softwaretype = $this->sanitizeString($request->get('softwaretype'));
+		$minrequirement = $this->sanitizeString($request->get('minrequirement'));
+		$maxrequirement = $this->sanitizeString($request->get('maxrequirement'));
 
 		$validator = Validator::make([
 				'Software Name' => $name,
@@ -65,7 +61,7 @@ class SoftwareController extends Controller {
 				'company' => $company,
 				'Minimum System Requirement' => $minrequirement,
 				'Recommended System Requirement' => $maxrequirement,
-		],Software::$rules);
+		], App\Software::$rules);
 
 		if($validator->fails())
 		{
@@ -74,13 +70,13 @@ class SoftwareController extends Controller {
 				->withErrors($validator);
 		}
 
-		$software = new Software;
-		$software->softwarename = $name;
+		$software = new App\Software;
+		$software->name = $name;
 		$software->company = $company;
-		$software->licensetype = $licensetype;
-		$software->softwaretype = $softwaretype;
-		$software->minsysreq = $minrequirement;
-		$software->maxsysreq = $maxrequirement;
+		$software->license_type = $licensetype;
+		$software->type = $softwaretype;
+		$software->minimum_requirements = $minrequirement;
+		$software->recommended_requirements = $maxrequirement;
 		$software->save();
 
 		Session::flash('success-message','Software listed');
@@ -94,7 +90,7 @@ class SoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 
 	}
@@ -106,13 +102,13 @@ class SoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
 		return view('software.edit')
-			->with('software',Software::find($id));
+			->with('software', App\Software::find($id));
 	}
 
-	public function assign($id)
+	public function assign(Request $request, $id)
 	{
 
 		$room = Room::lists('name','id');
@@ -128,17 +124,17 @@ class SoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
 		$id = $this->sanitizeString($id);
-		$name = $this->sanitizeString(Input::get('name'));
-		$company = $this->sanitizeString(Input::get('company'));
-		$licensetype = $this->sanitizeString(Input::get('licensetype'));
-		$softwaretype = $this->sanitizeString(Input::get('softwaretype'));
-		$licensekey = $this->sanitizeString(Input::get('licensekey'));
-		$multiple = $this->sanitizeString(Input::get('multiple'));
-		$minrequirement = $this->sanitizeString(Input::get('minrequirement'));
-		$maxrequirement = $this->sanitizeString(Input::get('maxrequirement'));
+		$name = $this->sanitizeString($request->get('name'));
+		$company = $this->sanitizeString($request->get('company'));
+		$licensetype = $this->sanitizeString($request->get('licensetype'));
+		$softwaretype = $this->sanitizeString($request->get('softwaretype'));
+		$licensekey = $this->sanitizeString($request->get('licensekey'));
+		$multiple = $this->sanitizeString($request->get('multiple'));
+		$minrequirement = $this->sanitizeString($request->get('minrequirement'));
+		$maxrequirement = $this->sanitizeString($request->get('maxrequirement'));
 
 		if($multiple == "on")
 		{
@@ -152,11 +148,11 @@ class SoftwareController extends Controller {
 				'company' => $company,
 				'Minimum System Requirement' => $minrequirement,
 				'Recommended System Requirement' => $maxrequirement,
-			],Software::$rules);
+			], App\Software::$rules);
 
 		$validator = Validator::make([
 			'Product Key' => 'licensekey'
-		],SoftwareLicense::$updateRules);
+		], App\SoftwareLicense::$updateRules);
 
 		if($validator->fails())
 		{
@@ -165,13 +161,13 @@ class SoftwareController extends Controller {
 				->withErrors($validator);
 		}
 
-		$software = Software::find($id);
+		$software =  App\Software::find($id);
 		$software->softwarename = $name;
 		$software->company = $company;
-		$software->licensetype = $licensetype;
-		$software->softwaretype = $softwaretype;
-		$software->minsysreq = $minrequirement;
-		$software->maxsysreq = $maxrequirement;
+		$software->license_type = $licensetype;
+		$software->type = $softwaretype;
+		$software->minimum_requirements = $minrequirement;
+		$software->recommended_requirements = $maxrequirement;
 		$software->save();
 		
 		Session::flash('success-message','Software updated');
@@ -185,12 +181,12 @@ class SoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			try{
-				$software = Software::find($id);
+				$software = App\Software::find($id);
 				$roomsoftware = $software->room()->detach();
 
 				foreach($software->softwarelicense as $license){
@@ -206,44 +202,34 @@ class SoftwareController extends Controller {
 	}
 
 	public function restore($id){
-		$software = Software::onlyTrashed()->where('id',$id)->first();
+		$software = App\Software::onlyTrashed()->where('id',$id)->first();
 		$software->restore();
 		Session::flash('success-message','Software restored');
 		return redirect('software/view/restore');
 	}
 
-	public function assignSoftwareToRoom()
+	public function assignSoftwareToRoom(Request $request)
 	{
-		if(Request::ajax()){
-			$id = $this->sanitizeString(Input::get('id'));
-			$room = Input::get('room');
-			foreach($room as $room)
-			{
-				try{
-					$room = $this->sanitizeString($room);
-					$room = Room::where('name','=',$room)->first();
-					$roomsoftware = new RoomSoftware;
-					$roomsoftware->software_id = $id;
-					$roomsoftware->room_id = $room->id;
-					$roomsoftware->save();
-				} catch(Exception $e) {
-					return json_encode('error');
-				}
-			}
+		if($request->ajax()){
+			$id = $this->sanitizeString($request->get('id'));
+			$room = $request->get('room');
 
-			return json_encode('success');
+			$software = App\Software::find($id);
+			$software->rooms()->sync($room);
+
+			return response()->json([], 200);
 		}
 
 		return redirect('software');
 	}
 
-	public function removeSoftwareFromRoom($id,$room)
+	public function removeSoftwareFromRoom(Request $request, $id,$room)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			try{
 
-				$roomsoftware = RoomSoftware::where('software_id','=',$id)
+				$roomsoftware = App\RoomSoftware::where('software_id','=',$id)
 											->where('room_id','=',$room)
 											->delete();
 				return json_encode('success');
@@ -253,32 +239,32 @@ class SoftwareController extends Controller {
 		}
 
 
-		$roomsoftware = RoomSoftware::where('software_id','=',$id)->where('room_id','=',$room)->first();
+		$roomsoftware = App\RoomSoftware::where('software_id','=',$id)->where('room_id','=',$room)->first();
 		$roomsoftware->delete();
 
 		Session::flash('success-message','Software removed from room');
 		return redirect('software');
 	}
 
-	public function getAllSoftwareName()
+	public function getAllSoftwareName(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$software = Software::select('id','softwarename as name')->get();
+			$software = App\Software::select('id','softwarename as name')->get();
 			return json_encode($software);
 		}
 	}
 
-	public function getAllSoftwareTypes()
+	public function getAllSoftwareTypes(Request $request)
 	{
-		if(Request::ajax()){
-			return json_encode(Software::$types);
+		if($request->ajax()){
+			return json_encode( App\Software::$types);
 		}
 	}
 
-	public function getAllLicenseTypes()
+	public function getAllLicenseTypes(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			return json_encode([
 				'Proprietary license',

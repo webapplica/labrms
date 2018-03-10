@@ -78,6 +78,11 @@ class Ticket extends \Eloquent{
 		return $date->format('y') . '-' . $date->format('m') . '-' . $this->id;
 	}
 
+	public function user()
+	{
+		return $this->belongsTo('App\User', 'user_id', 'id');
+	}
+
 	public function staff()
 	{
 		return $this->belongsTo('App\User', 'staff_id', 'id');
@@ -207,9 +212,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		else if(($item = Item::propertyNumber($tag))->count() > 0) 
+		else if(($item = Item::propertyNumber($tag))->count() > 0)  
 		{
-			return $item;
+			return $item->first();
 		}
 
 		/*
@@ -222,7 +227,7 @@ class Ticket extends \Eloquent{
 		*/
 		else if(($room = Room::location($tag))->count() > 0) 
 		{
-			return $room;
+			return $room->first();
 		}
 
 		/*
@@ -261,7 +266,7 @@ class Ticket extends \Eloquent{
 		if( ($pc = Workstation::isWorkstation($tag)) )
 		{
 			if($this->undermaintenance) Workstation::setItemStatus($pc->id,'undermaintenance');
-			$pc->ticket()->attach($this->id);
+			$pc->tickets()->attach($this->id);
 		} 
 
 		/*
@@ -274,7 +279,7 @@ class Ticket extends \Eloquent{
 		*/
 		else if(($item = Item::propertyNumber($tag)->orWhere('id','=',$tag))->count() > 0) 
 		{
-			$item->first()->ticket()->attach($this->id);
+			$item->first()->tickets()->attach($this->id);
 			if($this->undermaintenance) Item::setItemStatus($item->id,'undermaintenance');
 		}
 
@@ -288,7 +293,7 @@ class Ticket extends \Eloquent{
 		*/
 		else if(($room = Room::location($tag))->count() > 0) 
 		{
-			$room->ticket()->attach($this->id);
+			$room->first()->tickets()->attach($this->id);
 		}
 		
 	}

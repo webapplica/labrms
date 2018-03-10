@@ -46,8 +46,9 @@ class Software extends \Eloquent{
 		return $this->hasMany('App\RoomSoftware');
 	}
 
-	public function room(){
-		return $this->belongsToMany('App\Room');
+	public function rooms(){
+		return $this->belongsToMany('App\Room', 'room_software', 'software_id', 'room_id')
+				->withTimestamps();
 	}
 
 	public function pcsoftware(){

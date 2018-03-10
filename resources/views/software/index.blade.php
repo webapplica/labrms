@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Software
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/bootstrap-multiselect.css')) }}
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
@@ -48,6 +42,7 @@ Software
 <script type="text/javascript">
 	$(document).ready(function(){
 	    var table = $('#softwareTable').DataTable( {
+	    	serverSide: true,
 			"pageLength": 100,
 	  		select: {
 	  			style: 'single'
@@ -58,22 +53,22 @@ Software
 		    language: {
 		        searchPlaceholder: "Search..."
 		    },
-	    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
 	        ajax: "{{ url('software') }}",
 	        columns: [
 	            { data: "id" },
-	            { data: "softwarename" },
+	            { data: "name" },
 	            { data: "company" },
-	            { data: "licensetype" },
-	            { data: "softwaretype" },
-	            { data: "minsysreq" },
-	            { data: "maxsysreq" },
+	            { data: "license_type" },
+	            { data: "type" },
+	            { data: "minimum_requirements" },
+	            { data: "recommended_requirements" },
 	            { data: function(callback){
 	            	htmllist = ``
-	            	callback.roomsoftware.forEach(function(element){
+	            	callback.rooms.forEach(function(element){
 	            		htmllist += `<button class="remove btn btn-primary btn-sm" data-id="`+ callback.id +`" data-room="`+ element.room.id +`" style="border:none;margin:3px;">` + element.room.name + ` <span class="glyphicon glyphicon-remove"></span></button>`
 	            	})
 	            	return htmllist;
@@ -111,14 +106,6 @@ Software
 			try{
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
 				{
-					// $('#edit-id').val(table.row('.selected').data().id)
-					// $('#edit-name').val(table.row('.selected').data().softwarename)
-					// $('#edit-company').val(table.row('.selected').data().company)
-					// $('#edit-licensetype').val(table.row('.selected').data().licensetype)
-					// $('#edit-softwaretype').val(table.row('.selected').data().softwaretype)
-					// $('#edit-minrequirement').val(table.row('.selected').data().minsysreq)
-					// $('#edit-maxrequirement').val(table.row('.selected').data().maxsysreq)
-					// $('#updateSoftwareModal').modal('show');
 					window.location.href = '{{ url('software') }}' + '/' + table.row('.selected').data().id + '/edit'
 				}
 			}catch( error ){
@@ -135,7 +122,7 @@ Software
 				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
 				{
 					$('#assign-software').val(table.row('.selected').data().id)
-					$('#assign-room').data('room',table.row('.selected').data().roomsoftware)
+					$('#assign-room').data('room',table.row('.selected').data().rooms)
 					$('#assignSoftwareModal').modal('show');
 					$('#assignSoftwareModal').on('hide.bs.modal',function(){
 					table.ajax.reload()

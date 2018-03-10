@@ -488,7 +488,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|--------------------------------------------------------------------------
 	|
 	*/
-	Route::get('ticket/room/{id}','TicketsController@getRoomTicket');
+	Route::get('ticket/room/{id}','RoomsController@getRoomTickets');
 
 	/*
 	|--------------------------------------------------------------------------
@@ -499,17 +499,6 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	Route::post('ticket/transfer/{id}',[
 		'as' => 'ticket.transfer',
 		'uses' => 'TicketsController@transfer'
-	]);
-
-	/*
-	|--------------------------------------------------------------------------
-	| ticket history
-	|--------------------------------------------------------------------------
-	|
-	*/
-	Route::get('ticket/history/{id}',[
-		'as' => 'ticket.history.view',
-		'uses' => 'TicketsController@showHistory'
 	]);
 
 
@@ -563,6 +552,17 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 	|
 	*/
 	Route::post('ticket/{id}/reopen','TicketsController@reOpenTicket');
+
+	/*
+	|--------------------------------------------------------------------------
+	| ticket history
+	|--------------------------------------------------------------------------
+	|
+	*/
+	Route::get('ticket/{id}',[
+		'as' => 'ticket.history.view',
+		'uses' => 'TicketsController@show'
+	]);
 
 	/*
 	|--------------------------------------------------------------------------

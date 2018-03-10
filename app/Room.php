@@ -6,33 +6,29 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class Room extends \Eloquent{
-	//Database driver
-	/*
-		1 - Eloquent (MVC Driven)
-		2 - DB (Directly query to SQL database, no model required)
-	*/
-
- 	// use SoftDeletes;
-	//The table in the database used by the model.
 	protected $table = 'rooms';
-	// protected $dates = ['deleted_at'];
 
 	public $fillable = ['name','category','description','status', 'is_default'];
 	public $timestamps = false;
 	protected $primaryKey = 'id';
-	//Validation rules!
-	public static $rules = array(
-		'Name' => 'required|min:4|max:100|unique:room,name',
-		'Category' => 'required|min:4|max:100',
-		'Description' => 'required|min:4'
-	);
 
-	public static $updateRules = array(
-		'Name' => 'min:4|max:100',
-		'Category' => 'min:4|max:100',
-		'Description' => 'min:4'
+	public function rules()
+	{
+		return array(
+			'Name' => 'required|min:4|max:100|unique:rooms,name' ,
+			'Description' => 'required|min:4',
+			'Category' => 'exists:room_categories,id'
+		);
+	}
 
-	);
+	public function updateRules()
+	{
+		$name = $this->name;
+		return array(
+			'Name' => 'required|min:4|max:100|unique:rooms,name,' . $name . ',name' ,
+			'Description' => 'required|min:4'
+		);
+	}
 
 	public function scopeLocation($query, $location)
 	{
@@ -44,9 +40,14 @@ class Room extends \Eloquent{
 		return $query->where('name', '=', $location);
 	}
 
-	public function ticket()
+	public function tickets()
 	{
 		return $this->belongsToMany('App\Ticket','room_ticket','room_id','ticket_id');
+	}
+
+	public function categories()
+	{
+		return $this->belongsToMany('App\RoomCategory', 'room_category', 'room_id', 'category_id');
 	}
 
 }

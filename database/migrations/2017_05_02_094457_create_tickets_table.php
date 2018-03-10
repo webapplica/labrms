@@ -51,8 +51,8 @@ class CreateTicketsTable extends Migration {
 			/**
 			 * ticket history
 			 */
-			$table->integer('predecessor_id')->unsigned()->nullable();
-			$table->foreign('predecessor_id')
+			$table->integer('parent_id')->unsigned()->nullable();
+			$table->foreign('parent_id')
 					->references('id')
 					->on('tickets')
 					->onUpdate('cascade')

@@ -140,7 +140,7 @@ class Item extends \Eloquent{
 	*	Foreign key referencing ticket table
 	*
 	*/
-	public function ticket()
+	public function tickets()
 	{
 		return $this->belongsToMany('App\Ticket','item_ticket','item_id','ticket_id');
 	}
