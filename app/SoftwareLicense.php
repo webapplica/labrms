@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SoftwareLicense extends \Eloquent{
 	
-	protected $table = 'softwarelicenses';
+	protected $table = 'software_licenses';
 	
 	public $timestamps = true;
 

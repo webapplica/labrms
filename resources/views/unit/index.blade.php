@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Unit
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 <link rel="stylesheet" href="{{ asset('css/style.css') }}" />

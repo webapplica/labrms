@@ -6,7 +6,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends \Eloquent{
-	protected $table = 'payment';
+	protected $table = 'payments';
 	public $timestamps = true;
 
 	public $fillable = ['item_id','ORno','receivedby','details','amount'];

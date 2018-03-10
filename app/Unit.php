@@ -14,12 +14,14 @@ class Unit extends Model
 
 	public static $rules = array(
 		'Name' => 'required|unique:units,name',
-		'Description' => ''
+		'Description' => 'max:50',
+		'Abbreviation' => 'max:10'
 	);
 
 	public static $updateRules = array(
 		'Name' => 'required',
-		'Description' => ''
+		'Description' => 'max:50',
+		'Abbreviation' => 'max:10'
 	);
 
 	public function scopeFindByName($query, $value)

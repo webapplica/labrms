@@ -59,8 +59,7 @@ class SoftwareLicenseController extends Controller {
 		$softwarelicense = new SoftwareLicense;
 		$softwarelicense->software_id = $software_id;
 		$softwarelicense->key = $licensekey;
-		$softwarelicense->multipleuse = $multiple;
-		$softwarelicense->inuse = false;
+		$softwarelicense->usage = $multiple;
 		$softwarelicense->save();
 
 		Session::flash('success-message','Software License Added');

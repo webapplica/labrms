@@ -16,7 +16,7 @@ class Reservation extends \Eloquent{
 	*/
 
 	//The table in the database used by the model.
-	protected $table = 'reservation';
+	protected $table = 'reservations';
 	protected $dates = [
 		'timein',
 		'timeout'

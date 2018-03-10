@@ -307,7 +307,7 @@ class ItemsController extends Controller {
 		*	@return itemtype
 		*
 		*/
-		$itemprofile = App\Item::with('ticket')->with('inventory.itemtype')->orderBy('id', 'desc')->find($id);
+		$itemprofile = App\Item::with('tickets')->with('inventory.itemtype')->orderBy('id', 'desc')->find($id);
 		
 		return view('item.history')
 				->with('itemprofile',$itemprofile);

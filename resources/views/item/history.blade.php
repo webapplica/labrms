@@ -49,7 +49,7 @@
           </tr>
         </thead>
         <tbody>
-        @forelse($itemprofile->ticket->sortBy('id') as $ticket)
+        @forelse($itemprofile->tickets->sortBy('id') as $ticket)
           <tr>
             <td>{{ $ticket->ticket_code }}</td>
             <td>{{ $ticket->ticket_type_name }}</td>

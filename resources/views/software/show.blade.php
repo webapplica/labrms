@@ -1,14 +1,9 @@
 @extends('layouts.master-blue')
-@section('title')
-Software License Information
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-@stop
+<link href="{{ url('css/select.bootstrap.min.css') }}" rel="stylesheet" />
+@endsection
+
 @section('content')
 <div class="container-fluid">
 @include('modal.software.license.add')
@@ -18,15 +13,14 @@ Software License Information
 				<legend><h3 class="text-muted">Software License Information</h3></legend>
 				<ol class="breadcrumb">
 					<li><a href="{{ url('software') }}">Software</a></li>
-					<li class="active">{{ $software->softwarename }}</li>
+					<li class="active">{{ $software->name }}</li>
 					<li>License Keys</li>
 				</ol>
 				<table class="table table-hover table-striped table-bordered" id='softwareTable'>
 					<thead>
 						<th>ID</th>
 						<th>License Key</th>
-						<th>Multiple Usage</th>
-						<th>Used</th>
+						<th>Usage Times</th>
 					</thead>
 				</table>
 			</div>
@@ -34,6 +28,7 @@ Software License Information
 	</div>
 </div>
 @stop
+
 @section('script')
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
@@ -56,14 +51,13 @@ Software License Information
 	        columns: [
 	            { data: "id" },
 	            { data: "key" },
-	            { data: "multipleuse" },
-	            { data: "inuse" }
+	            { data: "usage" },
 	        ],
 	    } );
 
 	    $('div.toolbar').html(`
-	    	<button class="btn btn-md btn-success" id="add" data-toggle="modal" data-target="#addSoftwareLicenseModal"><span class="glyphicon glyphicon-plus"></span> Add</button>
- 			<button id="delete" class="btn btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+	    	<button class="btn btn-sm btn-primary" id="add" data-toggle="modal" data-target="#addSoftwareLicenseModal"><span class="glyphicon glyphicon-plus"></span> Add</button>
+ 			<button id="delete" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
     	`)
 
 	    table
@@ -127,13 +121,6 @@ Software License Information
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
 	    });
-
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 	})
 </script>
 @stop

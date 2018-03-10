@@ -14,7 +14,7 @@ class RoomSchedule extends \Eloquent{
 	*/
 
 	//The table in the database used by the model.
-	protected $table = 'roomschedule';
+	protected $table = 'room_schedules';
 
 	//The attribute that used as primary key.
 	protected $primaryKey = 'id';

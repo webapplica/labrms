@@ -210,7 +210,7 @@ class Item extends \Eloquent{
 		$ticket->title = $title;
 		$ticket->details = $details;
 		$ticket->staff_id = $staff_id;
-		$ticket->predecessor_id = $ticket_id;
+		$ticket->parent_id = $ticket_id;
 		$ticket->status = $status;
 		$ticket->generate($item_id);
 
@@ -310,7 +310,7 @@ class Item extends \Eloquent{
 		$ticket->title = $title;
 		$ticket->details = $details;
 		$ticket->staff_id = $staff_id;
-		$ticket->predecessor_id = $ticket_id;
+		$ticket->parent_id = $ticket_id;
 		$ticket->status = $status;
 		$ticket->generate($item_id);
 	}

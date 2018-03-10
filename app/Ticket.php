@@ -305,7 +305,7 @@ class Ticket extends \Eloquent{
 		$this->details = $ticket->details;
 		$this->author = $ticket->author;
 		$this->staff_id = $ticket->staff_id;
-		$this->predecessor_id = $ticket->id;
+		$this->parent_id = $ticket->id;
 		$this->status = $ticket->status;
 		$this->comments = $ticket->comments;
 		$this->closed_by = $ticket->closed_by;
@@ -407,7 +407,7 @@ class Ticket extends \Eloquent{
 		]);
 
 		$this->type_id = $type->id;
-		$ticket->predecessor_id = $this->id;
+		$ticket->parent_id = $this->id;
 		$ticket->status = 'Closed';
 		$ticket->generate();
 	}
@@ -429,7 +429,7 @@ class Ticket extends \Eloquent{
 		$date = Carbon\Carbon::now()->toDayDateTimeString();
 		$this->details = 'Item Condemned on ' . $date . 'by ' . $this->author;
 		$this->staff_id = Auth::user()->id;
-		$this->predecessor_id = null;
+		$this->parent_id = null;
 		$this->status = 'Closed';
 	
 		$type = TicketType::firstOrCreate([
@@ -492,7 +492,7 @@ class Ticket extends \Eloquent{
 
 		$this->staff_id = Auth::user()->id;
 		$this->status = 'Open';
-		$this->predecessor_id = null;
+		$this->parent_id = null;
 	
 		$type = TicketType::firstOrCreate([
 			'name' => 'Maintenance'

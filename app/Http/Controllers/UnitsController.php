@@ -53,7 +53,8 @@ class UnitsController extends Controller
 
         $validator = Validator::make([
             'Name' => $name,
-            'Description' => $description
+            'Description' => $description,
+            'Abbreviation' => $abbreviation
         ],App\Unit::$rules);
 
         if($validator->fails())
@@ -120,7 +121,8 @@ class UnitsController extends Controller
 
         $validator = Validator::make([
             'Name' => $name,
-            'Description' => $description
+            'Description' => $description,
+            'Abbreviation' => $abbreviation
         ],App\Unit::$updateRules);
 
         if($validator->fails())
