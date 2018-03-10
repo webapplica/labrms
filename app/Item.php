@@ -243,7 +243,7 @@ class Item extends \Eloquent{
 
 		$local =  Item::whereHas('inventory',function($query) use ($inventory){
 			$query->where('itemtype_id','=',$inventory->itemtype_id);
-		})->count();
+		})->count() + 1;
 
 		$this->local_id =  $_org . $itemtype . "-" . ($local + 1);
 

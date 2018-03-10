@@ -114,6 +114,7 @@ class ItemsController extends Controller {
 		$date_received = $this->sanitizeString($request->get('datereceived'));
 		$property_number = "";
 		$serial_number = "";
+		$quantity = $request->get('quantity');
 
 		DB::beginTransaction();
 
@@ -129,7 +130,7 @@ class ItemsController extends Controller {
 				'Location' => $location,
 				'Date Received' => $date_received,
 				'Status' => 'working'
-			],App\Item::$rules,[ 'Property Number.unique' => "The :attribute $property_number already exists" ]);
+			], App\Item::$rules,[ 'Property Number.unique' => "The :attribute $property_number already exists" ]);
 
 			if($validator->fails())
 			{
@@ -148,6 +149,10 @@ class ItemsController extends Controller {
 			$itemprofile->receipt_id = $receipt_id;
 			$itemprofile->profile();
 		}
+
+		$inventory = App\Inventory::find($inventory_id);
+		$inventory->log( ($quantity * - 1), 'Item Profiling' );
+
 		DB::commit();
 
 		Session::flash('success-message','Item profiled');

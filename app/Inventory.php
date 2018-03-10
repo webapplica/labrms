@@ -174,6 +174,15 @@ class Inventory extends \Eloquent
 		$inventory->pivot->save();
   }
 
+  public function log($quantity, $details)
+  {
+    $log = new InventoryLog;
+    $log->inventory_id = $this->id;
+    $log->quantity = $quantity;
+    $log->details = $details;
+    $log->save();
+  }
+
   /**
   *
   * calls remove profiled

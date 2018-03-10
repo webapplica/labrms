@@ -28,7 +28,6 @@ class CreateInventoryTransactionsTable extends Migration
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
             $table->integer('quantity');
-            $table->string('action');
             $table->string('details');
             $table->timestamps();
         });

@@ -111,10 +111,10 @@ class SoftwareController extends Controller {
 	public function assign(Request $request, $id)
 	{
 
-		$room = Room::lists('name','id');
+		$room = App\Room::lists('name','id');
 		return view('software.assign')
 			->with('room',compact('room'))
-			->with('software',Software::find($id));
+			->with('software', App\Software::find($id));
 	}
 
 
@@ -162,7 +162,7 @@ class SoftwareController extends Controller {
 		}
 
 		$software =  App\Software::find($id);
-		$software->softwarename = $name;
+		$software->name = $name;
 		$software->company = $company;
 		$software->license_type = $licensetype;
 		$software->type = $softwaretype;
@@ -185,62 +185,65 @@ class SoftwareController extends Controller {
 	{
 		if($request->ajax())
 		{
-			try{
-				$software = App\Software::find($id);
-				$roomsoftware = $software->room()->detach();
-
-				foreach($software->softwarelicense as $license){
-					$license->delete();
-				}
-
-				$software->forcedelete();
-				return json_encode('success');
-			}catch (Exception $e){}
+			$software = App\Software::find($id);
+			$software->rooms()->detach();
+			$software->forcedelete();
+			
+			return response()->json([
+				'success' => true
+			], 200);
 		}
 		Session::flash('success-message','Software deleted');
 		return redirect('software');
 	}
 
-	public function restore($id){
-		$software = App\Software::onlyTrashed()->where('id',$id)->first();
-		$software->restore();
-		Session::flash('success-message','Software restored');
-		return redirect('software/view/restore');
-	}
-
 	public function assignSoftwareToRoom(Request $request)
 	{
-		if($request->ajax()){
+		if($request->ajax())
+		{
 			$id = $this->sanitizeString($request->get('id'));
 			$room = $request->get('room');
 
 			$software = App\Software::find($id);
-			$software->rooms()->sync($room);
+			$software->rooms()->syncWithoutDetaching($room);
 
-			return response()->json([], 200);
+			return response()->json([
+				'success' => true
+			], 200);
 		}
 
 		return redirect('software');
 	}
 
-	public function removeSoftwareFromRoom(Request $request, $id,$room)
+	public function removeSoftwareFromRoom(Request $request, $software,$room)
 	{
 		if($request->ajax())
 		{
-			try{
 
-				$roomsoftware = App\RoomSoftware::where('software_id','=',$id)
-											->where('room_id','=',$room)
-											->delete();
-				return json_encode('success');
+			$validator = Validator::make([
+				'room' => $room,
+				'software' => $software
+			], [ 
+				'room' => 'required|exists:rooms,id',
+				'software' => 'required|exists:softwares,id'
 
-			} catch (Exception $e) { return json_encode('error'); }
+			]);
+
+			if( count($software) <= 0 || $validator->fails() )
+			{
+				return response()->json([
+					'errors' => $validator
+				], 500);
+			} 
+
+			$software = App\Software::find($software);
+			$software->rooms()->detach($room);
+
+			return response()->json([
+				'success' => true
+			], 200);
 
 		}
-
-
-		$roomsoftware = App\RoomSoftware::where('software_id','=',$id)->where('room_id','=',$room)->first();
-		$roomsoftware->delete();
 
 		Session::flash('success-message','Software removed from room');
 		return redirect('software');
@@ -262,21 +265,11 @@ class SoftwareController extends Controller {
 		}
 	}
 
-	public function getAllLicenseTypes(Request $request)
+	public function getAllLicenseTypes(Request $request, App\Software $software)
 	{
 		if($request->ajax())
 		{
-			return json_encode([
-				'Proprietary license',
-				'GNU General Public License',
-				'End User License Agreement (EULA)',
-				'Workstation licenses',
-				'Concurrent use license',
-				'Site licenses',
-				'Perpetual licenses',
-				'Non-perpetual licenses',
-				'License with Maintenance'
-			]);
+			return json_encode($software->licenseTypes());
 		}
 	}
 }

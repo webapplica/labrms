@@ -163,7 +163,6 @@
                 <li>{{ link_to('inventory','Item') }}</li>
                 <li>{{ link_to('workstation','Workstation') }}</li>
                 <li>{{ HTML::link('inventory/room','Room') }}</li>
-                <li>{{ HTML::link('supplies','Supplies') }}</li>
               </ul> <!-- end of dropdown items -->
             </li> <!-- end of inventory dropdown tab -->
 

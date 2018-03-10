@@ -67,7 +67,7 @@ class ItemInventoryController extends Controller {
 		$quantity = $this->sanitizeString($request->get('quantity'));
 		$unit = $this->sanitizeString($request->get('unit'));
 		$details = $this->sanitizeString($request->get('details'));
-		$receipt = $this->sanitizeString($request->get('receipt'));
+		$_receipt = $this->sanitizeString($request->get('receipt'));
 
 		$receipt = new App\Receipt;
 
@@ -76,7 +76,7 @@ class ItemInventoryController extends Controller {
 		 * @var [type]
 		 */
 		$validator = Validator::make([
-				'Receipt Number' => $receipt
+				'Receipt Number' => $_receipt
 			], $receipt->inventoryRules());
 
 		if($validator->fails())
@@ -115,7 +115,7 @@ class ItemInventoryController extends Controller {
 		 * @var [type]
 		 */
 		$receipt = App\Receipt::firstOrCreate([
-			'number' => $receipt
+			'number' => $_receipt
 		]);
 
 		$itemtype = App\ItemType::find($itemtype);
@@ -146,6 +146,7 @@ class ItemInventoryController extends Controller {
 		$inventory->details = $details;
 		$inventory->user_id = Auth::user()->id;
 		$inventory->save();
+		$inventory->log($quantity, $_receipt);
 
 		/**
 		 * insert the values in the pivot table

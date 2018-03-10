@@ -10,7 +10,7 @@
 		        <div class="form-group">
 		          <div class="col-md-12">
 		            {{ Form::label('room','Room Name') }}
-		            {{ Form::select('room',['Empty list'=>'Empty list'],Input::old('room'),[
+		            {{ Form::select('room',['Empty list'=>'Empty list'], Input::old('room'),[
 		              'id' => 'room',
 		              'class'=>'form-control',
 		              'multiple'
@@ -48,15 +48,13 @@
 				url: '{{ url("software/room/assign") }}',
 				dataType: 'json',
 				success: function(response){
-					if(response == 'success')
-					{
-						$('#assignSoftwareModal').modal('hide')
-						swal('Operation Success','Software Assigned to a Room','success')
-					} else 
-					{
-						$('#assignSoftwareModal').modal('hide')
-						swal('Operation Failed','Problem encountered while processing your request','error')
-					}										
+					swal('Operation Success','Software Assigned to a Room','success')
+				},
+				error: function(response){
+					swal('Operation Failed','Problem encountered while processing your request','error')
+				},
+				complete: function(response){
+					$('#assignSoftwareModal').modal('hide')
 				}
 			})
 		})
@@ -74,15 +72,13 @@
         		room = $('#assign-room').data('room');
 
         		room.forEach(function(obj){
-        			arr.push(obj.room.id)
+        			arr.push(obj.id)
         		})
 
         		for( ctr = 0 ; ctr < response.data.length ; ctr++ ){
-
-        			console.log(isIncluded(arr,response.data[ctr].id))
-        			if( isIncluded(arr,response.data[ctr].id) == false )
+        			if( !isIncluded(arr, response.data[ctr].id) )
         			{
-        				option += `<option val=` + response.data[ctr].id + `>` + response.data[ctr].name + `</option>`;
+        				option += `<option value=` + response.data[ctr].id + `>` + response.data[ctr].name + `</option>`;
         			}
         		}
 

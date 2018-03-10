@@ -26,16 +26,15 @@
 	<div class="col-md-12">
 		<div class="panel panel-body table-responsive">
 			<legend><h3 class="text-muted">Inventory</h3></legend>
-				@if( Session::has('success')  )
-				 <div class="alert alert-success alert-dismissible" role="alert">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<ul class="list-unstyled" style='margin-left: 10px;'>
+			@if( Session::has('success')  )
+			 <div class="alert alert-success alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<ul class="list-unstyled" style='margin-left: 10px;'>
 
-							<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
-						</ul>
-					</div>
-				@endif
-			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
+						<li class="text-capitalize"><span class="glyphicon glyphicon-ok"></span> {{ Session::pull('success') }}</li>
+					</ul>
+				</div>
+			@endif
 			<table class="table table-hover table-striped table-bordered table-condensed" id="inventoryTable">
 				<thead>
 					<th class="col-md-1">ID</th>

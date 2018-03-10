@@ -146,7 +146,7 @@
 				}
 				$('#licensetype').html("");
 				$('#licensetype').append(options);
-				$('#licensetype').val('{{ $software->license_types }}')
+				$('#licensetype').val('{{ $software->license_type }}')
 			}
 		});
 
@@ -164,7 +164,7 @@
 				}
 				$('#softwaretype').html("");
 				$('#softwaretype').append(options);
-				$('#softwaretype').val('{{ $software->software_types }}');
+				$('#softwaretype').val('{{ $software->type }}');
 			}
 		});
 

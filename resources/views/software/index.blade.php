@@ -69,12 +69,12 @@
 	            { data: function(callback){
 	            	htmllist = ``
 	            	callback.rooms.forEach(function(element){
-	            		htmllist += `<button class="remove btn btn-primary btn-sm" data-id="`+ callback.id +`" data-room="`+ element.room.id +`" style="border:none;margin:3px;">` + element.room.name + ` <span class="glyphicon glyphicon-remove"></span></button>`
+	            		htmllist += `<button type="button" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Removing..." class="remove btn btn-primary btn-sm" data-id="`+ callback.id +`" data-room="`+ element.id +`" style="border:none;margin:3px;">` + element.name + ` <span class="glyphicon glyphicon-remove"></span></button>`
 	            	})
 	            	return htmllist;
 	            } },
 	            { data: function(callback){
-	          		return "<a href='{{ url("software/license") }}" + '/' +  callback.id + "' class='btn btn-sm btn-default btn-block'>View License</a>"
+	          		return "<a href='{{ url("software/license") }}" + '/' +  callback.id + "' class='view btn btn-sm btn-default btn-block'>View License</a>"
 	          	} }
 	        ],
 	    } );
@@ -129,7 +129,6 @@
 					})
 				}
 			}catch( error ){
-				console.log(error)
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
 		});
@@ -158,16 +157,14 @@
 							url: '{{ url("software/") }}' + "/" + table.row('.selected').data().id,
 							dataType: 'json',
 							success: function(response){
-								if(response == 'success'){
-									swal('Operation Successful','Software removed','success')
-					        		table.row('.selected').remove().draw( false );
-					        	}else{
-									swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-								}
+								swal('Operation Successful','Software removed','success')
 							},
 							error: function(){
 								swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-							}
+							},
+				    		complete: function(response){
+				    			table.ajax.reload()
+				    		}
 						});
 			          } else {
 			            swal("Cancelled", "Operation Cancelled", "error");
@@ -179,8 +176,16 @@
 			}
 	    });
 
-	    $('#softwareTable').on('click','.remove',function()
+	    $('#softwareTable').on('click','.view',function(event)
 	    {
+    		event.stopPropagation();
+	    })
+
+	    $('#softwareTable').on('click','.remove',function(event)
+	    {
+    		var button = $(this).button('loading')
+	    	event.preventDefault()
+    		event.stopPropagation();
 	    	$.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -189,9 +194,14 @@
 	    		url: '{{ url("software/room/remove") }}' + '/' + $(this).data('id') + '/' + $(this).data('room'),
 	    		dataType: 'json',
 	    		success: function(response){
-	    			if(response == 'success') swal('Operation Success','Software unlinked from room','success')
-	    			else swal('Operation Failed','Problem occurred while processing data. Please reload the page','error')
+	    			swal('Operation Success','Software unlinked from room','success')
+	    		},
+	    		error: function(response){
+	    			swal('Operation Failed','Problem occurred while processing data. Please reload the page','error')
+	    		},
+	    		complete: function(response){
 	    			table.ajax.reload()
+	    			button.button('reset');
 	    		}
 	    	})
 	    })
@@ -211,13 +221,6 @@
 	        $('#delete').hide()
 	        $('#assign').hide()
 		});
-
-		@if( Session::has("success-message") )
-		swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 		$('#page-body').show();
 	});

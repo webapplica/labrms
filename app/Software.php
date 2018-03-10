@@ -32,27 +32,36 @@ class Software extends \Eloquent{
 	);
 
 	public static $types = [
-			'Programming',
-			'Database',
-			'Multimedia',
-			'Networking'
+		'Programming',
+		'Database',
+		'Multimedia',
+		'Networking'
 	];
 
-	public function softwarelicense(){
-		return $this->hasMany('App\SoftwareLicense');
+	public static $licensetypes = [
+		'Proprietary license',
+		'GNU General Public License',
+		'End User License Agreement (EULA)',
+		'Workstation licenses',
+		'Concurrent use license',
+		'Site licenses',
+		'Perpetual licenses',
+		'Non-perpetual licenses',
+		'License with Maintenance'
+	];
+
+	public function licenseTypes()
+	{
+		return self::$licensetypes;
 	}
 
-	public function roomsoftware(){
-		return $this->hasMany('App\RoomSoftware');
+	public function license(){ 
+		return $this->hasMany('App\SoftwareLicense');
 	}
 
 	public function rooms(){
 		return $this->belongsToMany('App\Room', 'room_software', 'software_id', 'room_id')
 				->withTimestamps();
-	}
-
-	public function pcsoftware(){
-		return $this->hasOne('App\PcSoftware','software_id','id');
 	}
 
 	public function pc()
