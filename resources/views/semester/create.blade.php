@@ -1,20 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Semester
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-{{ HTML::style(asset('css/datepicker.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-  #page-body{
-    display: none;
-  }
-</style>
-@stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
   <div class="row">

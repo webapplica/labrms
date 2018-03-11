@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Lost And Found
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
@@ -19,6 +13,7 @@ Lost And Found
 	}
 </style>
 @stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-12" id="semester-info">
@@ -57,7 +52,7 @@ Lost And Found
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
-	    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
@@ -67,21 +62,21 @@ Lost And Found
 	            { data: "identifier" },
 	            { data: "description" },
 	            { data: function(callback){
-	            	return moment(callback.datefound).format('MMMM DD, YYYY')
+	            	return moment(callback.date_found).format('MMMM DD, YYYY')
 	            } },
 	            { data: function(callback){
-	            	return moment(moment(callback.datefound).add(31,'days')).diff(moment(),'days')
+	            	return moment(moment(callback.date_found).add(31,'days')).diff(moment(),'days')
 	            } },
 	            { data: "claimant" },
 	            { data: function(callback){
 	            	if(callback.dateclaimed)
-	            		return moment(callback.dateclaimed).format('MMMM DD, YYYY')
+	            		return moment(callback.date_claimed).format('MMMM DD, YYYY')
 	            	else
 	            		return ''
 	            } },
 	            { data: "status" },
 				{ data: function(callback){
-					if(callback.dateclaimed)
+					if(callback.date_claimed)
 					{
 
 						return '<p class="text-muted">No Action</p>'
@@ -141,10 +136,10 @@ Lost And Found
 	    });
 
 	 	$("div.toolbar").html(`
- 			<a id="new" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;" href="{{  url("lostandfound/create") }}"><span class="glyphicon glyphicon-plus"></span>  Create</a>
+ 			<a id="new" class="btn btn-primary btn-sm" href="{{  url("lostandfound/create") }}"><span class="glyphicon glyphicon-plus"></span>  Create</a>
  			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
- 			<button id="edit" class="btn btn-default btn-flat" style="margin-right:5px;padding: 6px 10px;"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
- 			<button id="delete" class="btn btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+ 			<button id="edit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
+ 			<button id="delete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
  			@endif
 		`);
 
@@ -245,13 +240,6 @@ Lost And Found
 	          $(this).addClass('selected');
 	      }
 	    } );
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 
 		$('#page-body').show();
 	} );

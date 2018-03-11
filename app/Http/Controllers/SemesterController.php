@@ -30,7 +30,7 @@ class SemesterController extends Controller
                 {
                     $date = Carbon::now()->format('Y-m-d');
 
-                    $semester = Semester::where('datestart','<=',$date)
+                    $semester = Semester::where('date_start','<=',$date)
                                             ->pluck('academicyear');
                 }
 
@@ -45,7 +45,7 @@ class SemesterController extends Controller
                 {
                     $date = Carbon::now()->format('Y-m-d');
 
-                    $semester = Semester::where('datestart','<=',$date)
+                    $semester = Semester::where('date_start','<=',$date)
                                             ->pluck('semester');
                 }
 
@@ -105,8 +105,8 @@ class SemesterController extends Controller
         $semester = new Semester;
         $semester->semester = $sem;
         $semester->academicyear = $academicyear;
-        $semester->datestart = $start;
-        $semester->dateend = $end;
+        $semester->date_start = $start;
+        $semester->date_end = $end;
         $semester->save();
 
         Session::flash('success-message','Semester Added');
@@ -170,8 +170,8 @@ class SemesterController extends Controller
         $semester = Semester::find($id);
         $semester->semester = $sem;
         $semester->academicyear = $academicyear;
-        $semester->datestart = $start->format('Y-m-d');
-        $semester->dateend = $end->format('Y-m-d');
+        $semester->date_start = $start->format('Y-m-d');
+        $semester->date_end = $end->format('Y-m-d');
         $semester->save();
 
         Session::flash('success-message','Semester Updated');

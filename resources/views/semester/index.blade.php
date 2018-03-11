@@ -53,7 +53,7 @@ Semester
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
-	    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
@@ -72,9 +72,9 @@ Semester
 	    } );
 
 	 	$("div.toolbar").html(`
- 			<a id="new" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;" href="{{  url("semester/create") }}"><span class="glyphicon glyphicon-plus"></span>  Create</a>
- 			<button id="edit" class="btn btn-default btn-flat" style="margin-right:5px;padding: 6px 10px;"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
- 			<button id="delete" class="btn btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+ 			<a id="new" class="btn btn-primary btn-sm" href="{{  url("semester/create") }}"><span class="glyphicon glyphicon-plus"></span>  Create</a>
+ 			<button id="edit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
+ 			<button id="delete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
 		`);
 
     table
