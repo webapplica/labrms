@@ -25,7 +25,6 @@
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
-
 		init(1);
 
 		function init(data)

@@ -135,11 +135,11 @@
               <!-- dropdown items -->
               <ul class="dropdown-menu">
                 <!-- create tab -->
-                <li>{{ link_to('reservation/create','Item') }}</li>
+                <li>{{ link_to('reservation/create','Create') }}</li>
                 <!-- view all reservation -->
                 <li>{{ HTML::link('reservation/','List') }}</li>
                 <!-- view all reservation items -->
-                <li>{{ HTML::link('reservation/items/list','Item Filter') }}</li>
+                <li>{{ HTML::link('reservation/items/list','Items') }}</li>
               </ul> <!-- end of dropdown items -->
             </li> <!-- end of reservation dropdown tab -->
 

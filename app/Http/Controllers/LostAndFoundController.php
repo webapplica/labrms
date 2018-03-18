@@ -7,9 +7,8 @@ use Carbon\Carbon;
 use Validator;
 use Session;
 use DB;
-use App\LostAndFoundItems;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use App;
+use Illuminate\Http\Request;
 
 class LostAndFoundController extends Controller
 {
@@ -18,11 +17,12 @@ class LostAndFoundController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Request::ajax())
+        if( $request->ajax())
         {
-            return json_encode([ 'data' => LostAndFoundItems::all() ]);
+            $items = App\LostItem::all();
+            return datatables($items)->toJson();
         }
 
         return view("lostandfound.index");
@@ -46,9 +46,9 @@ class LostAndFoundController extends Controller
      */
     public function store(Request $request)
     {
-        $identifier = $this->sanitizeString(Input::get('identifier'));
-        $description = $this->sanitizeString(Input::get('description'));
-        $datefound = $this->sanitizeString(Input::get("datefound"));
+        $identifier = $this->sanitizeString($request->get('identifier'));
+        $description = $this->sanitizeString($request->get('description'));
+        $datefound = $this->sanitizeString($request->get("datefound"));
 
         $datefound = Carbon::parse($datefound);
 
@@ -56,7 +56,7 @@ class LostAndFoundController extends Controller
             'Identifier' => $identifier,
             'Description' => $description,
             'Date Found' => $datefound
-        ],LostAndFoundItems::$rules);
+        ],App\LostItem::$rules);
 
         if($validator->fails())
         {
@@ -65,11 +65,11 @@ class LostAndFoundController extends Controller
                     ->withErrors($validator);
         }
 
-        $lostandfounditems = new LostAndFoundItems;
-        $lostandfounditems->identifier = $identifier;
-        $lostandfounditems->description = $description;
-        $lostandfounditems->datefound = $datefound;
-        $lostandfounditems->save();
+        $item = new App\LostItem;
+        $item->identifier = $identifier;
+        $item->description = $description;
+        $item->date_found = $datefound;
+        $item->save();
 
         Session::flash('success-message','Item added to lost and found');
         return redirect('lostandfound');
@@ -94,7 +94,16 @@ class LostAndFoundController extends Controller
      */
     public function edit($id)
     {
-        $lostandfound = LostAndFoundItems::find($id);
+
+        $validator = Validator::make([
+                'Record' => $id
+            ], App\LostItem::$isExisting);
+
+        if($validator->fails()){
+            return back()->withInput()->withErrors($validator);
+        }
+
+        $lostandfound = App\LostItem::find($id);
         return view('lostandfound.update')
                 ->with('lostandfound',$lostandfound);
     }
@@ -109,11 +118,11 @@ class LostAndFoundController extends Controller
     public function update(Request $request, $id)
     {
 
-        if(Request::ajax())
+        if($request->ajax())
         {
-            if(Input::has('claim'))
+            if($request->has('claim'))
             {
-                $claimant = $this->sanitizeString(Input::get('claimant'));
+                $claimant = $this->sanitizeString($request->get('claimant'));
 
                 $dateclaimed = Carbon::now();
                 $status = 'claimed';
@@ -121,26 +130,31 @@ class LostAndFoundController extends Controller
                 $validator = Validator::make([
                     'Claimant' => $claimant,
                     'ID' => $id
-                ],LostAndFoundItems::$claimRules);
+                ],App\LostItem::$claimRules);
 
                 if($validator->fails())
                 {
-                    return json_encode('error');
+                    return response()->json([
+                            'success' => false,
+                            'error' => $errors
+                        ], 500);
                 }
 
-                $lostandfounditems = LostAndFoundItems::find($id);
-                $lostandfounditems->status = $status;
-                $lostandfounditems->dateclaimed = $dateclaimed;
-                $lostandfounditems->claimant = $claimant;
-                $lostandfounditems->save();
+                $item = App\LostItem::find($id);
+                $item->status = $status;
+                $item->date_claimed = $dateclaimed;
+                $item->claimant = $claimant;
+                $item->save();
 
-                return json_encode('success');
+                return response()->json([
+                        'success' => true
+                    ], 200);
             }
         }
 
-        $identifier = $this->sanitizeString(Input::get('identifier'));
-        $description = $this->sanitizeString(Input::get('description'));
-        $datefound = $this->sanitizeString(Input::get("datefound"));
+        $identifier = $this->sanitizeString($request->get('identifier'));
+        $description = $this->sanitizeString($request->get('description'));
+        $datefound = $this->sanitizeString($request->get("datefound"));
 
         $datefound = Carbon::parse($datefound);
 
@@ -148,7 +162,7 @@ class LostAndFoundController extends Controller
             'Identifier' => $identifier,
             'Description' => $description,
             'Date Found' => $datefound
-        ],LostAndFoundItems::$updateRules);
+        ],App\LostItem::$updateRules);
 
         if($validator->fails())
         {
@@ -157,11 +171,11 @@ class LostAndFoundController extends Controller
                     ->withErrors($validator);
         }
 
-        $lostandfounditems = LostAndFoundItems::find($id);
-        $lostandfounditems->identifier = $identifier;
-        $lostandfounditems->description = $description;
-        $lostandfounditems->datefound = $datefound;
-        $lostandfounditems->save();
+        $item = App\LostItem::find($id);
+        $item->identifier = $identifier;
+        $item->description = $description;
+        $item->date_found = $datefound;
+        $item->save();
 
         Session::flash('success-message','Item information updated');
         return redirect('lostandfound');
@@ -173,17 +187,24 @@ class LostAndFoundController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if(Request::ajax())
-        {
-            $lostandfounditems = LostAndFoundItems::find($id);
-            $lostandfounditems->delete();
-            return json_encode('success');
-        }
 
-        $lostandfounditems = LostAndFoundItems::find($id);
-        $lostandfounditems->delete();
+        $item = new App\LostItem;
+
+        $validator = Validator::make([
+            ''
+        ], $item->rules() );
+
+        $item = App\LostItem::find($id);
+        $item->delete();
+
+        if($request->ajax())
+        {
+            return response()->json([
+                    'success' => true
+                ], 200);
+        }
 
         Session::flash('success-message','Item removed');
         return redirect('lostandfound');

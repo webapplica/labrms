@@ -43,6 +43,8 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var table = $('#lostAndFoundTable').DataTable( {
+			serverSide: true,
+			processing: true,
 	  		select: {
 	  			style: 'single'
 	  		},
@@ -69,7 +71,7 @@
 	            } },
 	            { data: "claimant" },
 	            { data: function(callback){
-	            	if(callback.dateclaimed)
+	            	if(callback.date_claimed)
 	            		return moment(callback.date_claimed).format('MMMM DD, YYYY')
 	            	else
 	            		return ''
@@ -83,7 +85,7 @@
 					}
 
 					return `
-						<button data-id="`+callback.id+`" class="claim btn-block btn btn-xs btn-success">Claim</button>
+						<button type="button" data-id="`+callback.id+`" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Claiming..." class="claim btn-block btn btn-xs btn-success">Claim</button>
 					`
 				} }
 	        ],
@@ -91,6 +93,10 @@
 
 	    $('#lostAndFoundTable').on('click','.claim',function(){
 	    	id = $(this).data('id')
+    		var button = $(this).button('loading')
+	    	event.preventDefault()
+    		event.stopPropagation();
+
 	        swal({
 				  title: "Claimant Information",
 				  text: "Input full name of claimant",
@@ -101,7 +107,10 @@
 				  inputPlaceholder: "Lastname, Firstname Middlename"
 	        },
 	        function(inputValue){
-				if (inputValue === false) return false;
+				if (inputValue === false) {
+					button.button('reset');
+					return false;
+				};
 
 				if (inputValue === "") {
 					swal.showInputError("You need to write claimant name!");
@@ -120,16 +129,15 @@
 					},
 					dataType: 'json',
 					success: function(response){
-						if(response == 'success'){
-							swal('Operation Successful','Operation Complete','success')
-			        		table.ajax.reload();
-			        	}else{
-							swal('Operation Unsuccessful','Error occurred while processing your request','error')
-						}
+						swal('Operation Successful','Operation Complete','success')
+		        		table.ajax.reload();
 
 					},
 					error: function(){
 						swal('Operation Unsuccessful','Error occurred while processing your request','error')
+					}, 
+					complete: function(){
+						button.button('reset');
 					}
 	       		})
 	       	})
@@ -143,26 +151,26 @@
  			@endif
 		`);
 
-    table
-        .on( 'select', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
- 			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
- 			if(table.row('.selected').data().status == 'unclaimed')
- 			{
-	            $('#edit').show()
-	            $('#delete').show()	
- 			}
- 			@endif
-        } )
-        .on( 'deselect', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
- 			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
-            $('#edit').hide()
-            $('#delete').hide()
- 			@endif
-        } );
+	    table
+	        .on( 'select', function ( e, dt, type, indexes ) {
+	            // var rowData = table.rows( indexes ).data().toArray();
+	            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
+	 			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
+	 			if(table.row('.selected').data().status == 'unclaimed')
+	 			{
+		            $('#edit').show()
+		            $('#delete').show()	
+	 			}
+	 			@endif
+	        } )
+	        .on( 'deselect', function ( e, dt, type, indexes ) {
+	            // var rowData = table.rows( indexes ).data().toArray();
+	            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
+	 			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
+	            $('#edit').hide()
+	            $('#delete').hide()
+	 			@endif
+	        } );
         
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
 		$('#edit').on('click',function(){
