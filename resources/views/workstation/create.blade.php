@@ -44,8 +44,7 @@ Workstation | Add
               {{ Form::text('os',Input::old('os'),[
                 'id' => 'os',
                 'class'=>'form-control',
-                'placeholder'=>'Operating System Key',
-                'required'
+                'placeholder'=>'Operating System Key'
               ]) }}
             </div>
           </div>

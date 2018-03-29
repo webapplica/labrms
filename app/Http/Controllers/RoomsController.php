@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Validator;
 use Session;
 use App;
+use DB;
 use Illuminate\Http\Request;
 
 class RoomsController extends Controller {
@@ -111,11 +112,10 @@ class RoomsController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$room = Room::find($id);
-		$categories = App\RoomCategory::pluck('name', 'id');	
+		$room = App\Room::with('categories')->find($id);
+
 		return view('room.update')
-			->with('room',$room)
-			->with('categories', $categories);
+			->with('room',$room);
 	}
 
 
@@ -125,17 +125,21 @@ class RoomsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
 		$name = $this->sanitizeString($request->get("name"));
 		$description = $this->sanitizeString($request->get('description'));
+		$categories = $request->get('category');
+		$categories = App\RoomCategory::whereIn('name', $categories)->pluck('id');
+
+		$room = App\Room::findOrFail($id);
 
 		$validator = Validator::make([
 
 			'Name' => $name,
 			'Description' => $description
 
-		],Room::$updateRules);
+		], $room->updateRules());
 
 		if($validator->fails())
 		{
@@ -144,13 +148,16 @@ class RoomsController extends Controller {
 				->withErrors($validator);
 		}
 
-		$room = Room::find($id);
+		DB::beginTransaction();
+
 		$room->name = $name;
 		$room->description = $description;
-		$room->category = $category;
 		$room->status = 'working';
 		$room->save();
 
+		$room->categories()->sync($categories);
+
+		DB::commit();
 		Session::flash('success-message','Room information updated!');
 		return redirect('room');
 	}

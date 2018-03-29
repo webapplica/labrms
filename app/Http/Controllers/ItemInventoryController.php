@@ -81,7 +81,7 @@ class ItemInventoryController extends Controller {
 
 		if($validator->fails())
 		{
-			return redirect('inventory/item/create')
+			return redirect('inventory/create')
 				->withInput()
 				->withErrors($validator);
 		}
@@ -132,7 +132,8 @@ class ItemInventoryController extends Controller {
 		 * if the items exists, use the existing items
 		 * @var App
 		 */
-		if(count($inventory) <= 0 ) $inventory = new App\Inventory;
+		if( !isset($inventory) || $inventory->count() <= 0 ) 
+			$inventory = new App\Inventory;
 
 		/**
 		 * set all the values before sending to database

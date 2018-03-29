@@ -760,8 +760,6 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','Monitor');
-								})->orWhereHas('itemsubtype',function($query){
-									$query->where('name','=','Monitor');
 								});
 							})
 							->where('local_id','like','%'.$monitor.'%')
@@ -805,8 +803,6 @@ class ItemsController extends Controller {
 				App\Item::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
-									$query->where('name','=','Keyboard');
-								})->orWhereHas('itemsubtype',function($query){
 									$query->where('name','=','Keyboard');
 								});
 							})
@@ -852,8 +848,6 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','AVR');
-								})->orWhereHas('itemsubtype',function($query){
-									$query->where('name','=','AVR');
 								});
 							})
 							->where('local_id','like','%'.$avr.'%')
@@ -898,8 +892,6 @@ class ItemsController extends Controller {
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
 									$query->where('name','=','System Unit');
-								})->orWhereHas('itemsubtype',function($query){
-									$query->where('name','=','System Unit');
 								});
 							})
 							->where('local_id','like','%'.$systemunit.'%')
@@ -943,8 +935,6 @@ class ItemsController extends Controller {
 				App\Item::unassembled()
 							->whereHas('inventory',function($query){
 								$query->whereHas('itemtype',function($query){
-									$query->where('name','=','Mouse');
-								})->orWhereHas('itemsubtype',function($query){
 									$query->where('name','=','Mouse');
 								});
 							})

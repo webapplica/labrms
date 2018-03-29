@@ -49,8 +49,7 @@ Workstation | Update
               {{ Form::text('os',$pc->oskey,[
                 'id' => 'os',
                 'class'=>'form-control',
-                'placeholder'=>'Operating System Key',
-                'required'
+                'placeholder'=>'Operating System Key'
               ]) }}
             </div>
           </div>

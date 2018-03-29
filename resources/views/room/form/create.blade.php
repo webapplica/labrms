@@ -23,7 +23,7 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('category','Room Category') }}
-    {{ Form::select('category[]',isset($categories) ? $categories : ['Empty list'=>'Empty list'],Input::old('category'),[
+    {{ Form::select('category[]',isset($categories) ? $categories : ['Empty list'=>'Empty list'], old('category'),[
       'id' => 'category',
       'class'=>'form-control',
       'multiple' => 'multiple'
@@ -33,8 +33,7 @@
 <div class="form-group">
   <div class="col-md-12">
     {{ Form::label('description','Description') }}
-    {{ Form::textarea('description',Input::old('description'),[
-      'required',
+    {{ Form::textarea('description', isset($description) ? $description : old('description'),[
       'class'=>'form-control',
       'placeholder'=>'Room Description'
     ]) }}
@@ -42,12 +41,12 @@
 </div>
 <div class="form-group">
   <div class="col-md-12">
-    {{ Form::submit('Create',[
+    {{ Form::submit('Submit',[
       'class'=>'btn btn-lg btn-primary btn-block',
       'name' => 'create',
       'id' => 'create'
     ]) }}
-  </div>
+  </div>  
 </div>
 {{ Form::close() }}
 {{ HTML::script(asset('js/bootstrap-select.min.js')) }}

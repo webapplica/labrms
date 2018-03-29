@@ -154,7 +154,7 @@ class Inventory extends \Eloquent
 
   public static function generateCode()
   {
-    $value = count(Inventory::pluck('id')) + 1;
+    $value = Inventory::pluck('id')->count() + 1;
     $code = 'INV' . str_pad($value, 6, '0', STR_PAD_LEFT);
     return $code;
   }

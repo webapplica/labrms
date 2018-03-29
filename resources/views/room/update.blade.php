@@ -42,7 +42,7 @@ Update
         <div class="form-group">
           <div class="col-md-12">
             {{ Form::label('name','Room Name') }}
-            {{ Form::text('name',Input::old('name'),[
+            {{ Form::text('name', isset($room->name) ? $room->name : old('name'),[
               'required',
               'class'=>'form-control',
               'placeholder'=>'Room Name'
@@ -52,7 +52,7 @@ Update
         <div class="form-group">
           <div class="col-md-12">
             {{ Form::label('category','Room Category') }}
-            {{ Form::select('category[]',['Empty list'=>'Empty list'],Input::old('category'),[
+            {{ Form::select('category[]',['Empty list'=>'Empty list'], old('category'),[
               'id' => 'category',
               'class'=>'form-control',
               'multiple' => 'multiple'
@@ -62,8 +62,7 @@ Update
         <div class="form-group">
           <div class="col-md-12">
             {{ Form::label('description','Description') }}
-            {{ Form::textarea('description',Input::old('description'),[
-              'required',
+            {{ Form::textarea('description', isset($room->description) ? $room->description : old('description'),[
               'class'=>'form-control',
               'placeholder'=>'Room Description'
             ]) }}
@@ -71,7 +70,7 @@ Update
         </div>
         <div class="form-group">
           <div class="col-md-12">
-            {{ Form::submit('Create',[
+            {{ Form::submit('Update',[
               'class'=>'btn btn-lg btn-primary btn-block',
               'name' => 'create',
               'id' => 'create'
@@ -86,12 +85,8 @@ Update
 @stop
 @section('script')
 {{ HTML::script(asset('js/bootstrap-select.min.js')) }}
-{{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script>
   $(document).ready(function(){
-
-    $('#name').val('{{ $room->name }}')
-    $('#description').val('{{ $room->description }}')
 
     $.ajax({
         headers: {
@@ -104,7 +99,7 @@ Update
         option = "";
 
         for( ctr = 0 ; ctr < response.data.length ; ctr++ ){
-            option += `<option val=` + response.data[ctr].category + `>` + response.data[ctr].category + `</option>`;
+            option += `<option val=` + response.data[ctr].id + `>` + response.data[ctr].name + `</option>`;
         }
 
         $('#category').html("");
@@ -121,27 +116,6 @@ Update
       }
     })
 
-    function isIncluded(arr,id)
-    {
-      ret_val = false;
-      arr.forEach(function(obj){
-        if(obj == id)
-        {
-          ret_val = true;
-        }
-      })
-
-      return ret_val;
-    }
-
-    @if( Session::has("success-message") )
-        swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-    @if( Session::has("error-message") )
-        swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
-    
-    $('#page-body').show();
   });
 </script>
 @stop

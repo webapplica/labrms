@@ -81,10 +81,12 @@ Item Profile
 				<div class="form-group">
 					<div class="col-sm-12" id="quantity-to-profile-form">
 					{{ Form::label('quantity','Quantity To Profile') }}
-					{{ Form::number('quantity',Input::old('quantity'),[
+					{{ Form::number('quantity', old('quantity'),[
 						'id' => 'quantity',
 						'class' => 'form-control',
-						'placeholder' => 'Quantity To Profile'
+						'placeholder' => 'Quantity To Profile',
+						'min' => '1',
+						'required'
 					]) }}
 					</div>
 				</div>
@@ -117,7 +119,7 @@ Item Profile
 					        	<p class="text-muted" style="font-size: 12px;">
 					        		This will fill up the property number whatever constant value it contains
 					        	</p>
-					        	<input type="text" class="form-control" id="propertynumber-assitant" />
+					        	<input type="text" class="form-control" id="propertynumber-assitant" placeholder="PUP-0000-0000" />
 					        </div>
 				        </div>
 				        <div class="form-group">
@@ -135,7 +137,7 @@ Item Profile
 				</div>
 				<div class="form-group pull-right">
 						<div class="col-md-12">
-							<button type="button" id="next" class="btn btn-md btn-primary" style="padding-left: 20px;padding-right: 20px;">Next</button>
+							<button type="submit" id="next" class="btn btn-md btn-primary" style="padding-left: 20px;padding-right: 20px;">Next</button>
 						</div>
 				</div>
 			</div>
@@ -168,7 +170,8 @@ Item Profile
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function(){
-		$('#next').on('click',function(){
+		$('#next').on('click',function(event){
+			event.preventDefault()
 			quantity = $('#quantity').val()
 			if ( quantity == "" ){
 				swal('Error Occurred!','Quantity must be greater than zero','error')

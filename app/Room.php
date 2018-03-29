@@ -16,7 +16,7 @@ class Room extends \Eloquent{
 	{
 		return array(
 			'Name' => 'required|min:4|max:100|unique:rooms,name' ,
-			'Description' => 'required|min:4',
+			'Description' => 'min:4',
 			'Category' => 'exists:room_categories,id'
 		);
 	}
@@ -26,7 +26,7 @@ class Room extends \Eloquent{
 		$name = $this->name;
 		return array(
 			'Name' => 'required|min:4|max:100|unique:rooms,name,' . $name . ',name' ,
-			'Description' => 'required|min:4'
+			'Description' => 'min:4'
 		);
 	}
 
