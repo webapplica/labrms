@@ -162,18 +162,31 @@ class RoomsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if($request->ajax()){
-			try{
-				$room = Room::find($id);
-				$room->delete();
-				return json_encode('success');
-			} catch( Exception $e ){}
+		$validator = Validator::make([
+			'Room' => $id
+		], [ 'Room' => 'required|exists:rooms,id']);
+
+		if($validator->fails())
+		{
+			return response()->json([
+				'Operation' => false,
+				'errors' => $validator
+			], 500);
 		}
 
-		$room = Room::findOrFail($id);
+		$room = App\Room::findOrFail($id);
 		$room->delete();
+
+		if($request->ajax()){
+
+			return response()->json([
+				'Operation' => true,
+				'errors' => false
+			], 200);
+		}
+
 		Session::flash('success-message','Room information deleted');
 		return redirect('room');
 	}

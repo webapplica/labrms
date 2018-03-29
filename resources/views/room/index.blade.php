@@ -45,7 +45,7 @@
 	            	return `
 	            		<a href="` + '{{ url('room') }}' + '/' + callback.id +`" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> View</a>
 			 			<a href="{{ url('room') }}/`+callback.id+`/edit" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-pencil"></span>  Update</a>
-			 			<button id="delete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+			 			<button data-id="`+callback.id+`" class="delete btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
 	            	`;
 	            } }
 	        ],
@@ -55,9 +55,11 @@
 			<a href="{{ url('room/create') }}" class="btn btn-primary btn-sm">Create</a>
     	`)
 
-	    $('#roomTable').on('click', 'delete', function(){
+	    $('#roomTable').on('click', '.delete', function(){
+				id = $(this).data('id');
 			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
+				console.log(id)
+				if(id != null)
 				{
 			        swal({
 			          title: "Are you sure?",
@@ -76,23 +78,21 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
 							type: 'delete',
-							url: '{{ url("room/") }}' + "/" + table.row('.selected').data().id,
+							url: '{{ url("room/") }}' + "/" + id,
 							data: {
-								'id': table.row('.selected').data().id
+								'id': id
 							},
 							dataType: 'json',
 							success: function(response){
-								if(response == 'success'){
-									swal('Operation Successful','Room removed from database','success')
-					        		table.row('.selected').remove().draw( false );
-					        	}else{
-									swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-								}
-					            $('#edit').hide()
-					            $('#delete').hide()
+								swal('Operation Successful','Room removed from database','success')
 							},
 							error: function(){
 								swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+							},
+							complete: function(){
+								table.ajax.reload();
+					            $('#edit').hide()
+					            $('#delete').hide()
 							}
 						});
 			          } else {
@@ -101,7 +101,8 @@
 			        })
 				}
 			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
+				console.log(error)
+				swal('Oops..','You must choose a row','error');
 			}
 	    });
 	} );
