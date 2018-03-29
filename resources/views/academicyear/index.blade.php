@@ -154,7 +154,7 @@ Academic Year
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
 					type: 'delete',
-					url: '{{ url("academicyear") }}' + "/" + type,
+					url: '{{ url("academicyear") }}' + "/" + id,
 					data: {
 						'id': id
 					},
