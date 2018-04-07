@@ -42,8 +42,8 @@ class Ticket extends \Eloquent{
 	);
 
 	public static $transferRules = array(
-		'Ticket ID' => 'required|exists:tickets, id',
-		'Staff Assigned' => 'required|exists:users, id',
+		'Ticket ID' => 'required|exists:tickets,id',
+		'Staff Assigned' => 'required|exists:users,id',
 	);
 
 	protected $appends = [
@@ -57,7 +57,7 @@ class Ticket extends \Eloquent{
 
 	public function getStaffNameAttribute()
 	{
-		if(isset($this->staff) && count($this->staff) > 0)
+		if( isset($this->staff) && $this->staff->count() > 0)
 			return $this->staff->firstname . " " . $this->staff->middlename . " " . $this->staff->lastname;
 		return 'None';
 	}
@@ -69,7 +69,7 @@ class Ticket extends \Eloquent{
 
 	public function getTicketTypeNameAttribute()
 	{
-		return (isset($this->type) && count($this->type) > 0) ? $this->type->name : 'Not Set';
+		return ( isset( $this->type ) && $this->type->count() > 0) ? $this->type->name : 'Not Set';
 	}
 
 	public function getTicketCodeAttribute()
@@ -300,7 +300,7 @@ class Ticket extends \Eloquent{
 
 	public function copyRecordFromExisting($ticket)
 	{
-		$this->type = $ticket->type;
+		$this->type_id = $ticket->type_id;
 		$this->title = $ticket->title;
 		$this->details = $ticket->details;
 		$this->author = $ticket->author;
@@ -314,7 +314,6 @@ class Ticket extends \Eloquent{
 		$this->trashable = $ticket->trashable;
 		$this->severity = $ticket->severity;
 		$this->nature = $ticket->nature;
-		// $this-> = $ticket->;
 	}
 
 	/**
@@ -334,12 +333,16 @@ class Ticket extends \Eloquent{
 		|
 		*/
 		$ticket = Ticket::find($this->id);
+
+		$new_ticket = new Ticket;
+		$new_ticket->copyRecordFromExisting($ticket);
+		$new_ticket->status = 'Open';
+		$new_ticket->staff_id = $this->staff_id;
+		$new_ticket->comments = $this->comments;
+		$new_ticket->generate();
+
 		$ticket->status = 'Transferred';
 		$ticket->save();
-
-		$_ticket = new Ticket;
-		$_ticket->copyRecordFromExisting($this);
-		$_ticket->generate();
 	}
 
 	/**

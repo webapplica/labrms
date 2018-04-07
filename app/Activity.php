@@ -37,6 +37,10 @@ class Activity extends \Eloquent{
     'U' => 'Unidentified'
   ];
 
+  public static $isExistingActivity = [
+    'activity' => 'required|exists:activities,activity'
+  ];
+
   public function setTypeAttribute($value)
   {
     $type = ucfirst($value);

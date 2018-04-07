@@ -273,7 +273,7 @@ class Workstation extends \Eloquent{
 		|
 		*/
 		$item = Item::propertyNumber($tag)->first();
-    	if( count($item) > 0) 
+    	if( $item && $item->count() > 0) 
     	{
 		    
 			/*
@@ -310,7 +310,7 @@ class Workstation extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-	    	if(count($pc) > 0 )
+	    	if( $pc && $pc->count() > 0 )
 	    	{
 	    		return $pc;
 	    	}
@@ -349,7 +349,7 @@ class Workstation extends \Eloquent{
 			|
 			*/
 			$pc = Workstation::name($tag)->first();
-			if(count($pc) > 0)
+			if( $pc && $pc->count() > 0)
 			{
 				return $pc;
 			}

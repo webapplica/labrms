@@ -170,14 +170,14 @@ class MaintenanceActivityController extends Controller {
 	*	@param type
 	*	@return list of maintenance activity
 	*
-	*/
+	*/ 
 	public function getMaintenanceActivity()
 	{
 		if(Request::ajax())
 		{
 			$type = $this->sanitizeString(Input::get('type'));
 
-			return json_encode(App\Activity::type($type)->pluck('activity','id'));
+			return json_encode(App\Activity::type($type)->pluck('details','id'));
 		}
 	}
 

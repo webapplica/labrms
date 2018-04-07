@@ -40,7 +40,8 @@
 					{{ Form::label('Comments') }}
 					{{ Form::text('comment',null,[
 						'class' => 'form-control',
-						'id' => 'comment'
+						'id' => 'comment',
+						'placeholder' => 'Explanation or Note'
 					]) }}
 					</div>
 				</div>
@@ -56,8 +57,29 @@
 	</div>
 </div>
 <script>
-	$('#transferTicketModal').on('show.bs.modal',function(){
+	$('#transferTicketModal').on('show.bs.modal',function(event){
+		id = $(event.relatedTarget).data('id')
 		$(document).ready(function(){
+
+			$.ajax({
+		        headers: {
+		            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		        },
+				type: 'get',
+		        url: "{{ url('ticket') }}/" + id,
+		        dataType: 'json',
+		        success: function(response){
+		        	response = response.data[0]
+		        	$('#transfer-id').val(response.id)
+		        	$('#transfer-date').text(response.parsed_date)
+		        	$('#transfer-tag').text(response.tags)
+		        	$('#transfer-title').text(response.title)
+		        	$('#transfer-details').text(response.details)
+		        	$('#transfer-assigned').text(response.staff_name)
+		        	$('#transfer-author').text(response.author)
+				}
+			})
+
 			$.ajax({
 		        headers: {
 		            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

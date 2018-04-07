@@ -7,15 +7,13 @@
 @section('content')
 @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 @include('modal.ticket.transfer')
-@if($ticket->tickettype == 'Complaint')
+@if($ticket->type->name == 'Complaint')
 @include('modal.ticket.resolve') 
 @endif
 @endif
 <div class="container-fluid" id="page-body">
   <div class="col-md-12">
     <div class="panel panel-body ">
-  
-      @include('errors.alert')
 
       <div class='col-md-12'>
           <legend><h3 class="text-muted">Ticket {{ $ticket->id }} History</h3></legend>
@@ -24,6 +22,7 @@
               <li>{{ $id }}</li>
               <li class="active">History</li>
           </ol>
+          @include('errors.alert')
           <table class="table table-hover table-striped table-bordered table-condensed" id="ticketTable" cellspacing="0" width="100%">
             <thead>
                   <tr rowspan="2">
@@ -31,22 +30,21 @@
                         <span style="font-weight:normal">{{ $ticket->title }}</span> 
                       </th>
                       <th class="text-left" colspan="4">Ticket Type:  
-                        <span style="font-weight:normal">{{ $ticket->tickettype }}</span> 
+                        <span style="font-weight:normal">{{ $ticket->type->name }}</span> 
                       </th>
                   </tr>
                   <tr rowspan="2">
                       <th class="text-left" colspan="4">Details:  
                         <span style="font-weight:normal">{{ $ticket->details }}</span>  
                       </th>
-                      <th class="text-left" colspan="4"> 
+                      <th class="text-left" colspan="4"> Author:
+                        <span style="font-weight:normal">{{ $ticket->author }}</span>  
                       </th>
                   </tr>
                     <tr>
                 <th>Ticket ID</th>
-                <th>Ticket Type</th>
                 <th>Details</th>
                 <th>Staff Assigned</th>
-                <th>Author</th>
                 <th>Date Created</th>
                 <th>Status</th>
                 <th>Comment</th>
@@ -79,18 +77,9 @@
       ajax: "{{ url('ticket') }}/" + {{ $id }},
       columns: [
           { data: "id" },
-          { data: "type.name" },
           { data: "details" },
-          { data: function(callback){
-            if(callback.user)
-            return callback.user.firstname + " " + callback.user.middlename + " " + callback.user.lastname
-            else
-              return ''
-          } },
-          { data: "author" },
-          {data: function(callback){
-            return moment(callback.created_at).format("dddd, MMMM Do YYYY");
-          }},
+          { data: "staff_name"},
+          {data: "parsed_date"},
           { data: "status" },
           { data: "comments" }
       ],

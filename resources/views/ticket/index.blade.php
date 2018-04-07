@@ -18,6 +18,7 @@
 	<div class="col-md-12" id="workstation-info">
 		<div class="panel panel-body table-responsive" style="padding: 25px 30px;">
 			<legend class="text-muted">Tickets</legend>
+			@include('errors.alert')
 			 <!--Counter Section-->
 	        <section id="counter_two" class="counter_two col-sm-12">
 	            <div class="overlay" style="border: none;">
@@ -58,7 +59,6 @@
 	            </div><!-- End off overlay -->
         	</section><!-- End off Counter section -->
 
-			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
 			<table class="table table-hover table-bordered table-striped table-condensed" id="ticketTable">
 				<thead>
 					<th>ID</th>
@@ -86,12 +86,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 
-
-		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-		url = `?type=Complaint&status=Open`
-		@else
-		url = `?type=Complaint`
-		@endif
+		url = window.location.href
 
 	  	var table = $('#ticketTable').DataTable({
 	  		serverSide: true,
@@ -128,10 +123,10 @@
 
 	          	right_button_list = `
 						@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-						<button class="assign btn btn-success btn-md">
+						<button class="assign btn btn-success btn-md" data-id="` +  callback.id + `" data-target="#transferTicketModal" data-toggle="modal">
 							<span class="glyphicon glyphicon-share-alt"></span> Assign 
 						</button>
-						<button class="resolve btn btn-warning btn-md">
+						<button class="resolve btn btn-warning btn-md" data-id="` +  callback.id + `" data-type="`+ callback.type.name +`" data-tag="`+callback+`" data-target="#resolveTicketModal" data-toggle="modal">
 							<span class="glyphicon glyphicon-check"></span> Create an Action
 						</button>
 						@endif	
@@ -142,7 +137,7 @@
 
 	          	if(status == 'Open' || status == 'open')
 		          	right_button_list += `
-						<button class="close-ticket btn btn-danger btn-md">
+						<button class="close-ticket btn btn-danger btn-md" data-id="` +  callback.id + `">
 							<span class="glyphicon glyphicon-off"></span> Close
 						</button>
 
@@ -150,7 +145,7 @@
 		        else if(status == 'Reopen' || status == 'reopen')
 		          	right_button_list += `
 
-						<button class="reopen btn btn-info btn-md">
+						<button class="reopen btn btn-info btn-md" data-id="` +  callback.id + `">
 							<span class="glyphicon glyphicon-off"></span> Reopen
 						</button>
 
@@ -173,59 +168,48 @@
 		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 
 		$('div.filter').html(`
-			<span class='text-muted'>Type:</span><div class="btn-group">
-			  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="tickettype-filter" style="padding: 7px 7px"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="tickettype-button"></span> <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" id="tickettype-button">
-		   		@foreach($tickettype as $tickettype)
-		   		@if($tickettype->name != "Action Taken")
-				<li role="presentation">
-					<a class="tickettype"  data-name='{{ $tickettype->name }}'>{{ $tickettype->name }}</a>
-				</li>
-				@endif
-			    @endforeach
-			  </ul>
-			</div>
-			<span class='text-muted'>Status:</span><div class="btn-group">
-			  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="ticketstatus-filter" style="padding: 7px 7px"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="ticketstatus-button"></span> <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" id="ticketstatus-button">
-			      @foreach($ticketstatus as $ticketstatus)
-					<li role="presentation">
-						<a class="ticketstatus"  data-name='{{ $ticketstatus }}'>{{ $ticketstatus }}</a>
-					</li>
-			    @endforeach
-			  </ul>
-			</div>
+			<span class='text-muted'>Type:</span>
+			<select name="type" class="form-control ticket-filter" id="ticket-type">
+				<option value="all">All</option>
+				@foreach($ticket_types as $t)
+				<option value="{{ $t->name }}" @if( $type == $t->name) selected @endif>
+					{{ $t->name }}
+				</option>
+				@endforeach
+			</select>
+			<span class='text-muted'>Status:</span>
+			<select name="status" class="form-control ticket-filter" id="ticket-status">
+				@foreach($ticket_statuses as $stat)
+				<option value="{{ $stat }}" @if( $status == $stat) selected @endif>
+					{{ $stat }}
+				</option>
+				@endforeach
+			</select>
 		`);
 
-		$('#tickettype-button').text( $('.tickettype:first').text() )
-		$('#ticketstatus-button').text( 'Open' )
-
-		$('.tickettype').on('click',function(event)
+		$('.ticket-filter').on('change',function(event)
 		{
-			$('#tickettype-button').text($(this).data('name'))
-			url = "{{ url('ticket') }}" + '?status=' + $('#ticketstatus-button').text() + '&type=' + $('#tickettype-button').text()
+			url = setUrl()
 			table.ajax.url(url).load();
 		})
 
-		$('.ticketstatus').on('click',function(event)
+		function setUrl()
 		{
-			$('#ticketstatus-button').text($(this).data('name'))
-			url = "{{ url('ticket') }}" + '?status=' + $('#ticketstatus-button').text() + '&type=' + $('#tickettype-button').text()
-			table.ajax.url(url).load();
-		})
 
-	    $('.assign').click( function () {
-			id = $(this).data('id')
-			$('#transfer-id').val(id)
-	    } );
+			type = $('#ticket-type').val()
+			status = $('#ticket-status').val()
+			url = "{{ url('ticket') }}" + '?status=' + status + '&type=' + type
+			history.pushState(null, '', url);
+			return url
+		}
 
-	    $('.resolve').click( function () {
-			if(table.row('.selected').data().tickettype == 'Complaint' || table.row('.selected').data().tickettype == 'Maintenance')
+	    $('#ticketTable').on( 'click', '.resolve', function () {
+	    	id = $(this).data('id')
+	    	type = $(this).data('type')
+	    	tag = $(this).data('tag')
+			if(type == 'Complaint' || type == 'Maintenance')
 			{
-				$('#resolve-id').val(table.row('.selected').data().id);
-				tag = table.row('.selected').data().tag
+				$('#resolve-id').val(id);
 				if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
 				{
 					if(tag.indexOf('PC') !== -1)
@@ -258,7 +242,7 @@
 
 		@if(Auth::user()->accesslevel == 0)
 
-	    $('.close-ticket').click( function () {
+	    $('#ticketTable').on( 'click', '.close-ticket', function () {
 	    	id = $(this).data('id')
 	        swal({
 	          title: "Are you sure?",
@@ -301,7 +285,7 @@
 	        })
 	    } );
 
-	    $('.reopen').click( function () {
+	    $('#ticketTable').on( 'click', '.reopen', function () {
 	    	id = $(this).data('id')
 	        swal({
 	          title: "Are you sure?",
