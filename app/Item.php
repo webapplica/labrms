@@ -58,7 +58,7 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static $rules = array(
-		'Property Number' => 'required|min:5|max:100|unique:items,property_number',
+		'Property Number' => 'min:5|max:100|unique:items,property_number',
 		'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
 		'Location' =>'required',
 		'Date Received' =>'required|date',

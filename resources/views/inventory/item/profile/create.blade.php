@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Item Profile
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/jquery-ui.min.css')) }}
 {{ HTML::style(asset('css/style.css')) }}
@@ -18,9 +12,11 @@ Item Profile
 	}
 </style>
 @stop
+
 @section('script-include')
 {{ HTML::script(asset('js/jquery-ui.js')) }}
 @stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-offset-3 col-md-6 panel panel-body">
@@ -88,6 +84,8 @@ Item Profile
 						'min' => '1',
 						'required'
 					]) }}
+
+					<input type="checkbox" id="lock-quantity" value="1" {{ old('lock-quantity') ? 'checked' : '' }} name="lock-quantity"> Lock? 
 					</div>
 				</div>
 				<div class="form-group">
@@ -170,6 +168,18 @@ Item Profile
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function(){
+
+		$('#lock-quantity').trigger('click')
+
+		$('#lock-quantity').on('click', function(){
+			if($(this).is(':checked')) {
+				$('#quantity').prop('readonly', 'readonly')
+			}else {
+				$('#quantity').prop('readonly', '')
+
+			}
+		})
+
 		$('#next').on('click',function(event){
 			event.preventDefault()
 			quantity = $('#quantity').val()
@@ -233,27 +243,31 @@ Item Profile
 		{
 			$('#page-one').hide(400);
 			$('#page-two').show(400);
-			$('tbody').html("");
 
-			const1 = "";
-			if($('#propertynumber-assitant').val() != "")
+			if(! $('#lock-quantity').is(':checked') || $('tbody tr').length == 0)
 			{
-				const1 = $('#propertynumber-assitant').val()
-			}
+				$('tbody').html("");
 
-			const2 = "";
-			if($('#is-incrementing').is(":checked"))
-			{
-				const2 = $('#is-incrementing-value').val()
-			}
+				const1 = "";
+				if($('#propertynumber-assitant').val() != "")
+				{
+					const1 = $('#propertynumber-assitant').val()
+				}
 
-			quantity = $('#quantity').val();
-			for( var ctr = 1 ; ctr <= quantity ; ctr++ ){
-				insertForm(ctr,const1,const2);
-
+				const2 = "";
 				if($('#is-incrementing').is(":checked"))
 				{
-					const2++
+					const2 = $('#is-incrementing-value').val()
+				}
+
+				quantity = $('#quantity').val();
+				for( var ctr = 1 ; ctr <= quantity ; ctr++ ){
+					insertForm(ctr,const1,const2);
+
+					if($('#is-incrementing').is(":checked"))
+					{
+						const2++
+					}
 				}
 			}
 
@@ -296,6 +310,7 @@ Item Profile
 			  maxAge: 59,
 			  minAge: 15,
 		});
+
 		$('#inventory-help').click(function(){
 			$('#inventory-help').popover('show')
 		});

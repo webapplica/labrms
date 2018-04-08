@@ -28,8 +28,8 @@ class CreateItemsTable extends Migration {
 					->on('receipts')
 					->onUpdate('cascade')
 					->onDelete('cascade');
-			$table->string('property_number',100)->unique()->nullable();
-			$table->string('serial_number',100)->unique()->nullable();
+			$table->string('property_number',100)->nullable();
+			$table->string('serial_number',100)->nullable();
 			$table->string('location',100)->nullable();
 			$table->date('date_received')->nullable();
             $table->string('profiled_by')->nullable();

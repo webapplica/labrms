@@ -1543,7 +1543,8 @@ Route::middleware(['session_start'])->group(function () {
 	|--------------------------------------------------------------------------
 	|
 	*/
-	Route::get('/','HomeController@index');
+	// Route::get('/','HomeController@index');
+	Route::get('/','SessionsController@create');
 
 	/*
 	|--------------------------------------------------------------------------

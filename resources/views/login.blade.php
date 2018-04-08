@@ -1,11 +1,13 @@
-  @extends('layouts.master-plain')
+@extends('layouts.master-plain')
+
 @section('title')
 Login
 @stop
+
 @section('navbar')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar.main.default')
 @stop
+
 @section('style')
 <link rel="stylesheet" href="{{ asset('css/style.css') }}"  />
 <style>
@@ -31,14 +33,16 @@ Login
   }
 </style>
 @stop
+
 @section('script-include')
 <script type="text/javascript" src="{{ asset('js/jquery.validate.min.js') }}"></script>
 @stop
+
 @section('content')
 <div class="container-fluid" id="page-body" style="margin-top: 50px">
   <div class="row">
     <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6">
-      <div class="panel panel-body panel-shadow">
+      <div class="panel panel-body">
         <div class="col-sm-12" id="loginPanel" style="padding: 20px 20px 0px 20px" >
           <legend class=hidden-xs>
             <div class="row center-block" style="margin-bottom: 10px;">
@@ -83,12 +87,8 @@ Login
                 </button>
               </div>
             </div>
-            <div class="form-group">
-              <div class="col-md-12 text-center">
-                <p class="text-muted" style="letter-spacing: 1px"> CCIS - LOO </p>
-              </div>
-            </div>
-{{--             <a href="{{ route('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a> --}}
+            <hr />
+            <a href="{{ route('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a>
           {{ Form::close() }}
           </div>
         </div>
