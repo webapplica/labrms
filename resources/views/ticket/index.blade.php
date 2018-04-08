@@ -113,48 +113,12 @@
 	          { data: "status"},
 	          { data: function(callback){
 
-	          	status = callback.status
-	          	left_button_list = `
+	          	return `
 					<div class="pull-left">
 		          		<a href='{{ url("ticket") }}/` +  callback.id + `'' class='btn btn-md btn-default'>View More
 		          		</a>
 		          	</div>
-		         `
-
-	          	right_button_list = `
-						@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-						<button class="assign btn btn-success btn-md" data-id="` +  callback.id + `" data-target="#transferTicketModal" data-toggle="modal">
-							<span class="glyphicon glyphicon-share-alt"></span> Assign 
-						</button>
-						<button class="resolve btn btn-warning btn-md" data-id="` +  callback.id + `" data-type="`+ callback.type.name +`" data-tag="`+callback+`" data-target="#resolveTicketModal" data-toggle="modal">
-							<span class="glyphicon glyphicon-check"></span> Create an Action
-						</button>
-						@endif	
-
-	          	`;
-
-				@if(Auth::user()->accesslevel == 0)
-
-	          	if(status == 'Open' || status == 'open')
-		          	right_button_list += `
-						<button class="close-ticket btn btn-danger btn-md" data-id="` +  callback.id + `">
-							<span class="glyphicon glyphicon-off"></span> Close
-						</button>
-
-		          	`
-		        else if(status == 'Reopen' || status == 'reopen')
-		          	right_button_list += `
-
-						<button class="reopen btn btn-info btn-md" data-id="` +  callback.id + `">
-							<span class="glyphicon glyphicon-off"></span> Reopen
-						</button>
-
-		          	`
-				@endif
-
-				button_list = left_button_list + `<div class="pull-right">` + right_button_list + '</div>'
-
-	          	return button_list;
+		         `;
 	          } }
 	    	],
 	  	});
@@ -237,94 +201,6 @@
 				swal('Error!','Only complaints can be resolved','error')
 			}
 
-	    } );
-	    @endif
-
-		@if(Auth::user()->accesslevel == 0)
-
-	    $('#ticketTable').on( 'click', '.close-ticket', function () {
-	    	id = $(this).data('id')
-	        swal({
-	          title: "Are you sure?",
-	          text: "Do you really want to close the ticket?",
-	          type: "warning",
-	          showCancelButton: true,
-	          confirmButtonText: "Yes, close it!",
-	          cancelButtonText: "No, cancel it!",
-	          closeOnConfirm: false,
-	          closeOnCancel: false
-	        },
-	        function(isConfirm){
-         		if (isConfirm) {
-					$.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-						type: 'delete',
-						url: '{{ url("ticket") }}' + "/" + id,
-						data: {
-							'id': id
-						},
-						dataType: 'json',
-						success: function(response){
-							if(response.length > 0){
-								swal('Operation Successful','Ticket has been closed','success')
-							}else{
-								swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
-							}
-
-							table.ajax.reload()
-						},
-						error: function(){
-							swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
-						}
-					});
-		          } else {
-		            swal("Cancelled", "Operation Cancelled", "error");
-	          	}
-	        })
-	    } );
-
-	    $('#ticketTable').on( 'click', '.reopen', function () {
-	    	id = $(this).data('id')
-	        swal({
-	          title: "Are you sure?",
-	          text: "Do you really want to reopen the ticket.",
-	          type: "warning",
-	          showCancelButton: true,
-	          confirmButtonText: "Yes, reopen it!",
-	          cancelButtonText: "No, cancel it!",
-	          closeOnConfirm: false,
-	          closeOnCancel: false
-	        },
-	        function(isConfirm){
-	          if (isConfirm) {
-				$.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-					type: 'post',
-					url: '{{ url("ticket") }}' + "/" + id + '/reopen',
-					data: {
-						'id': id
-					},
-					dataType: 'json',
-					success: function(response){
-						if(response.length > 0){
-							swal('Operation Successful','Ticket has been reopened','success')
-			        		table.ajax.reload().order([ 0, "desc" ]);
-						}else{
-							swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
-						}
-					},
-					error: function(){
-						swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
-					}
-				});
-	          } else {
-	            swal("Cancelled", "Operation Cancelled", "error");
-	          }
-	        })
 	    } );
 	    @endif
 

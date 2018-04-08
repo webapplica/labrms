@@ -91,7 +91,7 @@
 	        ],
 	    } );
 
-	    $('#lostAndFoundTable').on('click','.claim',function(){
+	    $('#lostAndFoundTable').on('click','.claim',function(event){
 	    	id = $(this).data('id')
     		var button = $(this).button('loading')
 	    	event.preventDefault()

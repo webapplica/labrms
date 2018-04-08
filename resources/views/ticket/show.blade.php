@@ -86,12 +86,33 @@
     });
 
     $('.toolbar').html(`
-      @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-      <button id="assign" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
-        @if($ticket->type->name == 'Complaint')
-        <button id="resolve" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
+
+        @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+
+          @if( $ticket->status == 'open' || $ticket->status == 'Open' )
+
+            @if($ticket->type->name == 'Complaint' || $ticket->type->name == 'Incident' )
+
+            <button type="button" id="assign" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-share-alt"></span> Assign </button>
+
+            <button id="resolve" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-check"></span> Create an Action</button>
+            @endif
+
+          <button type="button" id="close" class="btn btn-danger btn-sm" data-id="{{ $ticket->id }}">
+            <span class="glyphicon glyphicon-off"></span> Close
+          </button>
+
+          @endif
+
+          @if( $ticket->status == 'closed' || $ticket->status == 'Closed' )
+
+          <button type="button" id="reopen" class="btn btn-info btn-sm" data-id="{{ $ticket->id }}">
+            <span class="glyphicon glyphicon-off"></span> Reopen
+          </button>
+
+          @endif
+
         @endif
-      @endif
     `)
 
     @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
@@ -107,36 +128,129 @@
           $('#transferTicketModal').modal('show')
       } );
 
-     @if($ticket->type->name == 'Complaint')
+      @if( $ticket->status == 'open' || $ticket->status == 'Open' )
 
-        $('#resolve').click( function () {
-              $('#resolve-id').val('{{ $ticket->id }}');
-                tag = '{{ $ticket->tag }}' 
-              if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
-              {
-                if(tag.indexOf('PC') !== -1)
+       @if($ticket->type->name == 'Complaint' || $ticket->type->name == 'Incident' )
+
+          $('#resolve').click( function () {
+                $('#resolve-id').val('{{ $ticket->id }}');
+                  tag = '{{ $ticket->tag }}' 
+                if(tag.indexOf('PC') !== -1 || tag.indexOf('Item') !== -1)
                 {
-                  $('#item-tag').val(tag.substr(4))
+                  if(tag.indexOf('PC') !== -1)
+                  {
+                    $('#item-tag').val(tag.substr(4))
+                  }
+
+                  if(tag.indexOf('Item') !== -1)
+                  {
+                    $('#item-tag').val(tag.substr(6))
+                  }
+
+                  $('#resolve-equipment').show()
+                }
+                else
+                {
+                  $('#item-tag').val("")
+                  $('#resolve-equipment').hide()
                 }
 
-                if(tag.indexOf('Item') !== -1)
-                {
-                  $('#item-tag').val(tag.substr(6))
-                }
+                $('#resolveTicketModal').modal('show')
+          } );
+          
+        @endif
 
-                $('#resolve-equipment').show()
-              }
-              else
-              {
-                $('#item-tag').val("")
-                $('#resolve-equipment').hide()
-              }
+      $('#close').on( 'click', function () {
+          id = $(this).data('id')
+          swal({
+            title: "Are you sure?",
+            text: "Do you really want to close the ticket?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, close it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+          },
+          function(isConfirm){
+            if (isConfirm) {
+                $.ajax({
+                  headers: {
+                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  type: 'delete',
+                  url: '{{ url("ticket") }}' + "/" + id,
+                  data: {
+                    'id': id
+                  },
+                  dataType: 'json',
+                  success: function(response){
+                    if(response.length > 0){
+                      swal('Operation Successful','Ticket has been closed','success')
+                    }else{
+                      swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
+                    }
 
-              $('#resolveTicketModal').modal('show')
-        } );
-        
+                    table.ajax.reload()
+                  },
+                  error: function(){
+                    swal('Operation Unsuccessful','Error occurred while closing a ticket','error')
+                  }
+                });
+              } else {
+                swal("Cancelled", "Operation Cancelled", "error");
+              }
+          })
+      } );
+
       @endif
+
+      @if( $ticket->status == 'closed' || $ticket->status == 'Closed' )
+
+      $('#reopen').on( 'click', function () {
+        id = $(this).data('id')
+          swal({
+            title: "Are you sure?",
+            text: "Do you really want to reopen the ticket.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, reopen it!",
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+          },
+          function(isConfirm){
+            if (isConfirm) {
+        $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+          type: 'post',
+          url: '{{ url("ticket") }}' + "/" + id + '/reopen',
+          data: {
+            'id': id
+          },
+          dataType: 'json',
+          success: function(response){
+            if(response.length > 0){
+              swal('Operation Successful','Ticket has been reopened','success')
+                  table.ajax.reload().order([ 0, "desc" ]);
+            }else{
+              swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
+            }
+          },
+          error: function(){
+            swal('Operation Unsuccessful','Error occurred while reopening a ticket','error')
+          }
+        });
+            } else {
+              swal("Cancelled", "Operation Cancelled", "error");
+            }
+          })
+      } );
+
       @endif
+    @endif
   })
 </script>
 @stop

@@ -470,7 +470,7 @@ class TicketsController extends Controller {
 		{
 			$ticket = App\Ticket::find($id);
 
-			if(count($ticket) > 0)
+			if($ticket && $ticket->count() > 0)
 			{
 				$ticket->reopen();
 				return json_encode('success');
