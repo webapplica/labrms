@@ -71,7 +71,7 @@
 			"processing": true,
 			ajax: "{{ url('inventory') }}",
 			columns: [
-					{ data: "id" },
+					{ data: "code" },
 					{ data: "model" },
 					{ data: "brand" },
 					{ data: "itemtype.name" },
@@ -81,13 +81,17 @@
 					{ data: "unprofiled" },
 					{ data: function(callback){
 						return `
+							<a href="{{ url('inventory') }}/`+callback.id+`/log" class="btn btn-primary btn-sm" type="button">
+								<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+								<span class="hidden-sm hidden-xs">Logs</span>
+							</a>
 							<a href="{{ url('item/profile/create?id=') }}`+callback.id+`" id="profile" class="btn btn-success btn-sm" type="button">
 								<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-								<span class="hidden-sm hidden-xs">Profile Items</span>
+								<span class="hidden-sm hidden-xs">Profile</span>
 							</a>
 							<a href="{{ url('item/profile') }}/`+callback.id+`" id="view" class="btn btn-sm btn-default" type="button">
 								<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-								<span class="hidden-sm hidden-xs">View Profiled Items</span>
+								<span class="hidden-sm hidden-xs">View</span>
 							</a>
 						`
 					}}

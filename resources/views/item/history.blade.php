@@ -3,14 +3,28 @@
 @section('content')
 <div class="container-fluid" id="page-body">
   <div class="col-md-12">
+
     <div class="panel panel-body table-responsive">
-      <legend class="text-muted"><h3>Item Profile History</h3></legend>
+
+      <legend class="text-muted">
+        <h3>Item Information</h3>
+      </legend>
+
       <ul class="breadcrumb">
-        <li><a href="{{ url('item/profile') }}">Items Profile</a></li>
-        <li class="active">{{ $itemprofile->property_number }}</li>
+        <li><a href="{{ url('item/profile') }}">Item</a></li>
+        <li class="active">{{ $itemprofile->local_id }}</li>
+        <li class="active">Logs</li>
       </ul>
+
       <table class="table table-hover table-bordered" id="itemProfileTable" cellspacing="0" width="100%">
         <thead>
+          <tr rowspan="2">
+              <th class="text-left" colspan="4">Local:  
+                <span style="font-weight:normal">{{ $itemprofile->local_id }}</span> 
+              </th>
+              <th class="text-left" colspan="4">
+              </th>
+          </tr>
           <tr rowspan="2">
               <th class="text-left" colspan="4">Property Number:  
                 <span style="font-weight:normal">{{ $itemprofile->property_number }}</span> 
@@ -49,7 +63,7 @@
           </tr>
         </thead>
         <tbody>
-        @forelse($itemprofile->tickets->sortBy('id') as $ticket)
+        @forelse($itemprofile->tickets->sortBy('created_at') as $ticket)
           <tr>
             <td>{{ $ticket->ticket_code }}</td>
             <td>{{ $ticket->ticket_type_name }}</td>

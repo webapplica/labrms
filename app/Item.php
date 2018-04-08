@@ -80,6 +80,13 @@ class Item extends \Eloquent{
 
 	);
 
+	public static $category = [
+		'equipment',
+		'fixtures',
+		'furniture',
+		'supplies'
+	];
+
 	protected $appends = [
 		'location_name', 'parsed_date_received', 'parsed_date_profiled'
 	];
@@ -153,6 +160,11 @@ class Item extends \Eloquent{
 	public function scopefindByLocalCode($query, $value)
 	{
 		return $query->where('local','=',$value);
+	}
+
+	public function scopeFindByStatus($query, $value)
+	{
+		return $query->where('status', '=', $value);
 	}
 
 	/*

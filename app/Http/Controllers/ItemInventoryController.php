@@ -203,6 +203,19 @@ class ItemInventoryController extends Controller {
 		return view('inventory.item.show');
 	}
 
+	public function showLogs(Request $request, $id)
+	{
+		$inventory = App\Inventory::with('logs')->find($id);
+
+		if($request->ajax())
+		{
+			return datatables($inventory->logs)->toJson();
+		}
+
+		return view('inventory.show')
+				->with('inventory', $inventory);
+	}
+
 	public function edit($id)
 	{
 		try

@@ -388,6 +388,9 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 			'as' => 'inventory.store',
 			'uses' => 'ItemInventoryController@store'
 		]);
+
+		Route::get('{inventory}/log', 'ItemInventoryController@showLogs');
+		
 		Route::get('{inventory}',[
 			'as' => 'inventory.show',
 			'uses' => 'ItemInventoryController@show'

@@ -1,22 +1,17 @@
 @extends('layouts.master-blue')
-@section('title')
-Inventory
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('content')
 <div class="container-fluid" id="page-body">
 @include('modal.inventory.item.assign')
 	<div class="col-md-12">
 		<div class="panel panel-body table-responsive">
+
 			<legend><h3 class="text-muted">{{ $inventory->itemtype->name }} Inventory</h3></legend>
 			<ol class="breadcrumb">
 			  <li><a href="{{ url('inventory') }}">Item Inventory</a></li>
 			  <li class="active">{{{ $inventory->model }}}</li>
 			</ol>
-			<p class="text-muted">Note: Actions will be shown when a row has been selected</p>	
+
 			<table class="table table-hover table-striped table-bordered table-condensed" id="itemProfileTable" cellspacing="0" width="100%">
 				<thead>
 		          <tr rowspan="2">

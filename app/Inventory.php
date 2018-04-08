@@ -145,6 +145,11 @@ class Inventory extends \Eloquent
     return $this->belongsTo('App\Unit','unit_name','name');
   }
 
+  public function logs()
+  {
+    return $this->hasMany('App\InventoryLog', 'inventory_id', 'id');
+  }
+
   public function receipts()
   {
     return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id')
@@ -176,10 +181,13 @@ class Inventory extends \Eloquent
 
   public function log($quantity, $details)
   {
+    $total = InventoryLog::findByInventoryID($this->id)->sum('quantity')  + $quantity ;
+    
     $log = new InventoryLog;
     $log->inventory_id = $this->id;
     $log->quantity = $quantity;
     $log->details = $details;
+    $log->remaining_balance = $total;
     $log->save();
   }
 

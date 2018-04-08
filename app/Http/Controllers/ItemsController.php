@@ -21,51 +21,44 @@ class ItemsController extends Controller {
 	public function index(Request $request)
 	{
 
+		$type = $request->get('type');
+		$status = $request->get('status');
+
 		if($request->ajax())
 		{
+			$item = new App\Item;
 
-			if($request->has('id'))
+			if($request->has('type'))
 			{
-				$id = $this->sanitizeString($request->get('id'));
-				$status = $this->sanitizeString($request->get('status'));
 
-				if($id == 'All' || $id == '')
-				{
-					return json_encode([
-						'data' => App\Item::where('status','=',$status)
-												->with('inventory.itemtype')
-												->with('receipt')
-												->get()
-					]);
-				}
-				else
+				if( ! ($type == 'All' || $type == '') )
 				{
 
-					$itemtype_id = App\ItemType::findByType($id)->pluck('id');
-					return json_encode([
-						'data' => App\Item::whereIn('inventory_id',App\Inventory::type($itemtype_id)->pluck('id'))
-												->where('status','=',$status)
-												->with('inventory.itemtype')
-												->with('receipt')
-												->withTrashed()
-												->get()
-					]);
+					$item = $item->whereHas('inventory', function($query) use ($type) {
+						$query->whereHas('itemtype', function($query) use ($type){
+							$query->findByType($type);
+						});
+					})->withTrashed();
 				}
 			}
 
-			return json_encode([
-				'data' => App\Item::with('inventory.itemtype')
-										->with('receipt')
-										->get()
-			]);
+			if( !$request->has('status') ) $status = 'working';
+
+			$item = $item->findByStatus($status)
+					->with('inventory.itemtype', 'receipt')
+					->get();
+
+			return datatables( $item )->toJson();
 		}
 
 		
-		$itemtype = App\ItemType::whereIn('category',['equipment','fixtures','furniture'])->get();
-		$status = App\Item::distinct('status')->pluck('status');
+		$item_types = App\ItemType::whereIn('category', ['equipment','fixtures','furniture'])->get();
+		$item_statuses = App\Item::distinct('status')->pluck('status');
 		return view('item.profile')
-				->with('status',$status)
-				->with('itemtype',$itemtype);
+				->with('item_statuses',$item_statuses)
+				->with('item_types',$item_types)
+				->with('current_status', $status)
+				->with('current_type', $type);
 	}
 
 
@@ -340,8 +333,8 @@ class ItemsController extends Controller {
 		|
 		*/
 		$item = App\Item::find($item);
-
-		if(count(App\Workstation::isWorkstation($item->property_number)) > 0)
+		$workstation = App\Workstation::isWorkstation($item->property_number);
+		if( $workstation && $workstation->count() > 0)
 		{
 			Session::flash('error-message','This item is used in a workstation. You cannot remove it here. You need to proceed to workstation');
 			return redirect("item/profile/assign");

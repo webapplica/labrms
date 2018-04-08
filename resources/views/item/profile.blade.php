@@ -32,6 +32,7 @@
 
 			table = $('#roomTable').DataTable({
 					"processing": true,
+					serverSide: true,
 			        ajax: "{{ url('item/profile') }}",
 			    	columnDefs:[
 						{ targets: 'no-sort', orderable: false },
@@ -50,14 +51,7 @@
 			            { data: "inventory.brand" },
 			            { data: "inventory.model" },
 			            { data: "inventory.itemtype.name" },
-			            { data: function(callback){
-								if(moment(callback.datereceived).isValid()){
-									return moment(callback.datereceived).format('MMM DD, YYYY');
-								}else{
-									return moment().format('MMM DD, YYYY');
-								}
-							}
-						},
+			            { data: 'parsed_date_received' },
 			            { data: "status" },
 				        { data: function(callback){
 				        	return "<a href='{{ url("item/profile/history") }}" + '/' +  callback.id + "' class='btn btn-sm btn-default btn-block'>View History</a>"
@@ -67,60 +61,39 @@
 
 			 	$("div.toolbar").html(`
 				  	Item type:
-					<div class="btn-group">
-					  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="itemtype" style="padding:10px;"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="itemtype-name"></span> <span class="caret"></span>
-					  </button>
-					  <ul class="dropdown-menu" id="itemtypeitems">
-							<li role="presentation" value='All'>
-								<a class="itemtype" data-id='All' data-name='All'>All</a>
-							</li>
-					      @foreach($itemtype as $itemtype)
-							<li role="presentation" value='{{ $itemtype->name }}'>
-								<a class="itemtype" data-id='{{ $itemtype->id }}' data-name='{{ $itemtype->name }}'>{{ $itemtype->name }}</a>
-							</li>
+					  <select class="item-filter form-control" id="item-types-list">
+							<option value='All'>
+								All
+							</option>
+					      @foreach($item_types as $type)
+							<option value='{{ $type->name }}' @if($current_type == $type->name) selected @endif>
+								{{ $type->name }}
+							</option>
 					    @endforeach
-					  </ul>
-					</div>
+					  </select>
 				  	Status:
-					<div class="btn-group">
-					  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="status" style="padding:10px;"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> <span id="status-name"></span> <span class="caret"></span>
-					  </button>
-					  <ul class="dropdown-menu" id="statusitems">
-						<li role="presentation" value='working'>
-							<a class="status" data-name='working'>working</a>
-						</li>
-						<li role="presentation" value='undermaintenance'>
-							<a class="status" data-name='undermaintenance'>undermaintenance</a>
-						</li>
-						<li role="presentation" value='condemn'>
-							<a class="status" data-name='condemn'>condemned</a>
-						</li>
-					  </ul>
-					</div>
+					  <select class="item-filter form-control" id="item-status-list">
+					  	@foreach($item_statuses as $status)
+						<option value='{{ $status }}' @if($current_status == $status) selected @endif>
+							{{ $status }}
+						</option>
+						@endforeach
+					  </select>
 				`);
-
-			$('#itemtype-name').text( $('.itemtype:first').text() )
-			$('#status-name').text( $('.status:first').text() )
-
 		}
 
-		$('.itemtype').on('click',function(){
-			$('#itemtype-name').text($(this).data('name'));
-			setFilter()
-		})
-
-		$('.status').on('click',function(){
-			$('#status-name').text($(this).data('name'));
+		$('.item-filter').on('change',function(){
 			setFilter()
 		})
 
 		function setFilter()
 		{
 
-			name = $('#itemtype-name').text()
-			status = $('#status-name').text()
-			url = "{{ url('item/profile') }}" + '?id=' + name + '&&status=' + status
+			name = $('#item-types-list').val()
+			status = $('#item-status-list').val()
+			url = "{{ url('item/profile') }}" + '?type=' + name + '&&status=' + status
 			table.ajax.url( url ).load();
+			history.pushState(null, '', url)
 		}
 
 		$('#page-body').show();

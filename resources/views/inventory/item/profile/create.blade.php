@@ -209,7 +209,21 @@ Item Profile
 				$('#quantity').val(30)
 			}
 
-			if( quantity <= 30 ) {
+			if( quantity == "" )
+			{
+					$('#quantity-error').remove()
+					$('#quantity').after('<p class="text-danger" id="quantity-error" style="font-size: 12px;">Warning! This is a required field.</p>')
+			}
+
+			if( !isNaN(quantity) && quantity != "" && quantity <= 0 )
+			{
+					$('#quantity-error').remove()
+					$('#quantity').after('<p class="text-danger" id="quantity-error" style="font-size: 12px;">Warning! Must have a minimum quantity of one(1).</p>')
+
+				$('#quantity').val(1)
+			}
+
+			if( quantity <= 30 && quantity >= 1 ) {
 
 				$('#quantity-error').fadeOut(400,function(){ $(this).remove() })
 			}

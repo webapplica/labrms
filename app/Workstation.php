@@ -327,7 +327,8 @@ class Workstation extends \Eloquent{
 				|--------------------------------------------------------------------------
 				|
 				*/
-				if(count($pc = Workstation::name($tag)->first()) > 0)
+				$pc = Workstation::name($tag)->first();
+				if( $pc && $pc->count() > 0)
 				{
 					return $pc;
 				}
