@@ -124,6 +124,14 @@ class User extends \Eloquent implements Authenticatable {
 		'email' => 'email'
 	);
 
+	public static $roles = [
+		0 => 'head',
+		1 => 'assistant',
+		2 => 'staff',
+		3 => 'faculty',
+		4 => 'student'
+	];
+
 	public function reservation()
 	{
 		return $this->hasOne('App\Reservation','user_id');

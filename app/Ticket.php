@@ -31,6 +31,7 @@ class Ticket extends \Eloquent{
 	public static $complaintRules = array(
 		'Ticket Subject' => 'required|min:2|max:100',
 		'Details' => 'required|min:2|max:500',
+		'Staff' => 'nullable|exists:users,id'
 	);
 
 	public static $maintenanceRules = array(
@@ -106,6 +107,16 @@ class Ticket extends \Eloquent{
 	public function room()
 	{
 		return $this->belongsToMany('App\Room','room_ticket','room_id','ticket_id');
+	}
+
+	public function parentTicket()
+	{
+		return $this->belongsTo('App\Ticket', 'parent_id', 'id');
+	}
+
+	public function childTickets()
+	{
+		return $this->hasMany('App\Ticket', 'parent_id', 'id');
 	}
 
 	public function pc()

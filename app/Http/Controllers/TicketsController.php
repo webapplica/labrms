@@ -72,6 +72,7 @@ class TicketsController extends Controller {
 		$author = Auth::user()->firstname." ".Auth::user()->middlename." ".Auth::user()->lastname;
 		$authored_tickets = App\Ticket::where('author','=',$author)
 										->count();
+
 		$open_tickets = App\Ticket::findByType('complaint')
 									->open()
 									->count();
@@ -124,7 +125,7 @@ class TicketsController extends Controller {
 		$tag = $this->sanitizeString($request->get('tag'));
 		$type = 'complaint';
 		$author = null;
-		$staffassigned = null;
+		$staff = null;
 
 		if($request->has('tickettype'))
 		{
@@ -156,14 +157,14 @@ class TicketsController extends Controller {
 		{
 			if($request->has('assign-to-staff'))
 			{
-				$staffassigned = $this->sanitizeString($request->get('staffassigned'));
+				$staff = $this->sanitizeString($request->get('staffassigned'));
 			}
 		}
 
 		$validator = Validator::make([
 				'Ticket Subject' => $title,
 				'Details' => $details,
-				'Author' => $author,
+				'Staff' => $staff
 			],App\Ticket::$complaintRules);
 
 		if($validator->fails())
@@ -174,6 +175,7 @@ class TicketsController extends Controller {
 		}
 
 		DB::beginTransaction();
+		
 		/**
 		 * find the type in database
 		 * if found, return the type information
@@ -187,7 +189,7 @@ class TicketsController extends Controller {
 		$ticket->title = $title;
 		$ticket->details = $details;
 		$ticket->type_id = $type->id;
-		$ticket->staff_id = $staffassigned;
+		$ticket->staff_id = $staff;
 		$ticket->status = 'Open';
 		$ticket->generate($tag);
 
