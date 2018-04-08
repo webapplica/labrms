@@ -279,6 +279,42 @@ class ItemInventoryController extends Controller {
 
 	}
 
+	public function release(Request $request)
+	{
+		$quantity = $request->get('quantity');
+		$purpose = $request->get('purpose');
+		$id = $request->get('id');
+
+		$validator = Validator::make([
+				'quantity' => $quantity,
+				'purpose' => $purpose,
+				'inventory' => $id,
+			], App\Inventory::$releaseRules);
+
+		if($validator->fails())
+		{
+
+			Session::flash('show-modal', true);
+			return back()->withErrors($validator)->withInput();
+		}
+
+		$inventory = App\Inventory::find($id);
+
+		if( abs($inventory->quantity) < abs($quantity) )
+		{
+
+			Session::flash('show-modal', true);
+			return back()->withErrors([
+					'Insufficient balance to release'
+				])->withInput();
+		}
+
+		$inventory->log( $quantity * -1, $purpose);
+
+		Session::flash('success-message', "$quantity Item Released");
+		return redirect("inventory/$id/log");
+	}
+
 	public function importView()
 	{
 		return view('inventory.item.import');

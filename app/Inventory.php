@@ -83,14 +83,20 @@ class Inventory extends \Eloquent
     'quantity', 'unprofiled'
   ];
 
+  public static $releaseRules = [
+    'purpose' => 'required|min:5|max:150',
+    'quantity' => 'required|integer',
+    'inventory' => 'required|exists:inventories,id'
+  ];
+
   public function getQuantityAttribute()
   {
-    return $this->receipts->sum('pivot.received_quantity');
+    return $this->logs->sum('quantity');
   }
 
   public function getUnprofiledAttribute()
   {
-    return $this->receipts->sum('pivot.received_quantity') - $this->receipts->sum('pivot.profiled_items');
+    return $this->logs->sum('quantity') - $this->receipts->sum('pivot.profiled_items');
   }
 
   public function getBrandAttribute($value)

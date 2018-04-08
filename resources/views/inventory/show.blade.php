@@ -1,6 +1,7 @@
 @extends('layouts.master-blue')
 
 @section('content')
+@include('modal.inventory.release')
 <div class="container-fluid" id="page-body">
 	<div class="" style="background-color: white;padding: 20px;">
 		<legend><h3 class="text-muted">Inventory Logs</h3></legend>
@@ -53,35 +54,41 @@
 {{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
-		init(1);
+		$('#inventoryTable').DataTable({
+			"processing": true,
+			serverSide: true,
+	        ajax: "{{ url("inventory/$inventory->id/log") }}",
+	    	columnDefs:[
+				{ targets: 'no-sort', orderable: false },
+	    	],
+		    language: {
+		        searchPlaceholder: "Search..."
+		    },
+	    	"dom": "<'row'<'col-sm-2'l><'col-sm-7'<'toolbar'>><'col-sm-3'f>>" +
+						    "<'row'<'col-sm-12'tr>>" +
+						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+	        columns: [
+	            { data: "id" },
+	            { data: "user_info" },
+	            { data: "details" },
+	            { data: "quantity_issued" },
+	            { data: "quantity_received" },
+	            { data: "remaining_balance" },
+	            { data: 'parsed_date' },
+	        ],
+	    } );
 
-		function init(data)
-		{
+	    $('.toolbar').html(`
+	    		<button type="button" id="release" class="btn btn-danger btn-sm" data-id="{{ $inventory->id }}" data-target="#releaseInventoryModal" data-toggle="modal">Release</button>
+	    	`)
 
-			table = $('#inventoryTable').DataTable({
-					"processing": true,
-					serverSide: true,
-			        ajax: "{{ url("inventory/$inventory->id/log") }}",
-			    	columnDefs:[
-						{ targets: 'no-sort', orderable: false },
-			    	],
-				    language: {
-				        searchPlaceholder: "Search..."
-				    },
-			    	"dom": "<'row'<'col-sm-2'l><'col-sm-7'<'toolbar'>><'col-sm-3'f>>" +
-								    "<'row'<'col-sm-12'tr>>" +
-								    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-			        columns: [
-			            { data: "id" },
-			            { data: "user_info" },
-			            { data: "details" },
-			            { data: "quantity_issued" },
-			            { data: "quantity_received" },
-			            { data: "remaining_balance" },
-			            { data: 'parsed_date' },
-			        ],
-			    } );
-		}
+		$('#releaseInventoryModal').on('show.bs.modal', function (e) {
+		  	$('#inventory-id').val('{{ $inventory->id }}')
+		})
+
+	    @if( Session::has('show-modal') )
+	    	$('#releaseInventoryModal').modal('show')
+	    @endif
 	} );
 </script>
 @stop

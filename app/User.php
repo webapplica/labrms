@@ -132,6 +132,16 @@ class User extends \Eloquent implements Authenticatable {
 		4 => 'student'
 	];
 
+	protected $appends = [
+		'fullname'
+	];
+
+	public function getFullnameAttribute()
+	{
+		$user = $this;
+		return $this->lastname . ", " . $this->firstname . " " . $this->middlename;
+	}
+
 	public function reservation()
 	{
 		return $this->hasOne('App\Reservation','user_id');

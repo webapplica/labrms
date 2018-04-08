@@ -384,6 +384,11 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 			'as' => 'inventory.create',
 			'uses' => 'ItemInventoryController@create'
 		]);
+
+		Route::post('release', [
+			'uses' => 'ItemInventoryController@release'
+		]);
+
 		Route::post('/',[
 			'as' => 'inventory.store',
 			'uses' => 'ItemInventoryController@store'
