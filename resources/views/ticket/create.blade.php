@@ -85,10 +85,13 @@ Create Ticket
 		margin: 10px;
 	}
 </style>
-<div class="container-fluid" id="page-body" style="margin-top: 40px;">
+<div class="container-fluid" id="page-body">
 	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>
 		<div class="panel panel-body panel-padding">
-			<h3 id="ticket-header" class="text-primary line-either-side"><span id="ticket-title-desc">Complaint</span> Ticket</h3>
+
+			<h3 id="ticket-header" class="text-primary line-either-side">
+				<span id="ticket-title-desc">Complaint</span> Ticket
+			</h3>
 			<ul class="breadcrumb">
 				<li>
 					<a href="{{ url('ticket') }}">Ticket</a>
@@ -97,41 +100,29 @@ Create Ticket
 					Create
 				</li>
 			</ul>
-		      @if (count($errors) > 0)
-		          <div class="alert alert-danger alert-dismissible" role="alert">
-		          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		              <ul style='margin-left: 10px;'>
-		                  @foreach ($errors->all() as $error)
-		                      <li>{{ $error }}</li>
-		                  @endforeach
-		              </ul>
-		          </div>
-		      @endif
+		      
+		    @include('errors.alert')
+
 			{{ Form::open(['method'=>'post','route'=>'ticket.store','class'=>'form-horizontal','id'=>'ticketForm']) }}
-				<div class="form-group">
-					<div class="col-sm-3">
-							<label>Ticket Number:</label>
-                   </div>
-					<div class="col-sm-9">
-							<div class="text-muted pull-right form-control" style="border:none;"><span class="text-muted">{{ $lastticket }}</span></div>
-                   </div>
-				</div>
+
 				<div class="form-group">
 					<div class="col-sm-3">
 							<label>Date:</label>
                    </div>
 					<div class="col-sm-9">
-							<div class="text-muted pull-right form-control" style="border:none;">
-								<span class="text-muted">{{ Carbon\Carbon::now()->toDayDateTimeString() }}</span>
-							</div>
+						<div class="text-muted pull-right form-control">
+							<span class="text-muted">
+								{{ Carbon\Carbon::now()->toDayDateTimeString() }}
+							</span>
+						</div>
                    </div>
 				</div>
 				<div class="form-group">
 					<div class="col-sm-3">
-	                        <label>Ticket Type:</label>
+                        <label>Ticket Type:</label>
                    </div>
 					<div class="col-sm-9">
-						<div class="form-control " style="border:none;">
+						<div class="form-control">
 							<span id="tickettype-name" class="text-muted">Complaint</span>
 	                        <div class="material-switch pull-right">
 	                            <input id="tickettype" name="tickettype" type="checkbox"/>
@@ -169,6 +160,7 @@ Create Ticket
 				</div>
 
 				@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2 )
+
 				<div class="form-group" id="author-form">
 					<div class="col-sm-3">
 						{{ Form::label('author','Complainant') }}
@@ -178,9 +170,12 @@ Create Ticket
 						'class'=>'form-control',
 						'placeholder' => Auth::user()->firstname.' '.Auth::user()->lastname
 						]) }}
-						<p class="text-muted text-warning" style="font-size:12px;">Leave this field blank if you're the <span>author/complainant</span>.</p>
+						<p class="text-muted text-warning" style="font-size:12px;">
+							Leave this field blank if you're the <span>author/complainant</span>.
+						</p>
 					</div>
 				</div>
+
 				@endif
 
 				@if(Auth::user()->accesslevel == 0)

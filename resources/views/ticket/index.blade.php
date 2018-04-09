@@ -1,8 +1,16 @@
 @extends('layouts.master-blue')
 
 @section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 {{ HTML::style(asset('css/font-awesome.min.css')) }}
+
+<style>
+	.simple-border {
+		border: #e5e5e5 solid 1px;
+		padding: 15px;
+		margin-bottom: 10px;
+	}
+
+</style>
 @endsection
 
 @section('content')
@@ -16,48 +24,24 @@
 	@endif
 
 	<div class="col-md-12" id="workstation-info">
-		<div class="panel panel-body table-responsive" style="padding: 25px 30px;">
-			<legend class="text-muted">Tickets</legend>
+		<div class="panel panel-body table-responsive">
+			<legend class="text-muted">
+				<h3>Tickets</h3>
+			</legend>
+
 			@include('errors.alert')
-			 <!--Counter Section-->
-	        <section id="counter_two" class="counter_two col-sm-12">
-	            <div class="overlay" style="border: none;">
-	                <div class="container">
-	                    <div class="row">
-	                        <div class="main_counter_two sections text-center text-muted">
-	                            <div>
-	                                <div class="row">
-	                                    <div class="col-sm-3 col-xs-12" style="padding: 0px 3px;">
-	                                        <div class="single_counter_two_right" style="padding: 2px 10px; margin: 2px 5px; background-color: #043D5D;color:white;">
-	                                            <h2 class="statistic-counter_two">{{ $total_tickets }}</h2>
-	                                            <p>Tickets Generated</p>
-	                                        </div>
-	                                    </div><!-- End off col-sm-3 -->
-	                                    <div class="col-sm-3 col-xs-12" style="padding: 0px 3px;">
-	                                        <div class="single_counter_two_right" style="padding: 2px 10px; margin: 2px 5px; background-color: #032E46;color:white;">
-	                                            <h2 class="statistic-counter_two">{{ $complaints }}</h2>
-	                                            <p>Unresolved Complaints</p>
-	                                        </div>
-	                                    </div><!-- End off col-sm-3 -->
-	                                    <div class="col-sm-3 col-xs-12" style="padding: 0px 3px;">
-	                                        <div class="single_counter_two_right" style="padding: 2px 10px; margin: 2px 5px; background-color: #0F595E;color:white;">
-	                                            <h2 class="statistic-counter_two">{{ $authored_tickets }}</h2>
-	                                            <p>Authored Tickets</p>
-	                                        </div>
-	                                    </div><!-- End off col-sm-3 -->
-	                                    <div class="col-sm-3 col-xs-12" style="padding: 0px 3px;">
-	                                        <div class="single_counter_two_right" style="padding: 2px 10px; margin: 2px 5px; background-color: #23B684;color:white;">
-	                                            <h2 class="statistic-counter_two">{{ $open_tickets }}</h2>
-	                                            <p>Open Tickets</p>
-	                                        </div>
-	                                    </div>
-	                                </div><!-- End off col-sm-3 -->
-	                            </div>
-	                        </div>
-	                    </div><!-- End off row -->
-	                </div><!-- End off container -->
-	            </div><!-- End off overlay -->
-        	</section><!-- End off Counter section -->
+
+			<div class="col-sm-4 simple-border">
+			Open Tickets: <span>{{ $open_tickets }}</span>
+			</div>
+
+			<div class="col-sm-4 simple-border">
+			Total Tickets: <span>{{ $total_tickets }}</span>
+			</div>
+
+			<div class="col-sm-4 simple-border">
+			Complaints: <span>{{ $complaints }}</span>
+			</div>
 
 			<table class="table table-hover table-bordered table-striped table-condensed" id="ticketTable">
 				<thead>
@@ -73,6 +57,7 @@
 				<tbody>
 				</tbody>
 			</table>
+
 		</div>
 	</div>
 </div>
@@ -80,8 +65,6 @@
 
 @section('script')
 {{ HTML::script(asset('js/moment.min.js')) }}
-<script type="text/javascript" src="{{ asset('js/jquery.waypoints.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/jquery.counterup.min.js') }}"></script>
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -129,9 +112,9 @@
 			</a>
 		`);
 
-		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
-
 		$('div.filter').html(`
+
+			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 			<span class='text-muted'>Type:</span>
 			<select name="type" class="form-control ticket-filter" id="ticket-type">
 				<option value="all">All</option>
@@ -141,6 +124,7 @@
 				</option>
 				@endforeach
 			</select>
+	    	@endif
 			<span class='text-muted'>Status:</span>
 			<select name="status" class="form-control ticket-filter" id="ticket-status">
 				@foreach($ticket_statuses as $stat)
@@ -159,14 +143,19 @@
 
 		function setUrl()
 		{
+			type = ""
+			status = ""
+			@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+			type = '&type=' + $('#ticket-type').val()
+	    	@endif
 
-			type = $('#ticket-type').val()
-			status = $('#ticket-status').val()
-			url = "{{ url('ticket') }}" + '?status=' + status + '&type=' + type
+			status = '?status=' + $('#ticket-status').val()
+			url = "{{ url('ticket') }}" +  status +  type
 			history.pushState(null, '', url);
 			return url
 		}
 
+		@if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 	    $('#ticketTable').on( 'click', '.resolve', function () {
 	    	id = $(this).data('id')
 	    	type = $(this).data('type')
@@ -202,13 +191,7 @@
 			}
 
 	    } );
-	    @endif
-
-	    // Counter
-        jQuery('.statistic-counter_two').counterUp({
-            delay: 10,
-            time: 2000
-        });
+    	@endif
     });
 </script>
 @stop

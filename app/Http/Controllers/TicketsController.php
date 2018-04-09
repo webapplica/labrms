@@ -57,7 +57,7 @@ class TicketsController extends Controller {
 			
 			if( Auth::user()->accesslevel == 3 || Auth::user()->accesslevel == 4  )
 			{
-				$query = $query->selfAuthored()->selfAssigned()->findByType('Complaint');
+				$query = $query->selfAuthored()->findByType('Complaint');
 			}
 
 			return datatables($query->get())->toJson();
@@ -65,18 +65,9 @@ class TicketsController extends Controller {
 
 		// total tickets
 		$total_tickets = App\Ticket::count();
-		$complaints = App\Ticket::findByType('complaint')
-						->open()
-						->count();
-
-		$author = Auth::user()->firstname." ".Auth::user()->middlename." ".Auth::user()->lastname;
-		$authored_tickets = App\Ticket::where('author','=',$author)
-										->count();
-
-		$open_tickets = App\Ticket::findByType('complaint')
-									->open()
-									->count();
-
+		$complaints = App\Ticket::selfAuthored()->findByType('complaint')->open()->count();
+		$authored_tickets = App\Ticket::selfAuthored()->count();
+		$open_tickets = App\Ticket::selfAuthored()->open()->count();
 		$ticket_types = App\TicketType::all();
 
 		return view('ticket.index')
@@ -339,6 +330,11 @@ class TicketsController extends Controller {
 
 		$ticket = App\Ticket::where('id','=',$id)->first();
 		$last_ticket = App\Ticket::orderBy('created_at', 'desc')->first();
+
+		if($ticket && $ticket->user_id != Auth::user()->id && ( in_array(Auth::user()->accesslevel, [ 3, 4] )) )
+		{
+			return redirect('ticket')->withErrors(['Invalid Ticket']);
+		}
 
 		if ( $last_ticket && $last_ticket->count() == 0 )
 		{
