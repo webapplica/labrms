@@ -21,7 +21,8 @@ class WorkstationController extends Controller {
 	{
 		if($request->ajax())
 		{
-			return json_encode(['data'=> App\Workstation::with('keyboard','avr','monitor','systemunit.roominventory.room')->get()]);
+			$workstations = App\Workstation::all();
+			return datatables($workstations)->toJson();
 		}
 
 		return view('workstation.index');
@@ -55,8 +56,8 @@ class WorkstationController extends Controller {
 		$name = $this->sanitizeString($request->get('name'));
 
 		$validator = Validator::make([
-			'Operating System Key' => $oskey,
-			'avr' => $avr,
+			'License Key' => $oskey,
+			'AVR' => $avr,
 			'Keyboard' => $keyboard,
 			'Monitor' => $monitor,
 			'System Unit' => $systemunit,
@@ -77,14 +78,35 @@ class WorkstationController extends Controller {
 		*/
 		DB::beginTransaction();
 
+		$systemunit = App\Item::findByPropertyNumber($systemunit)->pluck('id')->first();
+
+		if($monitor != "")
+			$monitor = App\Item::findByPropertyNumber($monitor)->first();
+		else
+			$monitor = null;
+
+		if($keyboard != "")
+			$keyboard = App\Item::findByPropertyNumber($keyboard)->first();
+		else
+			$keyboard = null;
+
+		if($avr != "")
+			$avr = App\Item::findByPropertyNumber($avr)->first();
+		else
+			$avr = null;
+
+		if($mouse != "")
+			$mouse = App\Item::findByLocalId($mouse)->first();
+		else
+			$mouse = null;
 
 		$workstation = new App\Workstation;
 		$workstation->systemunit_id = $systemunit;
-		$workstation->monitor_id = ($monitor == "" || is_null($monitor)) ? null : $monitor;
-		$workstation->avr_id = ($avr == "" || is_null($avr)) ? null : $avr;
-		$workstation->keyboard_id = ($keyboard == "" || is_null($keyboard)) ? null : $keyboard;
+		$workstation->monitor_id = $monitor;
+		$workstation->avr_id = $avr;
+		$workstation->keyboard_id = $keyboard;
 		$workstation->oskey = $oskey;
-		$workstation->mouse_id = ($mouse == "" || is_null($mouse)) ? null : $mouse;
+		$workstation->mouse_id = $mouse;
 		$workstation->assemble();
 
 		DB::commit();
@@ -105,90 +127,43 @@ class WorkstationController extends Controller {
 
 		if($request->ajax())
 		{
-			$workstation = App\Workstation::find($id);
-
-			return json_encode([
-				'data' => App\Software::whereHas('roomsoftware',function($query) use ($workstation) {
-								$query->where('room_id','=',$workstation->systemunit->roominventory->room_id);
-							})
-							->with('workstationsoftware.softwarelicense')
-							->get()
-			]);
+			$workstations = App\Workstation::with('softwares')->find($id);
+			return datatables($workstations)->toJson();
 		}
 
-		try{
+		$workstation = App\Workstation::find($id);
 
-			$room = "";
-			$software = "";
-			$workstation = App\App\Workstation::with('systemunit')
-						->with('keyboard')
-						->with('monitor')
-						->find($id);
+		if( App\Workstation::where('id', '=', $id)->count() <= 0 ) return view('errors.404');
 
-			if($workstation)
-			{
-				$room = $workstation->systemunit->roominventory->room_id;
+		$room = $workstation->systemunit->pluck('location')->first();
+		$software = App\Software::whereHas('rooms', function($query) use ($room) {
+						$query->where('room_id','=', $room);
+					})->get();
 
-				try
-				{
-					$software = App\Software::whereHas('roomsoftware',function($query) use ($room) {
-								$query->where('room_id','=',$room);
-							})->get();
-				} 
-				catch (Exception $e) 
-				{ 
-					$software = '';
-				}
-			}
-
-			$total = 0;
-			$mouseissued = 0;
-
-			$mouseissued = App\Ticket::whereIn('id',function($query) use ($id)
-			{
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	checks if workstation is in ticket
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				$query->where('workstation_id','=',$id)
-					->from('workstation_ticket')
-					->select('ticket_id')
-					->pluck('ticket_id');
-			})->where('details','like','%'.'As Mouse Brand' . '%')->count();
-
-			$total = App\Ticket::whereIn('id',function($query) use ($id)
-			{
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	checks if workstation is in ticket
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				$query->where('workstation_id','=',$id)
-					->from('workstation_ticket')
-					->select('ticket_id')
-					->pluck('ticket_id');
-			})->where('tickettype','=','Complaint')->count();
-
-			return view('workstation.show')
-				->with('workstation',$workstation)
-				->with('software',$software)
-				->with('total_tickets',$total)
-				->with('mouseissued',$mouseissued);
-		} 
-
-		catch (Exception $e) 
+		$mouse_issued = App\Ticket::whereIn('id', function($query) use ($id)
 		{
-			return redirect('workstation');
-		}
+			$query->where('workstation_id','=',$id)
+				->from('workstation_ticket')
+				->select('ticket_id');
+		})->where('details', 'like', "%As Mouse Brand%")->count();
+
+		$ticket_type = App\TicketType::firstOrCreate([
+			'name' => 'Receive'
+		]);
+
+		$total = App\Ticket::whereIn('id',function($query) use ($id)
+		{
+			$query->where('workstation_id','=',$id)
+				->from('workstation_ticket')
+				->select('ticket_id')
+				->pluck('ticket_id');
+		})->where('type_id','=', $ticket_type )->count();
+
+		return view('workstation.show')
+			->with('workstation',$workstation)
+			->with('software',$software)
+			->with('total_tickets',$total)
+			->with('mouseissued',$mouse_issued);
 	}
 
 	/**
@@ -199,9 +174,7 @@ class WorkstationController extends Controller {
 	 */
 	public function edit(Request $request, $id)
 	{
-		$workstation = App\Workstation::where('id','=',$id)
-					->with('keyboard','avr','monitor','systemunit.roominventory.room')
-					->first();
+		$workstation = App\Workstation::find($id);
 
 		return view('workstation.edit')
 			->with('workstation',$workstation);
@@ -409,7 +382,6 @@ class WorkstationController extends Controller {
 		if($request->ajax())
 		{
 
-			
 			return json_encode([
 				'data' => $ticket
 			]);

@@ -259,20 +259,14 @@ class ItemInventoryController extends Controller {
 				->withErrors($validator);
 		}
 
-		try {
-
-			$inventory = App\Inventory::find($id);
-			$inventory->brand = $brand;
-			$inventory->model = $model;
-			$inventory->itemtype_id = $itemtype;
-			$inventory->details = $details;
-			$inventory->warranty = $warranty;
-			$inventory->unit = $unit;
-			$inventory->save();
-		} catch(Exception $e) {
-			Session::flash('error-message','Unknown Error Encountered');
-			return redirect('inventory/item');
-		}
+		$inventory = App\Inventory::find($id);
+		$inventory->brand = $brand;
+		$inventory->model = $model;
+		$inventory->itemtype_id = $itemtype;
+		$inventory->details = $details;
+		$inventory->warranty = $warranty;
+		$inventory->unit = $unit;
+		$inventory->save();
 
 		Session::flash('success-message','Inventory content updated');
 		return redirect('inventory/item');

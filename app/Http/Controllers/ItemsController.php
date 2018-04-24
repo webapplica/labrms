@@ -755,8 +755,8 @@ class ItemsController extends Controller {
 									$query->where('name','=','Monitor');
 								});
 							})
-							->where('local_id','like','%'.$monitor.'%')
-							->pluck('local_id')
+							->where('property_number','like','%'.$monitor.'%')
+							->pluck('property_number')
 			);
 		}
 	}
@@ -799,8 +799,8 @@ class ItemsController extends Controller {
 									$query->where('name','=','Keyboard');
 								});
 							})
-							->where('local_id','like','%'.$keyboard.'%')
-							->pluck('local_id')
+							->where('property_number','like','%'.$keyboard.'%')
+							->pluck('property_number')
 			);
 		}
 	}
@@ -843,8 +843,8 @@ class ItemsController extends Controller {
 									$query->where('name','=','AVR');
 								});
 							})
-							->where('local_id','like','%'.$avr.'%')
-							->pluck('local_id')
+							->where('property_number','like','%'.$avr.'%')
+							->pluck('property_number')
 			);
 		}
 	}
@@ -887,8 +887,8 @@ class ItemsController extends Controller {
 									$query->where('name','=','System Unit');
 								});
 							})
-							->where('local_id','like','%'.$systemunit.'%')
-							->pluck('local_id')
+							->where('property_number','like','%'.$systemunit.'%')
+							->pluck('property_number')
 			);
 		}
 	}

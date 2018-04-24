@@ -15,7 +15,7 @@ class Ticket extends \Eloquent{
 	public $underrepair = "";
 	public $undermaintenance = false;
 
-	public $fillable = ['item_id','type','title','details','author','staff_id','ticket_id','status'];
+	public $fillable = ['item_id','type_id','title','details','author','staff_id','ticket_id','status'];
 	protected $primaryKey = 'id';
 
 	public static $rules = array(
