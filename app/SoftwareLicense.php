@@ -10,7 +10,7 @@ class SoftwareLicense extends \Eloquent{
 	protected $table = 'software_licenses';
 	protected $primaryKey = 'id';
 	public $timestamps = true;
-	public $fillable = [ 'sofware_id', 'key', 'usage'];
+	public $fillable = [ 'software_id', 'key', 'usage'];
 
 	public static $rules = array(
 		'Product Key' => 'required|string|min:5|max:100'

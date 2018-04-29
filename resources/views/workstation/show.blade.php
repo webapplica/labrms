@@ -150,7 +150,7 @@
 					<span>
 						<i class="fa fa-location-arrow" aria-hidden="true"></i> Location: 
 					</span>
-					<span>{{ $workstation->systemunit->location }}</span>
+					<span>{{ $workstation->systemunit->room->name }}</span>
 				</li>
 				<li class="text-muted" >
 					<span>
@@ -240,12 +240,12 @@ $(document).ready(function(){
         	{ data: "name"},
         	{ data: function(callback){
 
-        		key = callback.key
+        		key = callback.license_key
 
         		if(!key) key = "No License Key";
 
         		edit = `<button class="btn btn-default btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software='`+ callback.id +`' data-target='#updateSoftwareWorkstationModal' data-toggle='modal'>Change License</button>`
-        		remove = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`">Uninstall</button>`
+        		remove = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`" data-loading-text="Uninstalling...." autocomplete="off">Uninstall</button>`
 
         		if(key != 'No License Key' || callback.workstation != null)
     				return `Installed:  ` + " " + key + edit + remove
@@ -258,6 +258,7 @@ $(document).ready(function(){
     $('#softwareTable').on('click','.remove',function(){
     	pc = $(this).data('pc')
     	software = $(this).data('software')
+		var $btn = $(this).button('loading')
 
     	$.ajax({
             headers: {
@@ -276,6 +277,9 @@ $(document).ready(function(){
     		},
     		error: function(response){
 				swal('Error occurred while processing your request','','error')
+    		},
+    		complete: function(response){
+				$btn.button('reset')
     		}
     	})
 

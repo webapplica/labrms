@@ -91,24 +91,31 @@ class Software extends \Eloquent{
 
 	public function install($id, $license = null)
 	{
-		$otherFields = [
-			'software_id' => $this->id,
-			'usage' => 1
-		];
+		$license_addons = [];
+		
+		if(isset($license) && $license != "" && $license != null)
+		{
+			$otherFields = [
+				'software_id' => $this->id,
+				'usage' => 1
+			];
 
-		$license = SoftwareLicense::firstOrCreate([
-			'key' => $license
-		], $otherFields);
+			$license = SoftwareLicense::firstOrCreate([
+				'key' => $license
+			], $otherFields);
 
-		$this->workstations()->attach($id, [
-			'license_id' => $license->id
-		]);
+			$license_addons = [
+				'license_id' => $license->id
+			];
+		}
+
+		$this->workstations()->attach($id, $license_addons);
 
 		$workstation = Workstation::find($id);
 
 		$title = 'Software Installation';
 		$staff_id = Auth::user()->id;
-		$details = '$this->name installed on Workstation $workstation->name';
+		$details = "$this->name installed on Workstation $workstation->name";
 
 		$type = TicketType::firstOrCreate([
 			'name' => 'Maintenance'
@@ -130,7 +137,7 @@ class Software extends \Eloquent{
 
 		$title = 'Software Installation';
 		$staff_id = Auth::user()->id;
-		$details = '$this->name removed from Workstation $workstation->name';
+		$details = "$this->name removed from Workstation $workstation->name";
 
 		$type = TicketType::firstOrCreate([
 			'name' => 'Maintenance'
@@ -147,29 +154,31 @@ class Software extends \Eloquent{
 
 	public function updateSoftwareLicense($id, $license)
 	{
-
+		$license_addons = [];
 
 		if(isset($license) && $license != "" && $license != null)
 		{
 			$otherFields = [
+				'software_id' => $this->id,
 				'usage' => 1
 			];
 
 			$license = SoftwareLicense::firstOrCreate([
-				'software_id' => $this->id,
 				'key' => $license
 			], $otherFields);
 
-			$this->workstations()->attach($id, [
+			$license_addons = [
 				'license_id' => $license->id
-			]);
+			];
 		}
+
+		$this->workstations()->updateExistingPivot($id, $license_addons);
 
 		$workstation = Workstation::find($id);
 
 		$title = 'Software License Update';
 		$staff_id = Auth::user()->id;
-		$details = '$this->name license updated on Workstation $workstation->name';
+		$details = "$this->name license updated on Workstation $workstation->name";
 
 		$type = TicketType::firstOrCreate([
 			'name' => 'Maintenance'

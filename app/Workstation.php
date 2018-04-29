@@ -106,8 +106,8 @@ class Workstation extends \Eloquent{
 	public function softwares()
 	{
 		return $this->belongsToMany('App\Software','workstation_software','workstation_id','software_id')
-					->withPivot('license_id')
-					->withTimestamps();
+			->withPivot('license_id')
+			->withTimestamps();
 	}
 
 	public function tickets()

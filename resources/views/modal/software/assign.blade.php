@@ -22,7 +22,9 @@
 		            {{ Form::button('Assign',[
 		              'id' => 'assign-submit',
 		              'class'=>'btn btn-lg btn-primary btn-block',
-		              'name' => 'assign'
+		              'name' => 'assign',
+		              'data-loading-text' => 'Assigning...',
+		              'autocomplete' => 'off'
 		            ]) }}
 		          </div>
 		        </div>
@@ -36,6 +38,7 @@
 	$('#assignSoftwareModal').on('show.bs.modal',function(e){
 
 		$('#assign-submit').on('click',function(){
+			var $btn = $(this).button('loading')
 			$.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -55,6 +58,7 @@
 				},
 				complete: function(response){
 					$('#assignSoftwareModal').modal('hide')
+					$btn.button('reset')
 				}
 			})
 		})

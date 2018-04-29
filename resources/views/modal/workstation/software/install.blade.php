@@ -16,7 +16,7 @@
 				]) }}
 				</div>					
 				<div class="form-group">
-				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-deploy">Install</button>
+				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-deploy" data-loading-text="Installing..." autocomplete="off">Install</button>
 				</div>
 			</div> <!-- end of modal-body -->
 		</div> <!-- end of modal-content -->
@@ -35,6 +35,7 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 	})
 
 	$('#modal-deploy').on('click',function(){
+		var $btn = $(this).button('loading')
 		_url = '{{ url("workstation/software/$workstation->id/assign") }}'
 		console.log(_url)
 		$.ajax({
@@ -56,6 +57,7 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 			},
 			complete: function(){
 				$('#installSoftwareWorkstationModal').modal('hide')
+				$btn.button('reset')
 			}
 
 		})

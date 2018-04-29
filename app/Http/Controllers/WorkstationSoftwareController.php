@@ -16,7 +16,7 @@ class WorkstationSoftwareController extends Controller {
 		$softwares = DB::table('softwares')
 							->leftJoin('workstation_software', 'software_id', '=', 'softwares.id')
 							->leftJoin('software_licenses', 'workstation_software.license_id', '=', 'software_licenses.id')
-							->leftJoin('room_software', 'room_software.software_id', '=', 'softwares.id')
+							->Join('room_software', 'room_software.software_id', '=', 'softwares.id')
 							->leftJoin('rooms', 'room_software.room_id', '=', 'rooms.id')
 							->select(
 									'softwares.id as id', 'softwares.name as name', 
@@ -84,9 +84,9 @@ class WorkstationSoftwareController extends Controller {
 			if($request->ajax())
 			{
 				return response()->json([
-					'error-messages' => $validator->messages()->toJson(),
-					401
-				]);
+					'error-messages' => $validator->messages()->toJson()
+					
+				], 401);
 			}
 			else
 			{
@@ -96,8 +96,11 @@ class WorkstationSoftwareController extends Controller {
 					->withErrors($validator);
 			}
 		}
+		DB::beginTransaction();
 
 		App\Software::find($software)->install($id, $license);
+
+		DB::commit();
 
 		if($request->ajax())
 		{
@@ -105,6 +108,7 @@ class WorkstationSoftwareController extends Controller {
 				'message' => 'success',
 			], 200);
 		} 
+
 
 		Session::flash('success-message','Software added to workstation');
 		return redirect('workstation/view/software');
@@ -173,7 +177,11 @@ class WorkstationSoftwareController extends Controller {
 
 		}
 
+		DB::beginTransaction();
+
 		App\Software::find($software)->updateSoftwareLicense($id,$license);
+
+		DB::commit();
 
 		return response()->json([
 			'error-messages' => [],
@@ -220,7 +228,11 @@ class WorkstationSoftwareController extends Controller {
 				->withErrors($validator);
 		}
 
+		DB::beginTransaction();
+
 		App\Software::find($software)->uninstall($id);
+
+		DB::commit();
 
 
 		if($request->ajax())
