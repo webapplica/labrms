@@ -193,11 +193,10 @@ class ItemInventoryController extends Controller {
 
 		if($request->ajax())
 		{
-			return json_encode(
-				App\Inventory::where('id','=',$id)
+			$inventory = App\Inventory::where('id','=',$id)
 								->with('itemtype')
-								->first()
-			);
+								->first();
+			return json_encode( $inventory );
 		}
 
 		return view('inventory.item.show');
@@ -218,15 +217,10 @@ class ItemInventoryController extends Controller {
 
 	public function edit($id)
 	{
-		try
-		{
-			$inventory = App\Inventory::find($id);
-			return view('inventory.item.edit')
-					->with('inventory',$inventory);
-		} catch ( Exception $e ) {
-			Session::flash('success-message','Problems occur while sending your data to the server');
-			return redirect('inventory/item');
-		}
+		$inventory = App\Inventory::find($id);
+
+		return view('inventory.item.edit')
+				->with('inventory',$inventory);
 	}
 
 	public function update(Request $request, $id)
@@ -299,8 +293,8 @@ class ItemInventoryController extends Controller {
 
 			Session::flash('show-modal', true);
 			return back()->withErrors([
-					'Insufficient balance to release'
-				])->withInput();
+								'Insufficient balance to release'
+							])->withInput();
 		}
 
 		$inventory->log( $quantity * -1, $purpose);
@@ -341,9 +335,10 @@ class ItemInventoryController extends Controller {
 		if($request->ajax())
 		{
 			$brand = $this->sanitizeString($request->get('term'));
-			return json_encode(
-				App\Inventory::where('brand','like','%'.$brand.'%')->distinct()->pluck('brand')
-			);
+			$inventory = App\Inventory::where('brand','like','%'.$brand.'%')
+										->distinct()
+										->pluck('brand');
+			return json_encode( $inventory );
 		}
 	}
 
@@ -352,9 +347,8 @@ class ItemInventoryController extends Controller {
 		if($request->ajax())
 		{
 			$model = $this->sanitizeString($request->get('term'));
-			return json_encode(
-				App\Inventory::where('model','like','%'.$model.'%')->distinct()->pluck('model')
-			);
+			$inventory = App\Inventory::where('model','like','%'.$model.'%')->distinct()->pluck('model');
+			return json_encode( $inventory );
 		}
 	}
 

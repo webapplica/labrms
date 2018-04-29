@@ -12,27 +12,6 @@ use Illuminate\Support\Facades\Input;
 
 class SoftwareLicenseController extends Controller {
 
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		//
-	}
-
-
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
 
 	/**
 	 * Store a newly created resource in storage.
@@ -90,30 +69,6 @@ class SoftwareLicenseController extends Controller {
 
 
 	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
-
-	/**
 	 * Remove the specified resource from storage.
 	 *
 	 * @param  int  $id
@@ -131,6 +86,7 @@ class SoftwareLicenseController extends Controller {
 
 		$license = SoftwareLicense::find($id);
 		$license->delete();
+		
 		Session::flash('success-message','Software License removed');
 		return redirect('maintenance/activity');
 	}
@@ -141,9 +97,8 @@ class SoftwareLicenseController extends Controller {
 		{
 			$id = $this->sanitizeString($id);
 			$software = Software::find($id);
-			$softwarelicense = Softwarelicense::where('id',$software->id)
-																->select('id','key')->get();
-			return json_encode($softwarelicense);
+
+			return json_encode($software->licenses);
 		}
 	}
 
@@ -153,11 +108,10 @@ class SoftwareLicenseController extends Controller {
 		{
 			$id = $this->sanitizeString($id);
 			$licensekey = $this->sanitizeString(Input::get('term'));
-			return json_encode(
-				SoftwareLicense::where('software_id','=',$id)
-								->where('key','like','%'.$licensekey.'%')
-								->lists('key')
-			);
+			$licenses = SoftwareLicense::where('software_id','=',$id)
+								->where('key', 'like', "%$licensekey%")
+								->pluck('key');
+			return json_encode( $licenses );
 		}
 
 	}

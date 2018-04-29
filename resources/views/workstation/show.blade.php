@@ -69,10 +69,12 @@
 	}
 </style>
 @stop
+
 @section('content')
-<div class="container-fluid" id="page-body">
 @include('modal.workstation.software.install')
-	@include('modal.workstation.software.edit')
+@include('modal.workstation.software.edit')
+
+<div class="container-fluid" id="page-body">
 	<div class="panel panel-default" style="padding:0px 20px">
 		<div class="panel-body">
 			<div class="col-sm-12">
@@ -202,100 +204,92 @@
 	</div>
 </div>
 @stop
-@section('script')
 
+@section('script')
 <script type="text/javascript">
 $(document).ready(function(){
 
-	// var historyTable = $('#historyTable').DataTable( {
-	//     language: {
-	//         searchPlaceholder: "Search..."
-	//     },
-	//     order: [[ 0, "desc" ]],
-	// 	"processing": true,
- //        ajax: "{{ url("workstation/$workstation->id") }}",
- //        columns: [
- //        	{ data: 'id' },
- //        	{ data: 'ticketname' },
- //        	{ data: 'details' },
- //        	{ data: 'author' },
- //        	{ data: 'status' }
- //        ],
- //    } );
+	var historyTable = $('#historyTable').DataTable( {
+		serverSide: true,
+		"processing": true,
+	    language: {
+	        searchPlaceholder: "Search..."
+	    },
+	    order: [[ 0, "desc" ]],
+        ajax: "{{ url("workstation/$workstation->id") }}",
+        columns: [
+        	{ data: 'id' },
+        	{ data: 'title' },
+        	{ data: 'details' },
+        	{ data: 'author' },
+        	{ data: 'status' }
+        ],
+    } );
 
-	// var table = $('#softwareTable').DataTable( {
-	// 	"pageLength": 100,
- //  		select: {
- //  			style: 'multiple'
- //  		},
- //    	columnDefs:[
-	// 		{ targets: 'no-sort', orderable: false },
- //    	],
-	//     language: {
-	//         searchPlaceholder: "Search..."
-	//     },
-	// 	"processing": true,
- //        ajax: "{{ url("workstation/$workstation->id") }}",
- //        columns: [
- //        	{ data: function(callback){
- //        		return callback.softwarename
- //        	}},
- //        	{ data: function(callback){
+	var table = $('#softwareTable').DataTable( {
+		serverSide: true,
+		"processing": true,
+    	columnDefs:[
+			{ targets: 'no-sort', orderable: false },
+    	],
+	    language: {
+	        searchPlaceholder: "Search..."
+	    },
+        ajax: "{{ url("workstation/$workstation->id/softwares") }}",
+        columns: [
+        	{ data: "name"},
+        	{ data: function(callback){
 
- //        		edit = `<button class="btn btn-default btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software='`+ callback.id +`' data-target='#updateSoftwareWorkstationModal' data-toggle='modal'>Change License</button>`
- //        		button = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`">Uninstall</button>`
+        		key = callback.key
 
- //        		try
- //        		{
- //        			return `Installed:  ` + " " + callback.pcsoftware.softwarelicense.key + edit + button
- //        		} catch (e) {
- //        			try {
- //        				if(!callback.pcsoftware.isEmpty)
- //        				return `Installed` + edit + button
- //        			} catch (e) {
- //        				return "<i>Not Installed</i>  <button class='install btn btn-success btn-sm pull-right' data-pc='{{ $workstation->id }}' data-software='"+ callback.id +"' data-target='#installSoftwareWorkstationModal' data-toggle='modal'>Install</button>"
- //        			}
- //        		}
- //        	}}
- //        ],
- //    } );
+        		if(!key) key = "No License Key";
 
- //    $('#softwareTable').on('click','.remove',function(){
- //    	pc = $(this).data('pc')
- //    	software = $(this).data('software')
+        		edit = `<button class="btn btn-default btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software='`+ callback.id +`' data-target='#updateSoftwareWorkstationModal' data-toggle='modal'>Change License</button>`
+        		remove = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`">Uninstall</button>`
 
- //    	$.ajax({
- //            headers: {
- //                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
- //            },
- //    		type: 'delete',
- //    		url: '{{ url("workstation/software/$workstation->id/remove") }}',
- //    		data: {
- //    			'software': software
- //    		},
- //    		dataType: 'json',
- //    		success: function(response){
- //    			if(response == 'success')
- //    				swal('Operation Success','','success')
- //    			else
- //    				swal('Error occurred while processing your request','','error')
+        		if(key != 'No License Key' || callback.workstation != null)
+    				return `Installed:  ` + " " + key + edit + remove
+    			else
+    				return "<i>Not Installed</i>  <button class='install btn btn-success btn-sm pull-right' data-pc='{{ $workstation->id }}' data-software='"+ callback.id +"' data-target='#installSoftwareWorkstationModal' data-toggle='modal'>Install</button>"
+        	}}
+        ],
+    } );
 
- //    			table.ajax.reload()
- //    			historyTable.ajax.reload()
- //    		}
- //    	})
+    $('#softwareTable').on('click','.remove',function(){
+    	pc = $(this).data('pc')
+    	software = $(this).data('software')
 
- //    })
+    	$.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+    		type: 'delete',
+    		url: '{{ url("workstation/software/$workstation->id/remove") }}',
+    		data: {
+    			'software': software
+    		},
+    		dataType: 'json',
+    		success: function(response){
+				swal('Operation Success','','success')
+    			table.ajax.reload()
+    			historyTable.ajax.reload()
+    		},
+    		error: function(response){
+				swal('Error occurred while processing your request','','error')
+    		}
+    	})
 
- //    $('#installSoftwareWorkstationModal').on('hide.bs.modal',function(){
- //    	table.ajax.reload()
-	// 	historyTable.ajax.reload()
- //    })
+    })
 
- //    $('#updateSoftwareWorkstationModal').on('hide.bs.modal',function(){
- //    	table.ajax.reload()
-	// 	historyTable.ajax.reload()
- //    })
+    $('#installSoftwareWorkstationModal').on('hide.bs.modal',function(){
+    	table.ajax.reload()
+		historyTable.ajax.reload()
+    })
+
+    $('#updateSoftwareWorkstationModal').on('hide.bs.modal',function(){
+    	table.ajax.reload()
+		historyTable.ajax.reload()
+    })
 
 })
 </script>

@@ -71,10 +71,14 @@
 	            { data: "mouse_local" },
 	            { data: 'location' },
 	            { data: function(callback){
-	            	return `<a href="{{ url('workstation') }}/`+callback.id+`" class="btn btn-default btn-sm btn-block"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>`
+	            	return `<a href="{{ url('workstation') }}/`+callback.id+`" class="btn btn-default btn-sm btn-block btn-stop-select"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>`
 	            } }
 	        ],
 	    } );
+
+	    $('#workstationTable').on('click', '.btn-stop-select', function(e){
+	    	e.stopPropagation();
+	    })
 
 	 	$("div.toolbar").html(`
 

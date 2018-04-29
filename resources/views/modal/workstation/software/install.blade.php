@@ -28,6 +28,7 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 	pc_id = $(event.relatedTarget).data('pc')
 	software_id = $(event.relatedTarget).data('software')
 	_url = "{{ url('get/software') }}" + '/' + software_id + '/license/all'
+	
 	$('#softwarelicense').autocomplete({
 		source: _url,
 		"appendTo": "#installSoftwareWorkstationModal"
@@ -48,12 +49,12 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 			},
 			dataType: 'json',
 			success: function(response){
-				if(response == 'success') {
-					swal('Operation Success','','success')
-				} else {
-					swal('Error occurred while processing your data','','error')
-				}
-
+				swal('Operation Success','','success')
+			},
+			error: function(response){
+				swal('Error occurred while processing your data','','error')
+			},
+			complete: function(){
 				$('#installSoftwareWorkstationModal').modal('hide')
 			}
 

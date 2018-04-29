@@ -112,7 +112,7 @@ class Workstation extends \Eloquent{
 
 	public function tickets()
 	{
-		return $this->belongsToMany('App\Ticket','pc_ticket','pc_id','ticket_id');
+		return $this->belongsToMany('App\Ticket','workstation_ticket','workstation_id','ticket_id');
 	}
 
 	public function scopeName($query,$value)
@@ -187,7 +187,7 @@ class Workstation extends \Eloquent{
 		$ticket->details = $details;
 		$ticket->staff_id = $staff_id;
 		$ticket->status = 'Closed';
-		$ticket->generate($this->id);
+		$ticket->generate($this->systemunit->id);
     }
 
     public function updateParts()
@@ -249,7 +249,7 @@ class Workstation extends \Eloquent{
 		$ticket->details = $details;
 		$ticket->staffassigned = $staffassigned;
 		$ticket->status = 'Closed';
-		$ticket->generate($this->id);
+		$ticket->generate($this->systemunit->id);
     }
 
     public static function condemn($id,$systemunit,$monitor,$keyboard,$avr)
@@ -293,7 +293,16 @@ class Workstation extends \Eloquent{
 		$staffassigned = Auth::user()->id;
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
     	$details = `Workstation condemned on` . Carbon::now()->toDayDateTimeString() . 'by ' . $author;
-    	Ticket::generateWorkstationTicket($pc->id,'condemn',$name,$details,$author,$staffassigned,null,'Closed');
+
+		$ticket = new Ticket;
+		$ticket->type = 'Maintenance';
+		$ticket->name = $name;
+		$ticket->details = $details;
+		$ticket->staff_id = $staff_id;
+		$ticket->status = 'Closed';
+		$ticket->author = $author;
+		$ticket->generate($this->systemunit->id);
+
     	$pc->delete();
     }
 
@@ -336,15 +345,6 @@ class Workstation extends \Eloquent{
     	if( $item && $item->count() > 0) 
     	{
 		    
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get property number id
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-    		$id = Workstation::getID($item);
 		    
 			/*
 			|--------------------------------------------------------------------------
@@ -354,10 +354,11 @@ class Workstation extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-	    	$pc = Workstation::where('systemunit_id', '=', $id)
-	    		->orWhere('monitor_id','=',$id)
-	    		->orWhere('avr_id','=',$id)
-	    		->orWhere('keyboard_id','=',$id)
+	    	$pc = Workstation::where('systemunit_id', '=', $item->id)
+	    		->orWhere('monitor_id','=',$item->id)
+	    		->orWhere('avr_id','=',$item->id)
+	    		->orWhere('keyboard_id','=',$item->id)
+	    		->orWhere('mouse_id','=',$item->id)
 	    		->first();
 		    
 			/*
@@ -413,6 +414,17 @@ class Workstation extends \Eloquent{
 			if( $pc && $pc->count() > 0)
 			{
 				return $pc;
+			}
+			else
+			{
+
+		    	$pc = Workstation::where('systemunit_id', '=', $tag)
+		    		->orWhere('monitor_id','=',$tag)
+		    		->orWhere('avr_id','=',$tag)
+		    		->orWhere('keyboard_id','=',$tag)
+		    		->orWhere('mouse_id','=',$tag);
+
+		    	if($pc->count() > 0) return $pc->first();
 			}
 			
 			return null;
@@ -554,7 +566,7 @@ class Workstation extends \Eloquent{
 		$pc->save();
 
 		$title = "Item Transfer";
-		$details = "Workstation location has been set to $room";
+		$details = "Workstation location has been set to $room->name";
 		$staff_id = Auth::user()->id;
 		$ticket_id = null;
 		$status = 'Closed';
@@ -570,7 +582,7 @@ class Workstation extends \Eloquent{
 		$ticket->parent_id = $ticket_id;
 		$ticket->status = $status;
 		$ticket->type_id = $type->id;
-		$ticket->generate($pc->id);
+		$ticket->generate($pc->systemunit->id);
     }
 
     /*

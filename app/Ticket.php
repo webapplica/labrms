@@ -274,8 +274,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if( ($pc = Workstation::isWorkstation($tag)) )
+		if( $pc = Workstation::isWorkstation($tag) )
 		{
+
 			if($this->undermaintenance) Workstation::setItemStatus($pc->id,'undermaintenance');
 			$pc->tickets()->attach($this->id);
 		} 

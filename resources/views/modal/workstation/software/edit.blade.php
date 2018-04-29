@@ -48,11 +48,12 @@ $('#updateSoftwareWorkstationModal').on('show.bs.modal',function(event){
 			},
 			dataType: 'json',
 			success: function(response){
-				if(response == 'success') {
-					swal('Operation Success','','success')
-				} else {
-					swal('Error occurred while processing your data','','error')
-				}
+				swal('Operation Success','','success')
+			},
+			error: function(response){
+				swal('Error occurred while processing your data','','error')
+			},
+			complete: function(response){
 				$('#updateSoftwareWorkstationModal').modal('hide')
 			}
 

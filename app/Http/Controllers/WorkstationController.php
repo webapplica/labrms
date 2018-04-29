@@ -127,8 +127,8 @@ class WorkstationController extends Controller {
 
 		if($request->ajax())
 		{
-			$workstations = App\Workstation::with('softwares')->find($id);
-			return datatables($workstations)->toJson();
+			$workstation = App\Workstation::find($id);
+			return datatables($workstation->tickets)->toJson();
 		}
 
 		$workstation = App\Workstation::find($id);
@@ -147,10 +147,7 @@ class WorkstationController extends Controller {
 				->select('ticket_id');
 		})->where('details', 'like', "%As Mouse Brand%")->count();
 
-		$ticket_type = App\TicketType::firstOrCreate([
-			'name' => 'Receive'
-		]);
-
+		$ticket_type = App\TicketType::firstOrCreate([ 'name' => 'Receive' ]);
 		$total = App\Ticket::whereIn('id',function($query) use ($id)
 		{
 			$query->where('workstation_id','=',$id)
@@ -285,30 +282,8 @@ class WorkstationController extends Controller {
 	public function deploy(Request $request)
 	{
 
-		/**
-		*
-		*	check if the request is ajax
-		*
-		*/
-		if($request->ajax())
-		{
-			$room = $this->sanitizeString($request->get('room'));
-			$workstation = $this->sanitizeString($request->get('items'));
-			$name = $this->sanitizeString($request->get('name'));
+		DB::beginTransaction();
 
-			App\Workstation::setWorkstationLocation($workstation,$room);
-			$workstation = App\Workstation::find($workstation);
-			$workstation->name = $name;
-			$workstation->save();
-
-			return json_encode('success');
-		}
-
-		/**
-		*
-		*	normal request
-		*
-		*/
 		$room = $this->sanitizeString($request->get('room'));
 		$workstation = $this->sanitizeString($request->get('items'));
 		$name = $this->sanitizeString($request->get('name'));
@@ -317,6 +292,18 @@ class WorkstationController extends Controller {
 		$workstation = App\Workstation::find($workstation);
 		$workstation->name = $name;
 		$workstation->save();
+
+		DB::commit();
+
+		/**
+		*
+		*	check if the request is ajax
+		*
+		*/
+		if($request->ajax())
+		{
+			return json_encode('success');
+		}
 
 		Session::flash('success-message','Workstation deployed');
 		return redirect('workstation/form/deployment');
