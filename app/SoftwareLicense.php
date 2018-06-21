@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class SoftwareLicense extends \Eloquent{
 	
 	protected $table = 'software_licenses';
-	
-	public $timestamps = true;
-
-	public $fillable = ['sofware_id','key','multipleuse','inuse'];
 	protected $primaryKey = 'id';
+	public $timestamps = true;
+	public $fillable = [ 'software_id', 'key', 'usage'];
+
 	public static $rules = array(
 		'Product Key' => 'required|string|min:5|max:100'
 	);
@@ -47,9 +46,7 @@ class SoftwareLicense extends \Eloquent{
 	*/
 	public static function uninstall($id){
 		$softwarelicense = SoftwareLicense::find($id);
-		if($softwarelicense->inuse > 0){
-			$softwarelicense->inuse = $softwarelicense->inuse - 1;
-		}
+		$softwarelicense->inuse = ($softwarelicense->inuse > 0) ? $softwarelicense->inuse - 1 : 0;
 		$softwarelicense->save();
 	}
 

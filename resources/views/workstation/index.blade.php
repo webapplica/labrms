@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Workstation
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{-- css for select --}}
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
@@ -23,7 +17,7 @@ Workstation
 @include('modal.workstation.condemn')
 	<div class="col-md-12" id="workstation-info">
 		<div class="panel panel-body  table-responsive">
-			<legend><h3 class="text-muted">Workstation</h3></legend>
+			<legend><h3 class="text-muted">WorkstationS</h3></legend>
 			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
 				<table class="table table-hover table-striped table-bordered" id="workstationTable">
 					<thead>
@@ -51,13 +45,6 @@ Workstation
 
 	$(document).ready(function() {
 
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
     	var table = $('#workstationTable').DataTable( {
 	  		select: {
 	  			style: 'single'
@@ -75,88 +62,23 @@ Workstation
 	        ajax: "{{ url('workstation') }}",
 	        columns: [
 	        	{ data: 'id' },
+	            { data: "oskey" },
+	            { data: "name" },
+	            { data: "system_unit_local" },
+	            { data: "monitor_local" },
+	            { data: "avr_local" },
+	            { data: "keyboard_local" },
+	            { data: "mouse_local" },
+	            { data: 'location' },
 	            { data: function(callback){
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.oskey;
-	            		if (ret_val == "" || ret_val == null) ret_val = 'None';
-	            	} catch ( error){ 
-	            		ret_val = 'None';
-	            	}
-	            	return ret_val;
-	            }},
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.name;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.systemunit.propertynumber;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.monitor.propertynumber;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.avr.propertynumber;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.keyboard.propertynumber;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback){
-	            	if(callback.mouse) {
-	            		return callback.mouse;
-	            	} else{
-	            		return 'None';
-	            	}
-	            } },
-	            { data: function(callback)
-	            {
-	            	var ret_val;
-	            	try{
-	            		ret_val = callback.systemunit.roominventory.room.name;
-	            	} catch (error) {
-	            		ret_val = 'None';
-	            	} 
-            		return ret_val;
-	            } },
-	            { data: function(callback){
-	            	return `<a href="{{ url('workstation') }}/`+callback.id+`" class="btn btn-default btn-sm btn-block"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>`
+	            	return `<a href="{{ url('workstation') }}/`+callback.id+`" class="btn btn-default btn-sm btn-block btn-stop-select"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>`
 	            } }
 	        ],
 	    } );
+
+	    $('#workstationTable').on('click', '.btn-stop-select', function(e){
+	    	e.stopPropagation();
+	    })
 
 	 	$("div.toolbar").html(`
 
@@ -179,9 +101,8 @@ Workstation
  
     table
         .on( 'select', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
-            if(table.row('.selected').data().systemunit.roominventory.room.name == 'Server')
+
+            if(table.row('.selected').data().systemunit.room.name == 'Server')
             {
             	$('#deploy').show()
             }
@@ -192,14 +113,15 @@ Workstation
 
             $('#update').show()
             $('#delete').show()
+
         } )
         .on( 'deselect', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
+
             $('#deploy').hide()
             $('#transfer').hide()
             $('#update').hide()
             $('#delete').hide()
+
         } );
 
 		$('#deploy').on('click',function(){
@@ -499,8 +421,6 @@ Workstation
 			}
 		});
 	    })
-
-		$('#page-body').show();
   	});
 </script>
 @stop

@@ -16,7 +16,7 @@
 				]) }}
 				</div>					
 				<div class="form-group">
-				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-deploy">Install</button>
+				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-deploy" data-loading-text="Installing..." autocomplete="off">Install</button>
 				</div>
 			</div> <!-- end of modal-body -->
 		</div> <!-- end of modal-content -->
@@ -28,12 +28,14 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 	pc_id = $(event.relatedTarget).data('pc')
 	software_id = $(event.relatedTarget).data('software')
 	_url = "{{ url('get/software') }}" + '/' + software_id + '/license/all'
+	
 	$('#softwarelicense').autocomplete({
 		source: _url,
 		"appendTo": "#installSoftwareWorkstationModal"
 	})
 
 	$('#modal-deploy').on('click',function(){
+		var $btn = $(this).button('loading')
 		_url = '{{ url("workstation/software/$workstation->id/assign") }}'
 		console.log(_url)
 		$.ajax({
@@ -48,13 +50,14 @@ $('#installSoftwareWorkstationModal').on('show.bs.modal',function(event){
 			},
 			dataType: 'json',
 			success: function(response){
-				if(response == 'success') {
-					swal('Operation Success','','success')
-				} else {
-					swal('Error occurred while processing your data','','error')
-				}
-
+				swal('Operation Success','','success')
+			},
+			error: function(response){
+				swal('Error occurred while processing your data','','error')
+			},
+			complete: function(){
 				$('#installSoftwareWorkstationModal').modal('hide')
+				$btn.button('reset')
 			}
 
 		})

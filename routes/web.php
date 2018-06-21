@@ -793,6 +793,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 		'uses' => 'WorkstationController@transfer'
 	]);
 
+	Route::get('workstation/{id}/softwares', 'WorkstationSoftwareController@getAllWorkstationSoftware');
 	/*
 	|--------------------------------------------------------------------------
 	| workstation restful routing

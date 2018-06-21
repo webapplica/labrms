@@ -1,47 +1,35 @@
 @extends('layouts.master-blue')
-@section('title')
-Workstation | Add
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-{{ HTML::style(asset('css/jquery-ui.min.css')) }}
-{{ HTML::style(asset('css/animate.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
-<style>
 
-  .form-control{
-    margin: 10px 0px;
+@section('style')
+<style tyle="text/css">
+  .form-group > .col-sm-12 > span {
+    display: block;
+    font-size: 0.9em;
+    color: #545659;
   }
 </style>
-@stop
+@endsection
+
 @section('content')
 <div class="container-fluid" id="page-body">
-  <div class="panel panel-default col-md-offset-3 col-md-6" style="padding:10px;">
+
+  <div class="panel panel-default col-md-offset-3 col-md-6" style="padding: 10px">
     <div class="panel-body">
+
       <legend><h3 class="text-primary">Workstation</h3></legend>
       <ul class="breadcrumb">
         <li><a href="{{ url('workstation') }}">Workstation</a></li>
         <li class="active">Add</li>
       </ul>
-        @if (count($errors) > 0)
-            <div class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <ul style='margin-left: 10px;'>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-      {{ Form::open(['method'=>'post','route'=>array('workstation.store')]) }}
+ 
+      @include('errors.alert')
+
+      {{ Form::open(['method'=>'post','route'=>array('workstation.store'), 'class' => 'form-horizontal']) }}
           <div class="form-group">
             <div class="col-sm-12">
-              {{ Form::label('os','Operating System Key') }}
-              <span tabindex="0"  type="button" id="os-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" title="Help" data-trigger="focus" data-content="This field acceps operating system licence, if there are no license, you can leave this field blank" style="text-decoration: none;"></span>
-              {{ Form::text('os',Input::old('os'),[
+              {{ Form::label('os','OS License Key') }}
+
+              {{ Form::text('os', isset($workstation->oskey) ? $workstation->oskey : old('os')  ,[
                 'id' => 'os',
                 'class'=>'form-control',
                 'placeholder'=>'Operating System Key'
@@ -51,20 +39,8 @@ Workstation | Add
 
           <div class="form-group">
             <div class="col-sm-12">
-              {{ Form::label('name','Workstation Name') }}
-              {{ Form::text('name',isset($name) ? $name : Input::old('name'),[
-                'id'=>'name',
-                'class'=>'form-control',
-                'placeholder' => 'Workstation Name'
-              ]) }}
-              <p class="text-muted">For Identifying the workstation. Convention: WS-[Room Name]-[Number]</p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-12">
               {{ Form::label('systemunit','System Unit') }}
-              <span tabindex="0" type="button" id="systemunit-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" title="Help" data-trigger="focus" data-content="This field accepts a property number of existing system unit" style="text-decoration: none;"></span>
+              <span>Note: This field is required. Please input the property number for this item. </span>
               {{ Form::text('systemunit',Input::old('systemunit'),[
                 'id'=>'systemunit',
                 'class'=>'form-control',
@@ -76,7 +52,7 @@ Workstation | Add
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('monitor','Monitor') }}
-              <span tabindex="0"  type="button" id="monitor-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" title="Help" data-trigger="focus" data-content="This field accepts a property number of existing monitor" style="text-decoration: none;"></span>
+              <span>Note: This field accepts a property number.</span>
               {{ Form::text('monitor',Input::old('monitor'),[
                 'id'=>'monitor',
                 'class'=>'form-control',
@@ -88,7 +64,7 @@ Workstation | Add
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('avr','AVR') }}
-              <span tabindex="0"  type="button" id="avr-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" data-trigger="focus" title="Help" data-content="This field accepts a property number of existing avr" style="text-decoration: none;"></span>
+              <span>Note: This field accepts a property number.</span>
               {{ Form::text('avr',Input::old('avr'),[
                 'id'=>'avr',
                 'class'=>'form-control',
@@ -100,7 +76,7 @@ Workstation | Add
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('keyboard','Keyboard') }}
-              <span tabindex="0"  type="button" id="keyboard-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" data-trigger="focus" title="Help" data-content="This field accepts a property number of existing keyboard" style="text-decoration: none;"></span>
+              <span>Note: This field accepts a property number.</span>
               {{ Form::text('keyboard',Input::old('keyboard'),[
                 'id'=>'keyboard',
                 'class'=>'form-control',
@@ -112,7 +88,7 @@ Workstation | Add
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('mouse','Mouse') }}
-              <span tabindex="0"  type="button" id="keyboard-help" class="btn-link glyphicon glyphicon-question-sign" aria-hidden="true" data-toggle="popover" data-trigger="focus" title="Help" data-content="This field accepts local id of mouse" style="text-decoration: none;"></span>
+              <span> Note: This accepts the system-generated ID for its input. </span>
               {{ Form::text('mouse',Input::old('mouse'),[
                 'id'=>'mouse',
                 'class'=>'form-control',
@@ -126,15 +102,13 @@ Workstation | Add
               <button class="btn btn-primary btn-lg btn-block" name="create" type="submit"><span class="glyphicon glyphicon-check"></span> Add</button>
             </div>
           </div>
-        </div>
+
       {{ Form::close() }}
     </div>
   </div>
 </div><!-- Container -->
 @stop
 @section('script')
-{{ HTML::script(asset('js/jquery-ui.js')) }}
-{{ HTML::script(asset('js/moment.min.js')) }}
 <script>
   $(document).ready(function(){
 
@@ -156,19 +130,10 @@ Workstation | Add
 
     });
 
-    $('#avr').autocomplete({
+    $('#mouse').autocomplete({
       source: "{{ url('get/item/profile/mouse/propertynumber') }}"
 
     });
-
-    @if( Session::has("success-message") )
-        swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-    @if( Session::has("error-message") )
-        swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
-
-    $('#page-body').show();
 
   });
 </script>

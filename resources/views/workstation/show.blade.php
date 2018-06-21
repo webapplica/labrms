@@ -1,13 +1,6 @@
 @extends('layouts.master-blue')
-@section('title')
-Workstation Profile
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
-{{ HTML::style(asset('css/jquery-ui.css')) }}
 {{ HTML::style(asset('css/font-awesome.min.css')) }}
 {{ HTML::style(asset('css/style.css')) }}
 <style>
@@ -70,90 +63,109 @@ Workstation Profile
 	.overlay{
 		margin-bottom: 10px;
 	}
+
+	.display-information > li > span {
+		letter-spacing: 1.5px;
+	}
 </style>
 @stop
+
 @section('content')
-<div class="container-fluid" id="page-body">
 @include('modal.workstation.software.install')
-	@include('modal.workstation.software.edit')
+@include('modal.workstation.software.edit')
+
+<div class="container-fluid" id="page-body">
 	<div class="panel panel-default" style="padding:0px 20px">
 		<div class="panel-body">
 			<div class="col-sm-12">
-				<legend><h3 class="text-muted">Workstation {{ $workstation->name }}</h3></legend>
+				<legend><h3 class="text-muted">{{ $workstation->name }}</h3></legend>
 			</div>
 			<div class="col-sm-12">	
 				<ul class="breadcrumb">
 					<li><a href="{{ url('workstation') }}">Workstation</a></li>
-					<li class="active">{{ $workstation->id }}</li>
+					<li class="active">{{ $workstation->name }}</li>
+					<li class="active">Information</li>
 				</ul>
 			</div>
 			<div class="col-sm-12">
 				  <!-- Default panel contents -->
 				  <h3 class="line-either-side text-info">Basic Information</h3>
 			</div>
-			<div class="col-sm-9">
-				<div class="panel panel-default" style="border:none;">
-				  <!-- List group -->
-				  <ul class="list-unstyled">
-				    <li class="text-muted" style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-newspaper-o" aria-hidden="true"></i> Name: </span>
-				    	<span>{{ $workstation->name }}</span></li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6" style="font-size:12px;"><i class="fa fa-key" aria-hidden="true"></i> Operating System License Key: </span>
-				    	<span>{{ $workstation->oskey }}</span></li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-server" aria-hidden="true"></i> System Unit: </span>
-				    	<span>{{ ($workstation->systemunit) ? $workstation->systemunit->propertynumber : "" }}</span>
-				    </li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-desktop" aria-hidden="true"></i> Monitor: </span>
-				    	<span>{{ ($workstation->monitor) ? $workstation->monitor->propertynumber : "" }}</span>
-				    </li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-power-off" aria-hidden="true"></i> AVR: </span>
-				    	<span>{{ ($workstation->avr) ? $workstation->avr->propertynumber : "" }}</span>
-				    </li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
 
-				    	<span class="col-sm-6"><i class="fa fa-keyboard-o" aria-hidden="true"></i> Keyboard: </span>
-				    	<span>{{ ($workstation->keyboard) ? $workstation->keyboard->propertynumber : "" }}</span>
-				    </li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-mouse-pointer" aria-hidden="true"></i> Mouse: </span>
-				    	<span>{{ $workstation->mouse }}</span>
-				    </li>
-				    <li class="text-muted " style="padding:10px;letter-spacing:3px;">
-				    	<span class="col-sm-6"><i class="fa fa-location-arrow" aria-hidden="true"></i> Location: </span>
-				    	<span>{{ $workstation->systemunit->location }}</span>
-				    </li>
-				  </ul>
-				</div>
-			</div>
-			<div class="col-sm-2">
-				 <!--Counter Section-->
-		        <section id="counter_two" class="counter_two">
-		            <div class="overlay" style="border: none;">
-		                        <div class="main_counter_two sections text-center text-muted">
-	                                <div class="row pull-right">
-	                                    <div class="col-sm-12 col-xs-12" style="margin:5px;background-color: #043D5D;color:white;">
-	                                    	{{-- <i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i> --}}
-	                                        <div class="single_counter_two_right">
-	                                            <h2 class="statistic-counter_two">{{ isset($total_tickets) ? $total_tickets : 0 }}</h2>
-	                                            <p>Complaints</p>
-	                                        </div>
-	                                    </div><!-- End off col-sm-3 -->
-	                                    <div class="col-sm-12 col-xs-12" style="margin:5px;background-color: #032E46;color:white;">
-	                                    	{{-- <i class="fa fa-cog fa-2x" aria-hidden="true"></i> --}}
-	                                        <div class="single_counter_two_right">
-	                                            <h2 class="statistic-counter_two">{{ isset($mouseissued) ? $mouseissued : 0 }}</h2>
-	                                            <p>Mouse Issued</p>
-	                                        </div>
-	                                    </div><!-- End off col-sm-3 -->
-	                                </div><!-- End off col-sm-3 -->
-		                        </div>
-		            </div><!-- End off overlay -->
-	        	</section><!-- End off Counter section -->
-			</div>
+			<!-- List group -->
+			<ul class="col-sm-12 list-unstyled display-information">
+				<li class="text-muted">
+					<span>
+						<i class="fa fa-newspaper-o" aria-hidden="true"></i> Name: 
+					</span>
+					<span>
+						{{ $workstation->name }}
+					</span>
+				</li>
+				<li class="text-muted">
+					<span>
+						<i class="fa fa-key" aria-hidden="true"></i> License Key: 
+					</span>
+					<span>{{ $workstation->oskey }}</span>
+				</li>
+				<li class="text-muted">
+					<span>
+						<i class="fa fa-server" aria-hidden="true"></i> System Unit: 
+					</span>
+					<span>
+						{{ ($workstation->systemunit) ? $workstation->systemunit->local_id : "" }}
+					</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						<i class="fa fa-desktop" aria-hidden="true"></i> Monitor:
+					</span>
+					<span>
+						{{ ($workstation->monitor) ? $workstation->monitor->local_id : "" }}
+					</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						<i class="fa fa-power-off" aria-hidden="true"></i> AVR: 
+					</span>
+					<span>{{ ($workstation->avr) ? $workstation->avr->local_id : "" }}</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						<i class="fa fa-keyboard-o" aria-hidden="true"></i> Keyboard: 
+					</span>
+					<span>
+						{{ ($workstation->keyboard) ? $workstation->keyboard->local_id : "" }}
+					</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						<i class="fa fa-mouse-pointer" aria-hidden="true"></i> Mouse: 
+					</span>
+					<span>
+						{{ ($workstation->mouse) ? $workstation->mouse->local_id : "" }}
+					</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						<i class="fa fa-location-arrow" aria-hidden="true"></i> Location: 
+					</span>
+					<span>{{ $workstation->systemunit->room->name }}</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						Tickets: 
+					</span>
+					<span>{{ isset($total_tickets) ? $total_tickets : 0 }}</span>
+				</li>
+				<li class="text-muted" >
+					<span>
+						Mouse Issued: 
+					</span>
+					<span>{{ isset($mouseissued) ? $mouseissued : 0 }}</span>
+				</li>
+			</ul>
+	                                            
 			<div class="col-sm-12">
 			  <!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist">
@@ -192,23 +204,22 @@ Workstation Profile
 	</div>
 </div>
 @stop
+
 @section('script')
-{{ HTML::script(asset('js/jquery-ui.js')) }}
-<script type="text/javascript" src="{{ asset('js/jquery.waypoints.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/jquery.counterup.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 
 	var historyTable = $('#historyTable').DataTable( {
+		serverSide: true,
+		"processing": true,
 	    language: {
 	        searchPlaceholder: "Search..."
 	    },
 	    order: [[ 0, "desc" ]],
-		"processing": true,
-        ajax: "{{ url("ticket/workstation/$workstation->id") }}",
+        ajax: "{{ url("workstation/$workstation->id") }}",
         columns: [
         	{ data: 'id' },
-        	{ data: 'ticketname' },
+        	{ data: 'title' },
         	{ data: 'details' },
         	{ data: 'author' },
         	{ data: 'status' }
@@ -216,38 +227,30 @@ $(document).ready(function(){
     } );
 
 	var table = $('#softwareTable').DataTable( {
-		"pageLength": 100,
-  		select: {
-  			style: 'multiple'
-  		},
+		serverSide: true,
+		"processing": true,
     	columnDefs:[
 			{ targets: 'no-sort', orderable: false },
     	],
 	    language: {
 	        searchPlaceholder: "Search..."
 	    },
-		"processing": true,
-        ajax: "{{ url("workstation/$workstation->id") }}",
+        ajax: "{{ url("workstation/$workstation->id/softwares") }}",
         columns: [
+        	{ data: "name"},
         	{ data: function(callback){
-        		return callback.softwarename
-        	}},
-        	{ data: function(callback){
+
+        		key = callback.license_key
+
+        		if(!key) key = "No License Key";
 
         		edit = `<button class="btn btn-default btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software='`+ callback.id +`' data-target='#updateSoftwareWorkstationModal' data-toggle='modal'>Change License</button>`
-        		button = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`">Uninstall</button>`
+        		remove = `<button class="remove btn btn-danger btn-sm pull-right" data-pc='{{ $workstation->id }}' data-software="`+ callback.id +`" data-loading-text="Uninstalling...." autocomplete="off">Uninstall</button>`
 
-        		try
-        		{
-        			return `Installed:  ` + " " + callback.pcsoftware.softwarelicense.key + edit + button
-        		} catch (e) {
-        			try {
-        				if(!callback.pcsoftware.isEmpty)
-        				return `Installed` + edit + button
-        			} catch (e) {
-        				return "<i>Not Installed</i>  <button class='install btn btn-success btn-sm pull-right' data-pc='{{ $workstation->id }}' data-software='"+ callback.id +"' data-target='#installSoftwareWorkstationModal' data-toggle='modal'>Install</button>"
-        			}
-        		}
+        		if(key != 'No License Key' || callback.workstation != null)
+    				return `Installed:  ` + " " + key + edit + remove
+    			else
+    				return "<i>Not Installed</i>  <button class='install btn btn-success btn-sm pull-right' data-pc='{{ $workstation->id }}' data-software='"+ callback.id +"' data-target='#installSoftwareWorkstationModal' data-toggle='modal'>Install</button>"
         	}}
         ],
     } );
@@ -255,6 +258,7 @@ $(document).ready(function(){
     $('#softwareTable').on('click','.remove',function(){
     	pc = $(this).data('pc')
     	software = $(this).data('software')
+		var $btn = $(this).button('loading')
 
     	$.ajax({
             headers: {
@@ -267,13 +271,15 @@ $(document).ready(function(){
     		},
     		dataType: 'json',
     		success: function(response){
-    			if(response == 'success')
-    				swal('Operation Success','','success')
-    			else
-    				swal('Error occurred while processing your request','','error')
-
+				swal('Operation Success','','success')
     			table.ajax.reload()
     			historyTable.ajax.reload()
+    		},
+    		error: function(response){
+				swal('Error occurred while processing your request','','error')
+    		},
+    		complete: function(response){
+				$btn.button('reset')
     		}
     	})
 
@@ -289,20 +295,6 @@ $(document).ready(function(){
 		historyTable.ajax.reload()
     })
 
-    // Counter 
-    jQuery('.statistic-counter_two').counterUp({
-        delay: 10,
-        time: 200
-    });
-
-	@if( Session::has("success-message") )
-	  swal("Success!","{{ Session::pull('success-message') }}","success");
-	@endif
-	@if( Session::has("error-message") )
-	  swal("Oops...","{{ Session::pull('error-message') }}","error");
-	@endif
-
-	$('#page-body').show()
 })
 </script>
 @stop

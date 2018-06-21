@@ -5,12 +5,29 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\Pc;
-use App\PcSoftware;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use App;
+use DB;
+use Illuminate\Http\Request;
 
 class WorkstationSoftwareController extends Controller {
+
+	public function getAllWorkstationSoftware($id)
+	{
+		$softwares = DB::table('softwares')
+							->leftJoin('workstation_software', 'software_id', '=', 'softwares.id')
+							->leftJoin('software_licenses', 'workstation_software.license_id', '=', 'software_licenses.id')
+							->Join('room_software', 'room_software.software_id', '=', 'softwares.id')
+							->leftJoin('rooms', 'room_software.room_id', '=', 'rooms.id')
+							->select(
+									'softwares.id as id', 'softwares.name as name', 
+									'software_licenses.key  as license_key',
+									'workstation_id as workstation'
+								)
+							->distinct()
+							->get();
+
+		return datatables($softwares)->toJson();
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -19,8 +36,10 @@ class WorkstationSoftwareController extends Controller {
 	 */
 	public function index()
 	{
+		$workstations = App\Workstation::all();
+
 		return view('workstation.software.index')
-			->with('workstation',Pc::all())
+			->with('workstation', $workstations )
 			->with('active_tab','software');
 	}
 
@@ -32,12 +51,12 @@ class WorkstationSoftwareController extends Controller {
 	 */
 	public function create($id)
 	{
-		$workstation = Pc::find($id);
-		if(count($workstation) > 0)
-		{
-			return view('workstation.software.create')
-				->with('workstation',$workstation);
-		}
+		$workstation = Workstation::find($id);
+
+		if(count($workstation) <= 0) return view('errors.404');
+
+		return view('workstation.software.create')
+			->with('workstation',$workstation);
 	}
 
 
@@ -46,48 +65,50 @@ class WorkstationSoftwareController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store($id)
+	public function store(Request $request, $id)
 	{
-		if(Request::ajax())
-		{
-			$id = $this->sanitizeString($id);
-			$software = $this->sanitizeString(Input::get('software'));
-			$softwarelicense = $this->sanitizeString(Input::get('softwarelicense'));
-
-			$validator = Validator::make([
-				'PC ID' => $id,
-				'Software ID' => $software,
-				'Software License Key' => $softwarelicense
-			],Pcsoftware::$rules);
-
-			if($validator->fails())
-			{
-				return json_encode('error');
-			}
-
-			PcSoftware::installSoftware($id,$software,$softwarelicense);
-
-			return json_encode('success');
-		}
 
 		$id = $this->sanitizeString($id);
-		$software = $this->sanitizeString(Input::get('software'));
-		$softwarelicense = $this->sanitizeString(Input::get('softwarelicense'));
+		$software = $this->sanitizeString($request->get('software'));
+		$license = $this->sanitizeString($request->get('softwarelicense'));
 
 		$validator = Validator::make([
-			'PC ID' => $id,
-			'Software ID' => $software,
-			'Software License Key' => $softwarelicense
-		],PcSoftware::$rules);
+			'Workstation' => $id,
+			'Software' => $software,
+			'License Key' => $license
+		], App\Software::$installationRules);
+
 
 		if($validator->fails())
 		{
-			return redirect()->back()
-				->withInput()
-				->withErrors($validator);
-		}
+			if($request->ajax())
+			{
+				return response()->json([
+					'error-messages' => $validator->messages()->toJson()
+					
+				], 401);
+			}
+			else
+			{
 
-		PcSoftware::installSoftware($id,$software,$softwarelicense);
+				return redirect()->back()
+					->withInput()
+					->withErrors($validator);
+			}
+		}
+		DB::beginTransaction();
+
+		App\Software::find($software)->install($id, $license);
+
+		DB::commit();
+
+		if($request->ajax())
+		{
+			return response()->json([
+				'message' => 'success',
+			], 200);
+		} 
+
 
 		Session::flash('success-message','Software added to workstation');
 		return redirect('workstation/view/software');
@@ -114,7 +135,7 @@ class WorkstationSoftwareController extends Controller {
 	 */
 	public function edit($id)
 	{
-		Pcsoftware::find($id);
+		Workstationsoftware::find($id);
 		return view('workstation.software.edit');
 	}
 
@@ -125,54 +146,50 @@ class WorkstationSoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		if(Request::ajax())
-		{
-			$id = $this->sanitizeString($id);
-			$software = $this->sanitizeString(Input::get('software'));
-
-			$validator = Validator::make([
-				'PC ID' => $id,
-				'Software ID' => $software
-			],Pcsoftware::$withoutLicenseRules);
-
-			if($validator->fails())
-			{
-				return json_encode('error');
-			}
-
-			PcSoftware::updateInstalledSoftware($id,$software);
-			return json_encode('success');
-		}
-
 		$id = $this->sanitizeString($id);
-		$software = $this->sanitizeString(Input::get('software'));
-		$softwarelicense = $this->sanitizeString(Input::get('softwarelicense'));
+		$software = $this->sanitizeString($request->get('software'));
+		$license = $this->sanitizeString($request->get('softwarelicense'));
 
 		$validator = Validator::make([
-			'PC ID' => $id,
-			'Software ID' => $software,
-			'Software License Key' => $softwarelicense
-		],PcSoftware::$rules);
+			'Workstation' => $id,
+			'Software' => $software,
+			'License Key' => $license
+		], App\Software::$installationRules);
 
 		if($validator->fails())
 		{
-			return redirect()->back()
-				->withInput()
-				->withErrors($validator);
+
+			if($request->ajax())
+			{
+				return response()->json([
+					'error-messages' => $validator->messages()->toJson(),
+					'message' => '' 
+				], 401);
+			}
+			else
+			{
+				return redirect()->back()
+					->withInput()
+					->withErrors($validator);
+			}
+
 		}
 
-		SoftwareLicense::install($softwarelicense);
+		DB::beginTransaction();
 
-		$pcsoftware = new PcSoftware;
-		$pcsoftware->pc_id = $id;
-		$pcsoftware->software_id = $software;
-		$pcsoftware->softwarelicense_id = $softwarelicense;
-		$pcsoftware->save();
+		App\Software::find($software)->updateSoftwareLicense($id,$license);
 
-		Session::flash('success-message','Workstation software successfully updated');
-		return redirect('workstation/view/software');
+		DB::commit();
+
+		return response()->json([
+			'error-messages' => [],
+			'message' => 'success' 
+		], 200);
+
+		Session::flash('success-message','Software updated');
+		return redirect('workstation/software');
 	}
 
 
@@ -182,26 +199,48 @@ class WorkstationSoftwareController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if(Request::ajax())
-		{
-			$id = $this->sanitizeString($id);
-			$software = $this->sanitizeString(Input::get('software'));
+		$id = $this->sanitizeString($id);
+		$software = $this->sanitizeString($request->get('software'));
 
-			$validator = Validator::make([
-				'PC ID' => $id,
-				'Software ID' => $software
-			],PcSoftware::$withoutLicenseRules);
+		$validator = Validator::make([
+			'Workstation' => $id,
+			'Software' => $software
+		], App\Software::$installationRules);
+
+		if($request->ajax())
+		{
 
 			if($validator->fails())
 			{
-				return json_encode('error');
+				return response()->json([
+					'error-messages' => $validator->messages()->toJson()
+					
+				],401);
 			}
-
-			PcSoftware::uninstallSoftware($id,$software);
-			return json_encode('success');
 		}
+
+		if($validator->fails())
+		{
+			return redirect()->back()
+				->withInput()
+				->withErrors($validator);
+		}
+
+		DB::beginTransaction();
+
+		App\Software::find($software)->uninstall($id);
+
+		DB::commit();
+
+
+		if($request->ajax())
+		{
+			return response()->json([
+				'message' => 'success',
+			], 200);
+		} 
 
 		Session::flash('success-message','Software successfully removed from workstation');
 		return redirect('workstation/view/software');

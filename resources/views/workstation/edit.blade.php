@@ -1,52 +1,27 @@
 @extends('layouts.master-blue')
-@section('title')
-Workstation | Update
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-{{ HTML::style(asset('css/jquery-ui.min.css')) }}
-{{ HTML::style(asset('css/animate.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
-<style>
-  {
-    display:none;
-  }
-  #page-body,#page-two,#page-three{
-    display:none;
-  }
 
-  .form-control{
-    margin: 10px 0px;
-  }
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
   <div class="panel panel-default col-md-offset-3 col-md-6" style="padding:10px;">
     <div class="panel-body">
       <legend><h3 class="text-primary">Workstation</h3></legend>
       <ul class="breadcrumb">
-        <li><a href="{{ url('workstation') }}">Workstation</a></li>
-        <li class="active">Assemble</li>
+        <li>
+          <a href="{{ url('workstation') }}">Workstation</a>
+        </li>
+        <li>
+          <a href="{{ url("workstation/$workstation->id") }}">{{ $workstation->name }}</a>
+        </li>
+        <li class="active">Update</li>
       </ul>
-        @if (count($errors) > 0)
-            <div class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <ul style='margin-left: 10px;'>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-      {{ Form::open(['method'=>'put','route'=>array('workstation.update',$pc->id)]) }}
+
+      @include('errors.alert')
+
+      {{ Form::open(['method'=>'put','route'=>array('workstation.update',$workstation->id)]) }}
           <div class="form-group">
             <div class="col-sm-12">
               {{ Form::label('os','Operating System Key') }}
-              {{ Form::text('os',$pc->oskey,[
+              {{ Form::text('os',$workstation->oskey,[
                 'id' => 'os',
                 'class'=>'form-control',
                 'placeholder'=>'Operating System Key'
@@ -56,27 +31,12 @@ Workstation | Update
 
           <div class="form-group">
             <div class="col-sm-12">
-              {{ Form::label('systemunit','System Unit Property Number') }}
-              <p>
-                <span class="text-muted">
-                  @if($pc->systemunit)
-                  {{ $pc->systemunit->propertynumber }}
-                  @else
-                  None
-                  @endif
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-12">
               {{ Form::label('monitor','Monitor Property Number') }}
               <p>
                 <span class="text-danger">Old Value:</span>
                 <span class="text-muted">
-                  @if($pc->monitor)
-                  {{ $pc->monitor->propertynumber }}
+                  @if($workstation->monitor)
+                  {{ $workstation->monitor->property_number }}
                   @else
                   None
                   @endif
@@ -96,8 +56,8 @@ Workstation | Update
               <p>
                 <span class="text-danger">Old Value:</span>
                 <span class="text-muted">
-                  @if($pc->avr)
-                  {{ $pc->avr->propertynumber }}
+                  @if($workstation->avr)
+                  {{ $workstation->avr->property_number }}
                   @else
                   None
                   @endif
@@ -117,8 +77,8 @@ Workstation | Update
               <p>
                 <span class="text-danger">Old Value:</span>
                 <span class="text-muted">
-                  @if($pc->keyboard)
-                  {{ $pc->keyboard->propertynumber }}
+                  @if($workstation->keyboard)
+                  {{ $workstation->keyboard->property_number }}
                   @else
                   None
                   @endif
@@ -138,8 +98,8 @@ Workstation | Update
               <p>
                 <span class="text-danger">Old Value:</span>
                 <span class="text-muted">
-                  @if($pc->mouse)
-                  {{ $pc->mouse }}
+                  @if($workstation->mouse)
+                  {{ $workstation->mouse->local_id }}
                   @else
                   None
                   @endif
@@ -148,7 +108,7 @@ Workstation | Update
             </div>
             <div class="col-sm-12">
               <input type="checkbox" value="true" id="toggle-mouse" name="mousetag" /> Replace mouse?
-              {{ Form::text('mouse',Input::old('mouse'),[
+              {{ Form::text('mouse', Input::old('mouse'),[
                 'id'=>'mouse',
                 'class'=>'form-control',
                 'placeholder' => 'Mouse Brand',
@@ -169,8 +129,7 @@ Workstation | Update
 </div><!-- Container -->
 @stop
 @section('script')
-{{ HTML::script(asset('js/jquery-ui.js')) }}
-{{ HTML::script(asset('js/moment.min.js')) }}
+
 <script>
   $(document).ready(function(){
 
@@ -195,13 +154,6 @@ Workstation | Update
     $('#mouse').autocomplete({
       source: "{{ url('get/supply/mouse/brand') }}"
     });
-
-    @if( Session::has("success-message") )
-        swal("Success!","{{ Session::pull('success-message') }}","success");
-    @endif
-    @if( Session::has("error-message") )
-        swal("Oops...","{{ Session::pull('error-message') }}","error");
-    @endif
 
     $('#toggle-mouse').change(function()
     {

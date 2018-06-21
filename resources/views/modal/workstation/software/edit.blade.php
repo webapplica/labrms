@@ -16,7 +16,7 @@
 				]) }}
 				</div>					
 				<div class="form-group">
-				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-update-license">Update</button>
+				<button class="btn btn-block btn-lg btn-primary" type="button" id="modal-update-license" data-loading-text="Installing..." autocomplete="off">Update</button>
 				</div>
 			</div> <!-- end of modal-body -->
 		</div> <!-- end of modal-content -->
@@ -34,6 +34,7 @@ $('#updateSoftwareWorkstationModal').on('show.bs.modal',function(event){
 	})
 
 	$('#modal-update-license').on('click',function(){
+		var $btn = $(this).button('loading')
 		_url = '{{ url("workstation/software/$workstation->id/license/update") }}'
 
 		$.ajax({
@@ -48,12 +49,14 @@ $('#updateSoftwareWorkstationModal').on('show.bs.modal',function(event){
 			},
 			dataType: 'json',
 			success: function(response){
-				if(response == 'success') {
-					swal('Operation Success','','success')
-				} else {
-					swal('Error occurred while processing your data','','error')
-				}
+				swal('Operation Success','','success')
+			},
+			error: function(response){
+				swal('Error occurred while processing your data','','error')
+			},
+			complete: function(response){
 				$('#updateSoftwareWorkstationModal').modal('hide')
+				$btn.button('reset')
 			}
 
 		})

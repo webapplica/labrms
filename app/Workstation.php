@@ -15,17 +15,68 @@ class Workstation extends \Eloquent{
 	public $fillable = ['oskey','mouse','keyboard_id','systemunit_id','monitor_id','avr_id'];
 
 	public static $rules = array(
-		'Operating System Key' => 'min:2|max:50|unique:pc,oskey',
-		'avr' => 'exists:items,local_id',
-		'Monitor' => 'exists:items,plocal_id',
-		'System Unit' => 'required|exists:items,local_id',
-		'Keyboard' => 'exists:items,local_id',
+		'License Key' => 'min:2|max:50',
+		'AVR' => 'exists:items,property_number',
+		'Monitor' => 'exists:items,property_number',
+		'System Unit' => 'required|exists:items,property_number',
+		'Keyboard' => 'exists:items,property_number',
 		'Mouse' => 'exists:items,local_id'
 	);
 
-	public function roominventory()
+	protected $appends = [
+		'system_unit_local',
+		'monitor_local',
+		'keyboard_local',
+		'avr_local',
+		'mouse_local',
+		'location'
+	];
+
+	public function getSystemUnitLocalAttribute()
 	{
-		return $this->hasOne('App\RoomInventory','room_id','systemunit_id');
+		$var = $this->systemunit;
+		$var = isset($var->local_id) ? $var->local_id : "None";
+		return $var;
+	}
+
+	public function getMouseLocalAttribute()
+	{
+		$var = $this->mouse;
+		$var = isset($var->local_id) ? $var->local_id : "None";
+		return $var;
+	}
+
+	public function getKeyboardLocalAttribute()
+	{
+		$var = $this->keyboard;
+		$var = isset($var->local_id) ? $var->local_id : "None";
+		return $var;
+	}
+
+	public function getAvrLocalAttribute()
+	{
+		$var = $this->avr;
+		$var = isset($var->local_id) ? $var->local_id : "None";
+		return $var;
+	}
+
+	public function getMonitorLocalAttribute()
+	{
+		$var = $this->monitor;
+		$var = isset($var->local_id) ? $var->local_id : "None";
+		return isset($val) ? $val : "None";
+	}
+
+	public function getLocationAttribute()
+	{
+		$var = $this->room;
+		$var = isset($var->name) ? $var->name : "None";
+		return $var;
+	}
+
+	public function room()
+	{
+		return $this->belongsTo('App\Room','room_id','id');
 	}
 
 	public function systemunit()
@@ -47,16 +98,21 @@ class Workstation extends \Eloquent{
 		return $this->belongsTo('App\Item','avr_id','id');
 	}
 
-	public function software()
+	public function mouse()
 	{
-		return $this->belongsToMany('App\Software','pc_software','pc_id','software_id')
-					->withPivot('softwarelicense_id')
-					->withTimestamps();
+		return $this->belongsTo('App\Item', 'mouse_id', 'id');
+	}
+
+	public function softwares()
+	{
+		return $this->belongsToMany('App\Software','workstation_software','workstation_id','software_id')
+			->withPivot('license_id')
+			->withTimestamps();
 	}
 
 	public function tickets()
 	{
-		return $this->belongsToMany('App\Ticket','pc_ticket','pc_id','ticket_id');
+		return $this->belongsToMany('App\Ticket','workstation_ticket','workstation_id','ticket_id');
 	}
 
 	public function scopeName($query,$value)
@@ -118,16 +174,20 @@ class Workstation extends \Eloquent{
 			$details = $details . $this->mouse_id . ' for mouse. ';
 		}
 
-		$name = 'Workstation Assembly';
-		$staffassigned = Auth::user()->id;
+		$title = 'Workstation Assembly';
+		$staff_id = Auth::user()->id;
+
+		$type = TicketType::firstOrCreate([
+			'name' => 'Receive'
+		]);
 
 		$ticket = new Ticket;
-		$ticket->type = 'Receive';
-		$ticket->name = $name;
+		$ticket->type_id = $type->id;
+		$ticket->title = $title;
 		$ticket->details = $details;
-		$ticket->staffassigned = $staffassigned;
+		$ticket->staff_id = $staff_id;
 		$ticket->status = 'Closed';
-		$ticket->generate($this->id);
+		$ticket->generate($this->systemunit->id);
     }
 
     public function updateParts()
@@ -189,7 +249,7 @@ class Workstation extends \Eloquent{
 		$ticket->details = $details;
 		$ticket->staffassigned = $staffassigned;
 		$ticket->status = 'Closed';
-		$ticket->generate($this->id);
+		$ticket->generate($this->systemunit->id);
     }
 
     public static function condemn($id,$systemunit,$monitor,$keyboard,$avr)
@@ -233,7 +293,16 @@ class Workstation extends \Eloquent{
 		$staffassigned = Auth::user()->id;
 		$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
     	$details = `Workstation condemned on` . Carbon::now()->toDayDateTimeString() . 'by ' . $author;
-    	Ticket::generateWorkstationTicket($pc->id,'condemn',$name,$details,$author,$staffassigned,null,'Closed');
+
+		$ticket = new Ticket;
+		$ticket->type = 'Maintenance';
+		$ticket->name = $name;
+		$ticket->details = $details;
+		$ticket->staff_id = $staff_id;
+		$ticket->status = 'Closed';
+		$ticket->author = $author;
+		$ticket->generate($this->systemunit->id);
+
     	$pc->delete();
     }
 
@@ -276,15 +345,6 @@ class Workstation extends \Eloquent{
     	if( $item && $item->count() > 0) 
     	{
 		    
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get property number id
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-    		$id = Workstation::getID($item);
 		    
 			/*
 			|--------------------------------------------------------------------------
@@ -294,10 +354,11 @@ class Workstation extends \Eloquent{
 			|--------------------------------------------------------------------------
 			|
 			*/
-	    	$pc = Workstation::where('systemunit_id', '=', $id)
-	    		->orWhere('monitor_id','=',$id)
-	    		->orWhere('avr_id','=',$id)
-	    		->orWhere('keyboard_id','=',$id)
+	    	$pc = Workstation::where('systemunit_id', '=', $item->id)
+	    		->orWhere('monitor_id','=',$item->id)
+	    		->orWhere('avr_id','=',$item->id)
+	    		->orWhere('keyboard_id','=',$item->id)
+	    		->orWhere('mouse_id','=',$item->id)
 	    		->first();
 		    
 			/*
@@ -353,6 +414,17 @@ class Workstation extends \Eloquent{
 			if( $pc && $pc->count() > 0)
 			{
 				return $pc;
+			}
+			else
+			{
+
+		    	$pc = Workstation::where('systemunit_id', '=', $tag)
+		    		->orWhere('monitor_id','=',$tag)
+		    		->orWhere('avr_id','=',$tag)
+		    		->orWhere('keyboard_id','=',$tag)
+		    		->orWhere('mouse_id','=',$tag);
+
+		    	if($pc->count() > 0) return $pc->first();
 			}
 			
 			return null;
@@ -459,42 +531,58 @@ class Workstation extends \Eloquent{
     public static function setWorkstationLocation($pc,$room)
     {
 
+    	$room = Room::location($room)->first();
 		$pc = Workstation::find($pc);
+		$pc->room_id = $room->id;
+
 		if(isset($pc->systemunit_id))
 		{
-			Item::setLocation($pc->systemunit_id,$room);
+			$pc->systemunit()->update([
+				'location' => $room->id
+			]);
 		}
 
 		if(isset($pc->avr_id))
 		{
-			Item::setLocation($pc->avr_id,$room);
+			$pc->avr()->update([
+				'location' => $room->id
+			]);
 		}
 
 		if(isset($pc->keyboard_id))
 		{
-			Item::setLocation($pc->keyboard_id,$room);
+			$pc->keyboard()->update([
+				'location' => $room->id
+			]);
 		}
 
 		if(isset($pc->monitor_id))
 		{
-			Item::setLocation($pc->monitor_id,$room);
+			$pc->monitor()->update([
+				'location' => $room->id
+			]);
 		}
 
-		/*
-		*
-		*	create a transfer ticket
-		*
-		*/
-		$details = "Workstation location has been set to $room";
-		$staffassigned = Auth::user()->id;
+		$pc->save();
+
+		$title = "Item Transfer";
+		$details = "Workstation location has been set to $room->name";
+		$staff_id = Auth::user()->id;
+		$ticket_id = null;
+		$status = 'Closed';
+
+		$type = TicketType::firstOrCreate([
+			'name' => 'Transfer'
+		]);
 
 		$ticket = new Ticket;
-		$ticket->type = 'Transfer';
-		$ticket->name = 'Set Item Location';
+		$ticket->title = $title;
 		$ticket->details = $details;
-		$ticket->staffassigned = $staffassigned;
-		$ticket->status = 'Closed';
-		$ticket->generate($pc->id);
+		$ticket->staff_id = $staff_id;
+		$ticket->parent_id = $ticket_id;
+		$ticket->status = $status;
+		$ticket->type_id = $type->id;
+		$ticket->generate($pc->systemunit->id);
     }
 
     /*
@@ -505,25 +593,18 @@ class Workstation extends \Eloquent{
     public function generateWorkstationName($id = null)
     {
     	$cons = 'WS';
-
-    	if(isset($this->id))
-    	{
-    		$id = $this->id;
-    	} 
-    	else if($id == null || !isset($id) || $id == "")
-    	{
-    		$id = Workstation::count();
-    	}
-
-    	$id = '-' . $id;
-
     	$location = "";
+    	$id = '-' . ( isset($this->id) ? $this->id : Workstation::count() + 1 ) ;
 
-    	if( isset($this->location) && $this->location != null )
+
+    	if( isset($this->room_id) && $this->room_id != null )
     	{
-    		$location = '-' . $this->location;
+    		$location = '-' . $this->room->name;
+    	}else{
+    		$location = '-TMP';
     	}
 
-    	return $cost . $location . $id;
+
+    	return $cons . $location . $id;
     }
 }

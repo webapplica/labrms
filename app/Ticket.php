@@ -15,7 +15,7 @@ class Ticket extends \Eloquent{
 	public $underrepair = "";
 	public $undermaintenance = false;
 
-	public $fillable = ['item_id','type','title','details','author','staff_id','ticket_id','status'];
+	public $fillable = ['item_id','type_id','title','details','author','staff_id','ticket_id','status'];
 	protected $primaryKey = 'id';
 
 	public static $rules = array(
@@ -274,8 +274,9 @@ class Ticket extends \Eloquent{
 		|--------------------------------------------------------------------------
 		|
 		*/
-		if( ($pc = Workstation::isWorkstation($tag)) )
+		if( $pc = Workstation::isWorkstation($tag) )
 		{
+
 			if($this->undermaintenance) Workstation::setItemStatus($pc->id,'undermaintenance');
 			$pc->tickets()->attach($this->id);
 		} 

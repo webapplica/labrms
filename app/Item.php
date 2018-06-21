@@ -169,6 +169,16 @@ class Item extends \Eloquent{
 		return $query->where('status', '=', $value);
 	}
 
+	public function scopeFindByPropertyNumber($query,$propertynumber)
+	{
+		return $query->where('property_number', '=', $propertynumber);
+	}
+
+	public function scopeFindByLocalId($query,$local_id)
+	{
+		return $query->where('local_id','=',$local_id);
+	}
+
 	/*
 	*
 	*	Limit the scope by propertynumber
@@ -422,11 +432,11 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static function getListOfItems($id,$name){
-	$item = Item::whereIn('inventory_id',$id)
-	              ->whereNotIn('id',Workstation::select($name)->pluck($name))
-	              ->select('propertynumber')
-	              ->get();
-	return $item;
+		$item = Item::whereIn('inventory_id',$id)
+		              ->whereNotIn('id',Workstation::select($name)->pluck($name))
+		              ->select('property_number')
+		              ->get();
+		return $item;
 	}
 
 	/**
@@ -464,58 +474,47 @@ class Item extends \Eloquent{
 	*/
 	public static function setLocation($_item,$_room)
 	{
-		try
-		{
-			/*
-			*	get the item profile
-			*	assign to $item variable
-			*/
-			$item = Item::find($_item);
+		DB::beginTransaction();
+		/*
+		*	get the item profile
+		*	assign to $item variable
+		*/
+		$item = Item::find($_item);
 
-			/*
-			*	set item location
-			*	location is the room name
-			*/
-			$item->location  = $_room;
+		/*
+		*	set item location
+		*	location is the room name
+		*/
+		$room = Room::location($_room)->first();
+		$item->location  = $room->id;
+		$item->save();
 
-			/*
-			*	get the room information
-			*	link room and item
-			*/
-			$room = Room::location($_room)->first();
-			$item->room()->sync([$room->id]);
+		/*
+		*
+		*	create a transfer ticket
+		*
+		*/
+		$title = "Item Transfer";
+		$details = "Item's location has been set to $room->name";
+		$staff_id = Auth::user()->id;
+		$ticket_id = null;
+		$status = 'Closed';
 
-			/*
-			*
-			*	create a transfer ticket
-			*
-			*/
-			$details = "Items location has been set to $_room";
-			$staffassigned = Auth::user()->id;
-			$author = Auth::user()->firstname . " " . Auth::user()->middlename . " " . Auth::user()->lastname;
-			Ticket::generateEquipmentTicket(
-						$item->id,
-						'Transfer',
-						'Set Item Location',
-						$details,
-						$author,
-						$staffassigned,
-						null,
-						'Closed'
-					);
-			$item->save();
+		$type = TicketType::firstOrCreate([
+			'name' => 'Transfer'
+		]);
 
-		} 
-		catch(Exception $e)
-		{
+		$ticket = new Ticket;
+		$ticket->title = $title;
+		$ticket->details = $details;
+		$ticket->staff_id = $staff_id;
+		$ticket->parent_id = $ticket_id;
+		$ticket->status = $status;
+		$ticket->type_id = $type->id;
+		$ticket->generate($_item);
 
-			/*
-			*	if no room inventory found
-			*	create room inventory
-			*	room inventory links item and room
-			*/
-			RoomInventory::createRecord($room,$item);
-		}
+		DB::commit();
+
 	}
 
 	public function getIDFromPropertyNumber($propertynumber)
