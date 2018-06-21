@@ -45,6 +45,7 @@ class Item extends \Eloquent{
 	*
 	*/  
 	public $fillable = [
+		'local_id',
 		'property_number',
 		'serialid',
 		'location',
@@ -58,6 +59,7 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static $rules = array(
+		'University Property Number' => 'min:5|max:100|unique:items,property_number',
 		'Property Number' => 'min:5|max:100|unique:items,property_number',
 		'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
 		'Location' =>'required',
