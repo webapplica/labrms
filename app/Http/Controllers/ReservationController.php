@@ -8,6 +8,7 @@ use Session;
 use Auth;
 use Mail;
 use Carbon\Carbon;
+use App;
 use App\ItemType;
 use App\ItemProfile;
 use App\Inventory;
@@ -32,13 +33,10 @@ class ReservationController extends Controller {
 	{
 		if(Request::ajax())
 		{
-			return json_encode([ 
-				'data' => Reservation::with('itemprofile.inventory.itemtype')
-										->with('room')
-										->with('user')
-										->orderBy('created_at','desc')
-										->get() 
-			]);
+
+			$reservation = App\Reservation::orderBy('created_at','desc')
+								->get();
+			return datatables($reservation)->toJson();
 		}
 
 		return view('reservation.index');
@@ -53,6 +51,7 @@ class ReservationController extends Controller {
 	public function create()
 	{
 		$date = Reservation::thirdWorkingDay(Carbon::now());
+
 		return view('reservation.create')
 				->with('date',$date);
 	}

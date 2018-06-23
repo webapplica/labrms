@@ -1,11 +1,5 @@
 @extends('layouts.master-blue')
-@section('title')
-Reservation List
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 {{ HTML::style(asset('css/font-awesome.min.css')) }}
@@ -20,11 +14,10 @@ Reservation List
 <div class="container-fluid" id="page-body">
 	<div class="col-md-12" id="room-info">
 		<div class="panel panel-body table-responsive">
-			<legend><h3 class="text-muted">Reservation List</h3></legend>
+			<legend><h3 class="text-muted">Reservations</h3></legend>
 			<table class="table table-hover table-condensed table-bordered table-striped" id="reservationTable">
 				<thead>
 					<th>ID</th>
-					<th>Reservation</th>
 					<th>Reserved By</th>
 					<th>Faculty in-charge</th>
 					<th>Date and Time</th>
@@ -56,48 +49,12 @@ Reservation List
 	        ajax: "{{ url('reservation') }}",
 	        columns: [
 	            { data: "id" },
-				{ data: function(callback){
-					ret_val = "<ul class='list-unstyled'>";
-					if(callback.itemprofile.length > 0)
-					{ 
-						$.each( callback.itemprofile , function(ind,obj){
-							ret_val += `<li>` + obj.inventory.itemtype.name + `</li>`
-						})
-					} 
-					else if(callback.room.length > 0)
-					{
-						$.each( callback.room , function(ind,obj){
-							ret_val += `<li>` + obj.name + `</li>`
-						})
-					}
-
-					ret_val += '</ul>'
-
-					return ret_val;
-				} },
-	            { data: function(callback){
-					return callback.user.firstname + ' ' + callback.user.middlename + ' ' + callback.user.lastname
-				} },
-	            { data: "facultyincharge" },
-	            { data: function(callback){
-					return moment(callback.timein).format('MMMM DD, YYYY') + " " + moment(callback.timein).format('hh:mm a') + ' - ' + moment(callback.timeout).format('hh:mm a')
-				} },
+	            { data: 'reservee_name' },
+	            { data: "faculty_name" },
+	            { data: 'parsed_date_and_time'},
 				{ data: "purpose" },
 				{ data: "location" },
-				{ data: function(callback){
-					if(callback.approval == 0)
-					{
-						return 'pending';
-					}
-					if(callback.approval == 1)
-					{
-						return 'approved';
-					}
-					if(callback.approval == 2)
-					{
-						return 'disapproved';
-					}
-				} },
+				{ data: "status_name" },
 				{ data: 'remark' },
 				{ data: function(callback){
 					if(callback.approval == 0)
