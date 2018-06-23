@@ -261,44 +261,50 @@ Accounts
 	    });
 
 	    $('#reset').on('click',function(){
-
-	        swal({
-	          title: "Are you sure?",
-	          text: "This will reset this accounts password to the default '12345678'?",
-	          type: "warning",
-	          showCancelButton: true,
-	          confirmButtonText: "Yes, reset it!",
-	          cancelButtonText: "No, cancel it!",
-	          closeOnConfirm: false,
-	          closeOnCancel: false
-	        },
-	        function(isConfirm){
-	          if (isConfirm) {
-					$.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-					type: 'post',
-					url: '{{ url("account/password/reset") }}',
-					data: {
-						'id': table.row('.selected').data().id
+			try{
+				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
+				{
+					swal({
+					title: "Are you sure?",
+					text: "This will reset this accounts password to the default '12345678'?",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Yes, reset it!",
+					cancelButtonText: "No, cancel it!",
+					closeOnConfirm: false,
+					closeOnCancel: false
 					},
-					dataType: 'json',
-					success: function(response){
-						if(response == 'success'){
-							swal('Operation Successful','Password has been reset','success')
-						}else{
-							swal('Operation Unsuccessful','Error occurred while resetting the password','error')
-						}
-					},
-					error: function(){
-						swal('Operation Unsuccessful','Error occurred while resetting the password','error')
+					function(isConfirm){
+					if (isConfirm) {
+							$.ajax({
+							headers: {
+								'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+							},
+							type: 'post',
+							url: '{{ url("account/password/reset") }}',
+							data: {
+								'id': table.row('.selected').data().id
+							},
+							dataType: 'json',
+							success: function(response){
+								if(response == 'success'){
+									swal('Operation Successful','Password has been reset','success')
+								}else{
+									swal('Operation Unsuccessful','Error occurred while resetting the password','error')
+								}
+							},
+							error: function(){
+								swal('Operation Unsuccessful','Error occurred while resetting the password','error')
+							}
+						});
+					} else {
+						swal("Cancelled", "Operation Cancelled", "error");
 					}
-				});
-	          } else {
-	            swal("Cancelled", "Operation Cancelled", "error");
-	          }
-	        })
+					})
+				}
+			}catch( error ){
+				swal('Oops..','You must choose atleast 1 row','error');
+			}
 	    });
 
 	    $('#delete').on('click',function(){
