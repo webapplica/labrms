@@ -29,7 +29,7 @@ Login
   }
 
   body{
-        background-color: #F5F8FA;
+        background-color: #264653;
   }
 </style>
 @stop
