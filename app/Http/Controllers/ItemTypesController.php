@@ -20,9 +20,8 @@ class ItemTypesController extends Controller {
 	{
 		if(Request::ajax())
 		{
-			return json_encode([
-					'data' => App\ItemType::all()
-				]);
+			$types = App\ItemType::all();
+			return datatables($types)->toJson();
 		}
 
 		return view('item.type.index')

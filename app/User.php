@@ -57,36 +57,6 @@ class User extends \Eloquent implements Authenticatable {
 		'accesslevel'
 	];
 
-	// public function getFirstNameAttribute($value)
-	// {
-	// 	return ucwords($value);
-	// }
-
-	// public function getMiddleNameAttribute($value)
-	// {
-	// 	return ucwords($value);
-	// }
-
-	// public function getLastNameAttribute($value)
-	// {
-	// 	return ucwords($value);
-	// }
-
-	// public function setFirstNameAttribute($value)
-	// {
-	// 	$this->attribute['firstname'] = ucwords($value);
-	// }
-
-	// public function setMiddleNameAttribute($value)
-	// {
-	// 	$this->attribute['middlename'] = ucwords($value);
-	// }
-
-	// public function setLastNameAttribute($value)
-	// {
-	// 	$this->attribute['lastname'] =  ucwords($value);
-	// }
-
 	/**
 	*
 	* not shown when querying
@@ -100,7 +70,7 @@ class User extends \Eloquent implements Authenticatable {
 	*
 	*/
 	public static $rules = array(
-		'Username' => 'required_with:password|min:4|max:20|unique:User,username',
+		'Username' => 'required_with:password|min:4|max:20|unique:users,username',
 		'Password' => 'required|min:8|max:50',
 		'First name' => 'required|between:2,100|string',
 		'Middle name' => 'min:2|max:50|string',

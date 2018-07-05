@@ -59,7 +59,7 @@ class Inventory extends \Eloquent
   	'Model' => 'min:2|max:100',
   	'Details' => 'min:5|max:1000',
   	'Unit' => 'required',
-  	'Quantity' => 'required|numeric',
+  	'Quantity' => 'required|numeric|min:1',
   	'Profiled Items' => 'numeric'
 
   );
@@ -75,7 +75,7 @@ class Inventory extends \Eloquent
 		'Model' => 'min:2|max:100',
 		'Details' => 'min:5|max:1000',
 		'Unit' => 'numeric',
-		'Quantity' => 'numeric',
+  	'Quantity' => 'required|numeric|min:0',
 		'Profiled Items' => 'numeric'
 	);
 

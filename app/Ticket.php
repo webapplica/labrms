@@ -326,6 +326,7 @@ class Ticket extends \Eloquent{
 		$this->trashable = $ticket->trashable;
 		$this->severity = $ticket->severity;
 		$this->nature = $ticket->nature;
+		$this->main_id = (isset($ticket->main_id) && !is_null($ticket->main_id) ) ? $ticket->main_id : $ticket->id;
 	}
 
 	/**

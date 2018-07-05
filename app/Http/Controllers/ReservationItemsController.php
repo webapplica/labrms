@@ -5,12 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Validator;
 use Session;
-use App\ReservationItems;
-use App\ItemType;
-use App\ItemProfile;
-use App\Inventory;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use App;
+use Illuminate\Http\Request;
 
 class ReservationItemsController extends Controller {
 
@@ -19,8 +15,14 @@ class ReservationItemsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
+		if($request->ajax())
+		{
+
+			$items = App\Item::with('inventory.itemtype')->get();
+			return datatables($items)->toJson();
+		}
 		return view('reservation.item.index');
 	}
 

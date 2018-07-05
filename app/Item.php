@@ -90,8 +90,13 @@ class Item extends \Eloquent{
 	];
 
 	protected $appends = [
-		'location_name', 'parsed_date_received', 'parsed_date_profiled'
+		'location_name', 'parsed_date_received', 'parsed_date_profiled', 'reservation_status'
 	];
+
+	public function getReservationStatusAttribute()
+	{
+		return ($this->for_reservation) ? "Yes" : "No";
+	}
 
 	public function getParsedDateReceivedAttribute()
 	{

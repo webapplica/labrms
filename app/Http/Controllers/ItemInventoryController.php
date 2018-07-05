@@ -102,7 +102,7 @@ class ItemInventoryController extends Controller {
 
 		if($validator->fails())
 		{
-			return redirect('inventory/item/create')
+			return redirect('inventory/create')
 				->withInput()
 				->withErrors($validator);
 		}
@@ -248,7 +248,7 @@ class ItemInventoryController extends Controller {
 
 		if($validator->fails())
 		{
-			return redirect("inventory/item/$id/edit")
+			return redirect("inventory/$id/edit")
 				->withInput()
 				->withErrors($validator);
 		}
@@ -263,7 +263,7 @@ class ItemInventoryController extends Controller {
 		$inventory->save();
 
 		Session::flash('success-message','Inventory content updated');
-		return redirect('inventory/item');
+		return redirect('inventory');
 
 	}
 
@@ -327,7 +327,7 @@ class ItemInventoryController extends Controller {
 
 		return $excel;
 		Session::flash('success-message','Items Imported to Inventory');
-		return redirect('inventory/item/view/import');
+		return redirect('inventory/view/import');
 	}
 
 	public function getBrands(Request $request)
