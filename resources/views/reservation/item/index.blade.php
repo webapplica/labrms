@@ -1,19 +1,5 @@
 @extends('layouts.master-blue')
 
-@section('style')
-<link rel="stylesheet" href="{{ url('css/style.css') }}"  />
-<style>
-
-	.toolbar {
-    	float:left;
-	}
-
-	textarea{
-		resize:none;
-		overflow-y:hidden;
-	}
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-12" id="workstation-info">
@@ -27,9 +13,8 @@
 					<th>Brand</th>
 					<th>Model</th>
 					<th>Type</th>
-					<th>Allowed?</th>
 					<th>Status</th>
-					<th class="no-sort"></th>
+					<th class="no-sort">Enabled</th>
 				</thead>
 				<tbody>
 				</tbody>
@@ -42,7 +27,6 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 
-
   	var table = $('#reservationRulesTable').DataTable({
   		processing: true,
   		serverSide: true,
@@ -52,36 +36,65 @@
 	    language: {
 	        searchPlaceholder: "Search..."
 	    },
-    	"dom": "<'row'<'col-sm-6'<'toolbar'>><'col-sm-3 text-center'><'col-sm-3'f>>" +
-					    "<'row'<'col-sm-12'tr>>" +
-					    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-			"processing": true,
-      ajax: "{{ url('reservation/items/list') }}",
-      columns: [
-          { data: "id" },
-          { data: "local_id" },
-          { data: "property_number" },
-          { data: "inventory.brand" },
-          { data: "inventory.model" },
-          { data: "inventory.itemtype.name" },
-          { data: "reservation_status" },
-          { data: "status" },
-          { data: function(){
-          	return `
-          		<button type="button" class="allow btn btn-default"> Allow | Disallow </button>
-          	`
-          } },
-    	],
+		"processing": true,
+      	ajax: "{{ url('reservation/items/list') }}",
+		columns: [
+			{ data: "id" },
+			{ data: "local_id" },
+			{ data: "property_number" },
+			{ data: "inventory.brand" },
+			{ data: "inventory.model" },
+			{ data: "inventory.itemtype.name" },
+			{ data: "status" },
+			{ data: function(callback){
+				html = `<label class="switch">
+				<input class="is-enabled" type="checkbox"`
+				if(callback.reservation_status == 'Yes') {
+					html += ` checked`;
+				}
+				
+				html += 
+				` data-id="`+callback.id+`"><span class="slider round"></span>
+				</label>
+				`
+				return html;
+			} },
+		],
   	});
 
 
-  	$('#reservationRulesTable').on('click', '.allow', function(){
+  	$('#reservationRulesTable').on('click', '.is-enabled', function(){
   		id = $(this).data('id')
+		checked = $(this).is(':checked');
 
   		$.ajax({
-  			
+			headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          	},
+          	type:'post',
+			url:'{{ url("reservation/items/list") }}',
+			data:{
+				'id': id,
+				'checked': checked,
+			},
+			success:function(response) {
+				alert_success('Status successfully updated');
+			},
+			error:function(response) {
+				alert_error('Error encountered while updating your status');
+			},
+			complete: function(response) {
+				table.ajax.reload();
+			}
   		})
   	})
+
+    $(document).ajaxStart(function(){
+      $.LoadingOverlay("show");
+    });
+    $(document).ajaxStop(function(){
+        $.LoadingOverlay("hide");
+    });
   });
 </script>
 @stop

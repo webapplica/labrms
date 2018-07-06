@@ -917,30 +917,11 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 			'as' => 'reservation.items.list.index',
 			'uses' => 'ReservationItemsController@index'
 		]);
-		Route::get('list/create',[
-			'as' => 'reservation.items.list.create',
-			'uses' => 'ReservationItemsController@create'
-		]);
+
 		Route::post('list',[
-			'as' => 'reservation.items.list.store',
-			'uses' => 'ReservationItemsController@store'
-		]);
-		Route::get('list/{list}',[
-			'as' => 'reservation.items.list.show',
-			'uses' => 'ReservationItemsController@show'
-		]);
-		Route::get('list/{list}/edit',[
-			'as' => 'reservation.items.list.edit',
-			'uses' => 'ReservationItemsController@edit'
-		]);
-		Route::put('list/{list}',[
-			'as' => 'reservation.items.list.update',
 			'uses' => 'ReservationItemsController@update'
 		]);
-		Route::delete('list/{list}',[
-			'as' => 'reservation.items.list.destroy',
-			'uses' => 'ReservationItemsController@destroy'
-		]);
+
 	});
 
 	/*

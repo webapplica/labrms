@@ -42,6 +42,8 @@
     {{ HTML::script(asset('js/jquery.dataTables.min.js')) }}
     {{ HTML::script(asset('js/dataTables.bootstrap.min.js')) }}
     {{ HTML::script(asset('js/moment.min.js')) }}
+    {{ HTML::script(asset('js/loadingoverlay.min.js')) }}
+    {{ HTML::script(asset('js/loadingoverlay_progress.min.js')) }}
     @yield('script-include')
   </head>
   <body>
@@ -49,16 +51,21 @@
     @yield('footer')
     @yield('script')
     <script>
-    	// $( window ).resize(function () {
-    	// 	window.location.reload(true);
-    	// });
 
       @if( Session::has("success-message") )
-          swal("Success!","{{ Session::pull('success-message') }}","success");
+        alert_success("{{ Session::pull('success-message') }}")
       @endif
       @if( Session::has("error-message") )
-          swal("Oops...","{{ Session::pull('error-message') }}","error");
+        alert_error("{{ Session::pull('error-message') }}")
       @endif
+
+      function alert_success(message) {
+          swal("Success!", message, "success");
+      }
+
+      function alert_error(message) {
+          swal("Oops...", message ,"error");
+      }
 
       $('#page-body').show();
     </script>
