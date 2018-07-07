@@ -40,7 +40,7 @@ class RoomSchedule extends \Eloquent{
 
 	public function faculty()
 	{
-		return $this->belongsTo('App\FacultyView','faculty','id');
+		return $this->belongsTo('App\Faculty','faculty','id');
 	}
 
 

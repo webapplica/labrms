@@ -1476,6 +1476,7 @@ Route::middleware(['auth','laboratorystaff'])->group(function () {
 */
 Route::middleware(['auth'])->group(function(){
 
+	Route::resource('faculty','FacultiesController', array('except' => array('destroy')));
 
 	/*
 	|------------------c--------------------------------------------------------

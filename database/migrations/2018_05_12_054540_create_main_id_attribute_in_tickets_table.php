@@ -11,20 +11,20 @@ class CreateMainIdAttributeInTicketsTable extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::table('tickets', function (Blueprint $table) {
+    // public function up()
+    // {
+    //     Schema::table('tickets', function (Blueprint $table) {
 
-            if(! Schema::hasColumn('tickets', 'main_id'))
-                $table->integer('main_id')->unsigned();
+    //         if(! Schema::hasColumn('tickets', 'main_id'))
+    //             $table->integer('main_id')->unsigned();
 
-            $table->foreign('main_id')
-                    ->references('id')
-                    ->on('tickets')
-                    ->onDelete('cascade')
-                    ->onUpdate('cascade');
-        });
-    }
+    //         $table->foreign('main_id')
+    //                 ->references('id')
+    //                 ->on('tickets')
+    //                 ->onDelete('cascade')
+    //                 ->onUpdate('cascade');
+    //     });
+    // }
 
     /**
      * Reverse the migrations.
