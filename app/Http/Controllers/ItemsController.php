@@ -136,6 +136,7 @@ class ItemsController extends Controller {
 			}
 
 			$itemprofile = new App\Item;
+			$itemprofile->local_id = $university_property_number;
 			$itemprofile->property_number = $property_number;
 			$itemprofile->serial_number = $serial_number;
 			$itemprofile->location = $location;
@@ -143,7 +144,6 @@ class ItemsController extends Controller {
 			$itemprofile->inventory_id = $inventory_id;
 			$itemprofile->receipt_id = $receipt_id;
 			$itemprofile->profile();
-			$itemprofile->local_id = $university_property_number;
 		}
 
 		$inventory = App\Inventory::find($inventory_id);

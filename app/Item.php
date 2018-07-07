@@ -59,7 +59,7 @@ class Item extends \Eloquent{
 	*
 	*/
 	public static $rules = array(
-		'University Property Number' => 'min:5|max:100|unique:items,property_number',
+		'University Property Number' => 'min:5|max:100|unique:items,local_id',
 		'Property Number' => 'min:5|max:100|unique:items,property_number',
 		'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
 		'Location' =>'required',
@@ -274,7 +274,7 @@ class Item extends \Eloquent{
 			$query->where('itemtype_id','=',$inventory->itemtype_id);
 		})->count() + 1;
 
-		$this->local_id =  $_org . $itemtype . "-" . ($local + 1);
+		//$this->local_id =  $_org . $itemtype . "-" . ($local + 1);
 
 		$this->status = 'working';
 		$this->profiled_by = Auth::user()->firstname . " " . Auth::user()->middlename . " " .Auth::user()->lastname;
