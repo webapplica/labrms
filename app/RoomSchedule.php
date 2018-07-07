@@ -24,18 +24,18 @@ class RoomSchedule extends \Eloquent{
 	public static $rules = array(
 		'Subject' => 'required|min:2|max:50',
 		'Day' => 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
-		'Room' => 'exists:room,id',
-		'Semester' => 'exists:semester,semester',
+		'Room' => 'exists:rooms,id',
+		'Semester' => 'exists:semesters,semester',
 		'Academic Year' => 'exists:academic_years,name',
-		'Faculty' => 'exists:user,id'
+		'Faculty' => 'exists:users,id'
 	);
 
 	public static $updateRules = array(
 		'Subject' => 'min:2|max:50',
-		'Room' => 'exists:room,id',
-		'Semester' => 'exists:semester,semester',
+		'Room' => 'exists:rooms,id',
+		'Semester' => 'exists:semesters,semester',
 		'Academic Year' => 'exists:academic_years,name',
-		'Faculty' => 'exists:user,id'
+		'Faculty' => 'exists:users,id'
 	);
 
 	public function faculty()
