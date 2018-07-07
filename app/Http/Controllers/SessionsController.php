@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Session;
-use Auth;
-use Validator;
 use App;
-use App\User;
-use App\Reservation;
-use App\TicketView;
+use Auth;
 use Hash;
-use Illuminate\Support\Facades\Request;
+use Session;
+use App\User;
+use Validator;
+use App\TicketView;
+use App\Reservation;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class SessionsController extends Controller {
 

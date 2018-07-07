@@ -52,12 +52,7 @@ class Item extends \Eloquent{
 		'datereceived',
 		'status'
 	];
-
-	/**
-	*
-	* validation rules
-	*
-	*/
+	
 	public static $rules = array(
 		'University Property Number' => 'min:5|max:100|unique:items,local_id',
 		'Property Number' => 'min:5|max:100|unique:items,property_number',
@@ -67,20 +62,35 @@ class Item extends \Eloquent{
 		'Status' =>'required|min:5|max:50'
 
 	);
-
-	/**
-	*
-	* update rules
-	*
-	*/
+	
 	public static $updateRules = array(
 		'Property Number' => 'min:5|max:100',
 		'Serial Number' => 'min:5|max:100',
 		'Location' =>'',
 		'Date Received' =>'date',
 		'Status' =>'min:5|max:50'
-
 	);
+
+	public static $updateForReservationRules = array(
+		'id' => 'required|exists:items,id',
+		'checked' => 'required|boolean',
+	);
+
+	public function enabledReservation()
+	{
+		$this->for_reservation = true;
+		$this->save();
+
+		return $this;
+	}
+
+	public function disabledReservation()
+	{
+		$this->for_reservation = false;
+		$this->save();
+
+		return $this;
+	}
 
 	public static $category = [
 		'equipment',
