@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateRoomReservationTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -38,7 +42,7 @@ class CreateRoomReservationTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('room_reservation');
     }
 }

@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateInventoriesTable extends Migration {
+class CreateInventoriesTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.

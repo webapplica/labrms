@@ -5,25 +5,6 @@
 */
 
 Route::middleware(['auth'])->group(function(){
-    Route::resource('dashboard', 'DashboardController', array('only'=>array('index')));
-
-    Route::prefix('reservation')->group(function () {
-        Route::get('create', [
-            'as' => 'reservation.create',
-            'uses' => 'ReservationController@create'
-        ]);
-
-        Route::get('{id}', [
-            'as' => 'reservation.show',
-            'uses' => 'ReservationController@show'
-        ]);
-
-        Route::post('/', [
-            'as' => 'reservation.store',
-            'uses' => 'ReservationController@store'
-        ]);
-    });
-
 
 	Route::prefix('reservation')->group(function(){
 

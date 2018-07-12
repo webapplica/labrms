@@ -74,20 +74,14 @@ class Item extends \Eloquent{
 		'checked' => 'required|boolean',
 	);
 
-	public function enabledReservation()
+	public function scopeEnabledReservation($query)
 	{
-		$this->for_reservation = true;
-		$this->save();
-
-		return $this;
+		$query->where('for_reservation', '=', 1);
 	}
 
-	public function disabledReservation()
+	public function scopeDisabledReservation($query)
 	{
-		$this->for_reservation = false;
-		$this->save();
-
-		return $this;
+		$query->where('for_reservation', '=', 0);
 	}
 
 	public static $category = [

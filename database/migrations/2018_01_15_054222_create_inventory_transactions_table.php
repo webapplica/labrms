@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateInventoryTransactionsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -40,7 +44,7 @@ class CreateInventoryTransactionsTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('inventory_transactions');
     }
 }

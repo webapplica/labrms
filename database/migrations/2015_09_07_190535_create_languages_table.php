@@ -5,6 +5,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateLanguagesTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -31,6 +35,6 @@ class CreateLanguagesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('languages');
+        Schema::dropIfExists('languages');
     }
 }

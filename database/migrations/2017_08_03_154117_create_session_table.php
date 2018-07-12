@@ -3,8 +3,13 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSessionTable extends Migration {
+class CreateSessionTable extends Migration 
+{
 
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 	/**
 	 * Run the migrations.
 	 *
@@ -27,7 +32,7 @@ class CreateSessionTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('sessions');
+		Schema::dropIfExists('sessions');
 	}
 
 }

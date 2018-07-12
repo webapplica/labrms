@@ -20,7 +20,7 @@
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-offset-3 col-md-6 panel panel-body">
-		{{ Form::open(['method'=>'post','route'=>'item.profile.store','class'=>'form-horizontal','id'=>'profilingForm']) }}
+		{{ Form::open(['method'=>'post','url'=>'item/profile','class'=>'form-horizontal','id'=>'profilingForm']) }}
 		<legend><h3 class="text-muted">Item Profile</h3></legend>
 		<ol class="breadcrumb">
 		  <li><a href="{{ url('inventory') }}">Item Inventory</a></li>

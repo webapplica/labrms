@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateIssuancesTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -43,7 +47,7 @@ class CreateIssuancesTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('issuances');
     }
 }

@@ -268,7 +268,7 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
+			if( isset($itemprofile->propertynumber) && App\Workstation::isWorkstation( $itemprofile->propertynumber))
 			{
 				return json_encode('connected');
 

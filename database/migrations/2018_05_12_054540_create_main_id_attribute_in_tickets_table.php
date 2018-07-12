@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateMainIdAttributeInTicketsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -16,7 +20,7 @@ class CreateMainIdAttributeInTicketsTable extends Migration
         Schema::table('tickets', function (Blueprint $table) {
 
             if(! Schema::hasColumn('tickets', 'main_id'))
-                $table->integer('main_id')->unsigned();
+                $table->integer('main_id')->unsigned()->nullable();
 
             $table->foreign('main_id')
                     ->references('id')
@@ -34,11 +38,8 @@ class CreateMainIdAttributeInTicketsTable extends Migration
     public function down()
     {
         Schema::table('tickets', function (Blueprint $table) {
-
-            if(Schema::hasColumn('main_id')) {       
-                Schema::disableForeignKeyConstraints(); 
+            if(Schema::hasColumn('tickets', 'main_id')) { 
                 $table->drop('main_id');        
-                Schema::enableForeignKeyConstraints();
             }
         });
     }

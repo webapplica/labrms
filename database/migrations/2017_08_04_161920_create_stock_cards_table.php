@@ -6,6 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateStockCardsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
+    
     /**
      * Run the migrations.
      *

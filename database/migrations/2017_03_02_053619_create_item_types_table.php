@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateItemTypesTable extends Migration {
+class CreateItemTypesTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -36,7 +41,7 @@ class CreateItemTypesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('item_types');
+		Schema::dropIfExists('item_types');
 	}
 
 }

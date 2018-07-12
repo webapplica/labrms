@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateSoftwareTypesTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -26,7 +30,7 @@ class CreateSoftwareTypesTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('software_types');
     }
 }

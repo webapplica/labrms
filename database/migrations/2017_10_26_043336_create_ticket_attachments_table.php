@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTicketAttachmentsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -32,7 +36,7 @@ class CreateTicketAttachmentsTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('ticket_attachments');
     }
 }

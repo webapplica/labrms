@@ -3,7 +3,13 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateItemReservationTable extends Migration {
+class CreateItemReservationTable extends Migration
+{
+
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -40,7 +46,7 @@ class CreateItemReservationTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('item_reservation');
+		Schema::dropIfExists('item_reservation');
 	}
 
 }

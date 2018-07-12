@@ -2,25 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
+use App;
 use Auth;
 use Mail;
-use Carbon\Carbon;
-use App;
-use App\ItemType;
-use App\ItemProfile;
-use App\Inventory;
-use App\Purpose;
-use App\Reservation;
-use App\ReservationItems;
-use App\ReservationItemsView;
-use App\ReservedItemsView;
-use App\SpecialEvent;
+use Session;
 use App\User;
-use Illuminate\Support\Facades\Request;
+use Validator;
+use App\Purpose;
+use App\ItemType;
+use Carbon\Carbon;
+use App\Inventory;
+use App\ItemProfile;
+use App\Reservation;
+use App\SpecialEvent;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class ReservationController extends Controller {
 
@@ -51,9 +48,15 @@ class ReservationController extends Controller {
 	public function create()
 	{
 		$date = Reservation::thirdWorkingDay(Carbon::now());
+		$items = App\Item::enabledReservation()->pluck('property_number', 'id');
+		$rooms = App\Room::pluck('name', 'id');
+		$purposes = App\Purpose::pluck('title', 'id');
 
 		return view('reservation.create')
-				->with('date',$date);
+				->with('date',$date)
+				->with('items', $items)
+				->with('rooms', $rooms)
+				->with('purposes', $purposes);
 	}
 
 
@@ -645,176 +648,5 @@ class ReservationController extends Controller {
 		|
 		*/
 		return redirect("lend/create?reservation=$id");
-	}
-
-	/**
-	*
-	*	returns available equipment
-	*	@param start time
-	*	@param end time
-	*	@param date of use
-	*	@return all equipments
-	*
-	*/
-	public function getAvailableReservationItemType()
-	{
-		if(Request::ajax())
-		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	init all values
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$item = $this->sanitizeString(Input::get("item"));
-			$dateofuse = $this->sanitizeString(Input::get("dateofuse"));
-			$time_start = $this->sanitizeString(Input::get("time_start"));
-			$time_end = $this->sanitizeString(Input::get('time_end'));
-			// return json_encode(ReservedItemsView::all());
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_start, 'F d Y h:m A' )->format('Y-m-d H:i'));
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get all reserved items during the time given
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$ret_val = ReservedItemsView::reserved($dateofuse,$time_start,$time_end)->itemtype($item)->get();
-
-			return json_encode($ret_val);
-		}
-	}
-
-	public function getAvailableReservationItemTypeCount()
-	{
-		if(Request::ajax())
-		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	init all values
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$item = $this->sanitizeString(Input::get("item"));
-			$dateofuse = $this->sanitizeString(Input::get("dateofuse"));
-			$time_start = $this->sanitizeString(Input::get("time_start"));
-			$time_end = $this->sanitizeString(Input::get('time_end'));
-			// return json_encode(ReservedItemsView::all());
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get all unreserved items during the time given
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-
-
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_start, 'F d Y h:m A' )->toDateTimeString());
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_end)->format('Y-m-d h:m:s'));
-
-			return	$ret_val = ReservationItemsView::unreserved($dateofuse,$time_start,$time_end)
-													->filter($item)
-													->pluck('propertynumber');
-			return json_encode($ret_val);
-		}
-	}
-
-	public function getAllReservationItemList()
-	{
-		if(Request::ajax())
-		{
-			$reservationitems = ReservationItems::leftJoin('inventory','inventory.id','=','reservationitems.inventory_id')
-								->leftJoin('itemtype','itemtype.id','=','reservationitems.itemtype_id')
-								->select('reservationitems.id as id','itemtype.name as name','inventory.model as model','inventory.brand as brand','reservationitems.included as included','reservationitems.excluded as excluded','reservationitems.status as status')
-								->get();
-
-			return json_encode(['data'=>$reservationitems]);
-		}
-	}
-
-	/*
-	|--------------------------------------------------------------------------
-	|
-	| 	Update status of reservation item
-	|
-	|--------------------------------------------------------------------------
-	|
-	*/
-	public function updateReservationItemListStatus($id)
-	{
-		$reservationitems = ReservationItems::find($id);
-		if(count($reservationitems) > 0)
-		{
-			if($reservationitems->status == 'Disabled')
-			{
-				$reservationitems->status = 'Enabled';
-			}
-			else
-			{
-				$reservationitems->status = 'Disabled';	
-			} 
-
-			$reservationitems->save();
-			return json_encode('success');
-		}
-
-		return json_encode('error');
-	}
-
-	public function getAllReservationItemType()
-	{
-		$reservationitems = ReservationItems::with('itemtype')
-												->enabled()
-												->get()
-												->unique('itemtype_id');
-		return json_encode($reservationitems);
-	}
-
-	public function getAllReservationItemBrand()
-	{
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$itemtype = Itemtype::where('name',$itemtype)->select('id')->first();
-		if(count($itemtype) > 0)
-		{
-			$reservationitems = Inventory::where('itemtype_id',$itemtype->id)->select('brand')->get();
-			return json_encode($reservationitems);
-		}
-	}
-
-	public function getAllReservationItemModel()
-	{
-		$brand = $this->sanitizeString(Input::get('brand'));
-		$model = Inventory::where('brand',$brand)->select('model')->get();
-		return json_encode($model);
-	}
-
-	public function getAllReservationItemPropertyNumber()
-	{
-		$propertynumber = $this->sanitizeString(Input::get('propertynumber'));
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$itemtype = ItemType::where('name',$itemtype)
-								->select('id')
-								->first();
-		if(count($itemtype) > 0)
-		{
-			$brand = $this->sanitizeString(Input::get('brand'));
-			$model = $this->sanitizeString(Input::get('model'));
-			$inventory = Inventory::where('brand',$brand)
-									->where('model',$model)
-									->first();
-			if(count($inventory) > 0){
-				$propertynumber = ItemProfile::where('inventory_id',$inventory->id)
-												->whereNotIn('propertynumber',explode(',',$propertynumber))
-												->select('propertynumber')
-												->get();
-				return json_encode($propertynumber);
-			}
-		}
 	}
 }

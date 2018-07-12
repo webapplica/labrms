@@ -3,8 +3,13 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoomSchedulesTable extends Migration {
+class CreateRoomSchedulesTable extends Migration 
+{
 
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 	/**
 	 * Run the migrations.
 	 *
@@ -38,7 +43,7 @@ class CreateRoomSchedulesTable extends Migration {
 	 * @return void
 	 */
 	public function down()
-	{
+	{      
 		Schema::drop('room_schedules');
 	}
 

@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTicketTypesTable extends Migration {
+class CreateTicketTypesTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -28,7 +33,7 @@ class CreateTicketTypesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('ticket_types');
+		Schema::dropIfExists('ticket_types');
 	}
 
 }

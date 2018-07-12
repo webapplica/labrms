@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateLostItemsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -35,7 +39,7 @@ class CreateLostItemsTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('lost_items');
     }
 }

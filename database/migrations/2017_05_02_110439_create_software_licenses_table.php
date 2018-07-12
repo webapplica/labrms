@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSoftwareLicensesTable extends Migration {
+class CreateSoftwareLicensesTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -34,7 +39,7 @@ class CreateSoftwareLicensesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('software_licenses');
+		Schema::dropIfExists('software_licenses');
 	}
 
 }

@@ -5,7 +5,7 @@
 	<div class='col-md-offset-3 col-md-6'>
 		<div class="panel panel-body" style="padding-top: 20px;padding-left: 40px;padding-right: 40px;">
 
-	 		{{ Form::open(['method'=>'post','route'=>'inventory.store','class'=>'form-horizontal','id'=>'inventoryForm']) }}
+	 		{{ Form::open(['method'=>'post','url'=>'inventory','class'=>'form-horizontal','id'=>'inventoryForm']) }}
 
 			<legend><h3 style="color:#337ab7;"><span id="form-name">Inventory</span></h3></legend>
 			<ul class="breadcrumb">

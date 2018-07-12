@@ -6,7 +6,7 @@
 |--------------------------------------------------------------------------
 |
 */
-Route::get('pagenotfound',['as'=>'pagenotfound','uses'=>'HomeController@pagenotfound']);
+Route::get('pagenotfound', 'HomeController@pagenotfound');
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +14,7 @@ Route::get('pagenotfound',['as'=>'pagenotfound','uses'=>'HomeController@pagenotf
 |--------------------------------------------------------------------------
 |
 */
-Route::middleware(['session_start'])->group(function () {
+Route::namespace('auth')->middleware(['session_start'])->group(function () {
 
 	/*
 	|--------------------------------------------------------------------------
@@ -31,8 +31,8 @@ Route::middleware(['session_start'])->group(function () {
 	|--------------------------------------------------------------------------
 	|
 	*/
-	Route::get('login', ['as'=>'login.index','uses'=>'SessionsController@create']);
-	Route::post('login', ['as'=>'login.store','uses'=>'SessionsController@store']);
+	Route::get('login', 'SessionsController@create');
+	Route::post('login', 'SessionsController@store');
 
 	/*
 	|--------------------------------------------------------------------------
@@ -40,8 +40,23 @@ Route::middleware(['session_start'])->group(function () {
 	|--------------------------------------------------------------------------
 	|
 	*/
-	Route::get('reset',['as'=>'reset','uses'=>'SessionsController@getResetForm']);
-	Route::post('reset',['as'=>'reset.store','uses'=>'SessionsController@reset']);
+	Route::get('reset', 'SessionsController@getResetForm');
+	Route::post('reset', 'SessionsController@reset');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| authenticated users
+|--------------------------------------------------------------------------
+|
+*/
+Route::namespace('auth')->middleware(['auth'])->group(function(){
+	Route::get('profile', 'SessionsController@show');
+	Route::get('settings', 'SessionsController@edit');
+	Route::post('settings', 'SessionsController@update');
+	Route::get('logout','SessionsController@destroy');
+
 });
 
 
@@ -53,14 +68,6 @@ Route::middleware(['session_start'])->group(function () {
 */
 Route::middleware(['auth'])->group(function(){
 
-	Route::resource('dashboard','DashboardController', array('only'=>array('index')));
-
-	Route::get('profile',['as'=>'profile.index','uses'=>'SessionsController@show']);
-
-	Route::get('settings',['as'=>'settings.edit','uses'=>'SessionsController@edit']);
-
-	Route::post('settings',['as'=>'settings.update','uses'=>'SessionsController@update']);
-
-	Route::get('logout','SessionsController@destroy');
+	Route::get('dashboard','DashboardController@index');
 
 });

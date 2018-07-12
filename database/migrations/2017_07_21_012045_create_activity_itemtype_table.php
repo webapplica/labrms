@@ -3,8 +3,13 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateActivityItemtypeTable extends Migration {
+class CreateActivityItemtypeTable extends Migration
+{
 
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 	/**
 	 * Run the migrations.
 	 *
@@ -36,7 +41,7 @@ class CreateActivityItemtypeTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('activity_itemtype');
+		Schema::dropIfExists('activity_itemtype');
 	}
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\auth;
 
 use App;
 use Auth;
@@ -12,7 +12,7 @@ use App\TicketView;
 use App\Reservation;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class SessionsController extends Controller {
 
@@ -21,7 +21,7 @@ class SessionsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
 		return view('pagenotfound');
 	}
@@ -32,7 +32,7 @@ class SessionsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		return view('login');
 	}
@@ -43,11 +43,11 @@ class SessionsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		if(Request::ajax()){
-			$username = $this->sanitizeString(Input::get('username'));
-			$password = $this->sanitizeString(Input::get('password'));
+		if($request->ajax()) {
+			$username = $this->sanitizeString($request->get('username'));
+			$password = $this->sanitizeString($request->get('password'));
  		
 			$user = array(	
 				'username' => $username,
@@ -58,16 +58,16 @@ class SessionsController extends Controller {
 			{
 	 			return 'success';
 	 		}else{
-	 			return 'error';
+	 			return 'balakajan';
 	 		}
 		}
 
-		$username = $this->sanitizeString(Input::get('username'));
-		$password = $this->sanitizeString(Input::get('password'));
+		$username = $this->sanitizeString($request->get('username'));
+		$password = $this->sanitizeString($request->get('password'));
 
- 		$user = User::where('username','=',$username)->first();
+ 		$user = User::where('username','=',$username)->count();
 
- 		if(count($user) == 0)
+ 		if($user == 0)
  		{
 			Session::flash('error-message','Invalid login credentials');
 			return redirect('login');
@@ -103,7 +103,7 @@ class SessionsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show()
+	public function show(Request $request)
 	{
 		$person = Auth::user(); 
 		$reservation = App\Reservation::withInfo()->user(Auth::user()->id)->get()->count();
@@ -113,6 +113,7 @@ class SessionsController extends Controller {
 		$tickets = App\Ticket::selfAuthored()->get()->count();
 		$assigned = App\Ticket::selfAssigned(Auth::user()->id)->findByType('Complaint')->count();
 		$complaints = App\Ticket::selfAuthored()->findByType('Complaint')->count();
+
 		return view('user.index')
 			->with('person',$person)
 			->with('reservation',$reservation)
@@ -131,7 +132,7 @@ class SessionsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit()
+	public function edit(Request $request)
 	{
 		return view('user.edit');
 	}
@@ -143,10 +144,10 @@ class SessionsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update()
+	public function update(Request $request)
 	{
-		$password = $this->sanitizeString(Input::get('password'));
-		$newpassword = $this->sanitizeString(Input::get('newpassword'));
+		$password = $this->sanitizeString($request->get('password'));
+		$newpassword = $this->sanitizeString($request->get('newpassword'));
 
 		$user = User::find(Auth::user()->id);
 
@@ -173,17 +174,17 @@ class SessionsController extends Controller {
 		{
 
 			//verifies if current password is the same as the new password
-			if(Hash::check($newpassword,Auth::user()->password)){
+			if(Hash::check($newpassword,Auth::user()->password)) {
 				Session::flash('error-message','Your New Password must not be the same as your Old Password');
 				return redirect()->back()
 					->withInput()
 					->withErrors($validator);
-			}else{
+			} else {
 
 				$user->password = Hash::make($newpassword);
 				$user->save();
 			}
-		}else{
+		} else {
 
 			Session::flash('error-message','Incorrect Password');
 			return redirect()->back()
@@ -201,20 +202,30 @@ class SessionsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy()
+	public function destroy(Request $request)
 	{
-		//remove everything from session
 		Session::flush();
-		//remove everything from auth
 		Auth::logout();
 		return redirect('login');
 	}
 
-	public function getResetForm(){
+	/**
+	 * Returns the function for resetting the user
+	 *
+	 * @return void
+	 */
+	public function getResetForm(Request $request)
+	{
 		return view('user.reset');
 	}
 
-	public function reset(){
+	/**
+	 * Resets user password
+	 *
+	 * @return void
+	 */
+	public function reset(Request $request)
+	{
 		
 	}
 

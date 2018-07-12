@@ -4,7 +4,12 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePurposesTable extends Migration {
+class CreatePurposesTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -29,7 +34,7 @@ class CreatePurposesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('purposes');
+		Schema::dropIfExists('purposes');
 	}
 
 }

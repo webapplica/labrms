@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTagsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -27,7 +31,7 @@ class CreateTagsTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('tags');
     }
 }
