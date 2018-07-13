@@ -51,6 +51,7 @@ class ReservationController extends Controller {
 		$items = App\Item::enabledReservation()->pluck('property_number', 'id');
 		$rooms = App\Room::pluck('name', 'id');
 		$purposes = App\Purpose::pluck('title', 'id');
+		$faculties =  App\Faculty::all();
 
 		return view('reservation.create')
 				->with('date',$date)
