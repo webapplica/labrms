@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Carbon;
-use Validator;
 use DB;
-use Session;
 use App;
+use Carbon;
+use Session;
+use Validator;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 
 class ItemsController extends Controller {
@@ -50,10 +50,10 @@ class ItemsController extends Controller {
 
 			return datatables( $item )->toJson();
 		}
-
 		
 		$item_types = App\ItemType::whereIn('category', ['equipment','fixtures','furniture'])->get();
 		$item_statuses = App\Item::distinct('status')->pluck('status');
+		
 		return view('item.profile')
 				->with('item_statuses',$item_statuses)
 				->with('item_types',$item_types)
@@ -114,16 +114,18 @@ class ItemsController extends Controller {
 		foreach($request->get('item') as $item)
 		{
 
+			$university_property_number = $this->sanitizeString($item['universitypropertynumber']);
 			$property_number = $this->sanitizeString($item['propertynumber']);
 			$serial_number = $this->sanitizeString($item['serialid']);
 
 			$validator = Validator::make([
+				'University Property Number' => $university_property_number,
 				'Property Number' => $property_number,
 				'Serial Number' => $serial_number,
 				'Location' => $location,
 				'Date Received' => $date_received,
 				'Status' => 'working'
-			], App\Item::$rules,[ 'Property Number.unique' => "The :attribute $property_number already exists" ]);
+			], App\Item::$rules,[ 'University Property Number.unique' => "The :attribute $university_property_number already exists" ],[ 'Property Number.unique' => "The :attribute $property_number already exists" ]);
 
 			if($validator->fails())
 			{
@@ -134,6 +136,7 @@ class ItemsController extends Controller {
 			}
 
 			$itemprofile = new App\Item;
+			$itemprofile->local_id = $university_property_number;
 			$itemprofile->property_number = $property_number;
 			$itemprofile->serial_number = $serial_number;
 			$itemprofile->location = $location;

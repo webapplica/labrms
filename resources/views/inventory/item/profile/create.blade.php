@@ -143,7 +143,8 @@
 				<table id="itemTable" class="table table-bordered table-hover">
 						<thead>
 							<th>ID</th>
-							<th>Property Number</th>
+							<th>University Property Number</th>
+							<th>Local Property Number</th>
 							<th>Serial ID</th>
 						</thead>
 						<tbody>
@@ -288,6 +289,9 @@
 	      $('tbody').append(`
 				<tr>
 					<td>`+row+`</td>
+					<td>
+						<input type="text" name="item[`+(row-1)+`][universitypropertynumber]" class="form-control" >
+					</td>
 					<td>
 						<input type="text" name="item[`+(row-1)+`][propertynumber]" class="form-control" placeholder="Property Number" value="`+ const1 + const2 + `">
 					</td>

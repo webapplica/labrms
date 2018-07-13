@@ -108,6 +108,7 @@
             <li>{{ link_to('academicyear','Academic Year') }}</li>
             <li>{{ link_to('maintenance/activity','Maintenance Activities') }}</li>
             <li>{{ link_to('event','Event') }}</li>
+            <li>{{ link_to('faculty','Faculty') }}</li>
             @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1)
             <li>{{ link_to('item/type','Item Types') }}</li>
             <li>{{ link_to('room/category','Laboratory Room Category') }}</li>

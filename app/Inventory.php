@@ -91,12 +91,12 @@ class Inventory extends \Eloquent
 
   public function getQuantityAttribute()
   {
-    return $this->logs->sum('quantity');
+    return $this->logs->sum('quantity') + $this->receipts->sum('pivot.profiled_items');;
   }
 
   public function getUnprofiledAttribute()
   {
-    return $this->logs->sum('quantity') - $this->receipts->sum('pivot.profiled_items');
+    return $this->logs->sum('quantity');
   }
 
   public function getBrandAttribute($value)
