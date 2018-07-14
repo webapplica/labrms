@@ -23,15 +23,15 @@ class Reservation extends \Eloquent{
 	];
 	public $timestamps = true;
 	public $fillable = [
-		'item_id',
-		'purpose_id',
+		'purpose',
 		'user_id',
-		'faculty-in-charge',
+		'faculty_id',
 		'location',
-		'dateofuse',
-		'timein',
-		'timeout',
-		'approval'
+		'start',
+		'end',
+		'is_approved',
+		'is_claimed',
+		'is_cancelled',
 	];
 	protected $primaryKey = 'id';
 
@@ -87,8 +87,23 @@ class Reservation extends \Eloquent{
 	}
 
 	protected $appends = [
-		'reservee_name', 'parsed_date_and_time'
+		'reservee_name', 'parsed_date_and_time', 'status_name'
 	];
+
+	public function getStatusNameAttribute()
+	{
+		if( $this->is_disapproved ) {
+			return 'disapproved';
+		} else if( $this->is_cancelled ) {
+			return 'cancelled';
+		} else if( $this->is_claimed ) {
+			return 'claimed';
+		} else if ( $this->is_approved ) { 
+			return 'approved';
+		} else {
+			return 'pending';
+		}
+	}
 
 	public function getReserveeNameAttribute()
 	{
@@ -148,7 +163,7 @@ class Reservation extends \Eloquent{
 	public static function approve($id)
 	{
 		$reservation = Reservation::find($id);
-		$reservation->is_approved =  1;
+		$reservation->is_approved = Carbon::now();
 		$reservation->save();
 
 		return $reservation;
@@ -163,8 +178,8 @@ class Reservation extends \Eloquent{
 	public static function disapprove($id,$reason)
 	{
 		$reservation = Reservation::find($id);
-		$reservation->is_approved = 2;
-		$reservation->remark = $reason;
+		$reservation->is_disapproved = Carbon::now();
+		$reservation->remarks = $reason;
 		$reservation->save();
 		
 		return $reservation;

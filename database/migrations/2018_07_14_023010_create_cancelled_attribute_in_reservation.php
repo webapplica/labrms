@@ -16,9 +16,15 @@ class CreateCancelledAttributeInReservation extends Migration
         Schema::table('reservations', function (Blueprint $table) {
             if(! Schema::hasColumn('reservations', 'is_cancelled')) {
                 $table->datetime('is_cancelled')->nullable();
-                $table->datetime('is_approved')->nullable();
-                $table->datetime('is_claimed')->nullable();
             }
+
+            $table->dropColumn('is_approved');        
+            $table->dropColumn('is_claimed');        
+        });
+
+        Schema::table('reservations', function (Blueprint $table) {      
+            $table->datetime('is_approved')->nullable();
+            $table->datetime('is_claimed')->nullable();
         });
     }
 
@@ -31,7 +37,7 @@ class CreateCancelledAttributeInReservation extends Migration
     {
         Schema::table('reservations', function (Blueprint $table) {
             if(Schema::hasColumn('reservations', 'is_cancelled')) { 
-                $table->drop('is_cancelled');        
+                $table->dropColumn('is_cancelled');        
             }
         });
     }
