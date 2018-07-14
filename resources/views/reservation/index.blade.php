@@ -50,7 +50,7 @@
 	        columns: [
 	            { data: "id" },
 	            { data: 'reservee_name' },
-	            { data: "faculty_name" },
+	            { data: "accountable" },
 	            { data: 'parsed_date_and_time'},
 				{ data: "purpose" },
 				{ data: "location" },

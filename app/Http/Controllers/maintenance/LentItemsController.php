@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use Validator;
-use Session;
 use DB;
 use App;
+use Session;
+use Validator;
 use App\LendLog;
+use Carbon\Carbon;
 use App\ItemProfile;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class LentItemsController extends Controller
 {

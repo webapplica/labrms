@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
 use App;
-use Illuminate\Support\Facades\Request;
+use Session;
+use Validator;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class ItemTypesController extends Controller {
 

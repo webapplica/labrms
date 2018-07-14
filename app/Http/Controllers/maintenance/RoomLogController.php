@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
 use Session;
-use App;
-use Illuminate\Support\Facades\Request;
+use App\Room;
+use Validator;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
-class FacultyController extends Controller
+class RoomLogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,12 +18,17 @@ class FacultyController extends Controller
      */
     public function index()
     {
+
         if(Request::ajax())
         {
             return json_encode([
-                'data' => Faculty::all()
-            ]);
+                    'data'=> Room::all()
+                ]);
         }
+
+        $rooms = Room::all();
+        return view('room.log.index')
+            ->with('rooms',$rooms);
     }
 
     /**
@@ -55,7 +60,17 @@ class FacultyController extends Controller
      */
     public function show($id)
     {
-        //
+        /**
+        *
+        *   @param id
+        *   @return ticket information
+        *   @return inventory
+        *   @return itemtype
+        *
+        */
+        $room = Room::with('roomticket.ticket')->find($id);   
+        return view('room.log.show')
+                ->with('room',$room);
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace App;
 
-// use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
+use Auth;
 use Carbon\Carbon;
 use App\SpecialEvent;
-use Auth;
+use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends \Eloquent{
 	//Database driver
@@ -42,11 +42,11 @@ class Reservation extends \Eloquent{
 	*/
 	public static $rules = array(
 		'Items' => 'required',
-		'Location' => 'required|between:4,100',
+		'Location' => 'required|exists:rooms,id',
 		'Time started' => 'required|date',
 		'Time end' => 'required|date',
 		'Purpose' => 'required',
-		'Faculty-in-charge' => 'required|between:5,50'
+		'Faculty-in-charge' => 'nullable|exists:faculties,id'
 	);
 
 	/**
@@ -76,14 +76,28 @@ class Reservation extends \Eloquent{
 		return $this->belongsTo('App\User','user_id','id');
 	}
 
-	public function itemprofile()
+	public function item()
 	{
-		return $this->belongsToMany('App\ItemProfile','item_reservation','reservation_id','item_id'); 
+		return $this->belongsToMany('App\Item','item_reservation','reservation_id','item_id'); 
 	}
 
 	public function room()
 	{
-		return $this->belongsToMany('App\Room','roomreservation','reservation_id','room_id');
+		return $this->belongsToMany('App\Room','room_reservation','reservation_id','room_id');
+	}
+
+	protected $appends = [
+		'reservee_name', 'parsed_date_and_time'
+	];
+
+	public function getReserveeNameAttribute()
+	{
+		return  trim("{$this->user->lastname},{$this->user->firstname} {$this->user->middlename}");
+	}
+
+	public function getParsedDateAndTimeAttribute()
+	{
+		return Carbon::parse($this->end)->toDayDateTimeString();
 	}
 
 	public function scopeUnclaimed($query)
@@ -125,8 +139,6 @@ class Reservation extends \Eloquent{
 	{
 		return $query->where('user_id','=',$id);
 	}
-
-	
 
 	/**
 	*	change reservation status to approved

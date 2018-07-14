@@ -1,11 +1,12 @@
 @extends('layouts.master-blue')
 
 @section('style')
-{{ HTML::style(asset('css/bootstrap-select.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/selectize.bootstrap3.css') }}" type="text/css">
-{{ HTML::style(asset('css/datepicker.min.css')) }}
-{{ HTML::style(asset('css/bootstrap-clockpicker.min.css')) }}
-{{ HTML::style(asset('css/style.min.css')) }}
+
+<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="http://labrms.local/css/selectize.bootstrap3.css" type="text/css">
+<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/datepicker.min.css">
+<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/bootstrap-clockpicker.min.css">
+<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/style.min.css">
 <style>
 	#page-body, #hide,#hide-notes,#reservation-info{
 		display:none;
@@ -16,13 +17,18 @@
 	.datepicker{z-index:1151 !important;}
 </style>
 @stop
+
 @section('script-include')
-{{ HTML::script(asset('js/moment.min.js')) }}
-{{ HTML::script(asset('js/datepicker.min.js')) }}
-{{ HTML::script(asset('js/datepicker.en.js')) }}
-{{ HTML::script(asset('js/bootstrap-clockpicker.min.js')) }}
-{{ HTML::script(asset('js/bootstrap-select.min.js')) }}
+<script src="http://labrms.local/js/moment.min.js"></script>
+<script src="http://labrms.local/js/loadingoverlay.min.js"></script>
+<script src="http://labrms.local/js/loadingoverlay_progress.min.js"></script>
+<script src="http://labrms.local/js/moment.min.js"></script>
+<script src="http://labrms.local/js/datepicker.min.js"></script>
+<script src="http://labrms.local/js/datepicker.en.js"></script>
+<script src="http://labrms.local/js/bootstrap-clockpicker.min.js"></script>
+<script src="http://labrms.local/js/bootstrap-select.min.js"></script>
 @stop
+
 @section('content')
 <div class="col-md-offset-3 col-md-6 panel" id="reservation">
 	<div class="panel-body">
@@ -60,11 +66,13 @@
 				{{ Form::label('name','Faculty-in-charge') }}
 				</div>
 				<div class="col-sm-9">
-				{{
-					Form::select('name',[],Input::old('name'),[
-					'id'=>'name',
-					'class'=>'form-control'
-				]) }}
+					<select name="name" id="name" class="form-control">
+					@if( !empty($faculties))
+						@foreach($faculties as $faculty)
+						<option value="{{ $faculty->id }}" {{ $faculty->id == old('name') ? 'selected' : "" }}>{{ $faculty->full_name }}</option>
+						@endforeach
+					@endif
+					</select>	
 				</div>
 			</div>
 			<!-- date of use -->
@@ -75,7 +83,7 @@
 				]) }}
 				</div>
 				<div class="col-sm-9">
-				{{ Form::text('dateofuse',Input::old('dateofuse'),[
+				{{ Form::text('dateofuse', old('dateofuse'),[
 					'id' => 'dateofuse',
 					'class'=>'form-control',
 					'placeholder'=>'MM | DD | YYYY',
@@ -90,7 +98,7 @@
 				{{ Form::label('time_start','Time started') }}
 				</div>
 				<div class="col-sm-9">
-				{{ Form::text('time_start',Input::old('time_start'),[
+				{{ Form::text('time_start', old('time_start'),[
 					'class'=>'form-control',
 					'placeholder'=>'Hour : Min',
 					'id' => 'starttime',
@@ -106,7 +114,7 @@
 				{{ Form::label('time_end','Time end') }}
 				</div>
 				<div class="col-sm-9">
-				{{ Form::text('time_end',Input::old('time_end'),[
+				{{ Form::text('time_end', old('time_end'),[
 					'class'=>'form-control background-white',
 					'placeholder'=>'Hour : Min',
 					'id' => 'endtime',
@@ -119,12 +127,13 @@
 			<!-- Item type -->
 			<div class="form-group">
 				<div class="col-xs-3">
-					{{ Form::label('itemtype','Items') }}
+					{{ Form::label('items','Items') }}
 				</div>
 				<div class="col-xs-9"> 
-					{{ Form::select('items[]', $items,Input::old('items'),[
+					{{ Form::select('items[]', $items, old('items'),[
 						'id' => 'items',
-						'class'=>'form-control'
+						'class'=>'form-control',
+						'multiple'
 					]) }}
 				</div>
 			</div>
@@ -135,7 +144,7 @@
 				</div>
 				<div class="col-sm-9">
 				{{
-					Form::select('location', $rooms,Input::old('location'),[
+					Form::select('location', $rooms, old('location'),[
 					'id'=>'location',
 					'class'=>'form-control'
 				]) }}
@@ -146,7 +155,7 @@
 				{{ Form::label('purpose','Purpose') }}
 				</div>
 				<div class="col-sm-9">
-				{{ Form::select('purpose', $purposes,Input::old('purpose'),[
+				{{ Form::select('purpose', $purposes, old('purpose'),[
 					'id' => 'purpose',
 					'class'=>'form-control'
 				]) }}
@@ -155,7 +164,7 @@
 						<input type="checkbox" name="contains" id="contains"> Not in the list?
 					</label>
 				</div>
-				{{ Form::textarea('description',Input::old('description'),[
+				{{ Form::textarea('description',old('description'),[
 					'id' => 'description',
 					'class'=>'form-control',
 					'placeholder'=>'Enter  details here...',
@@ -275,17 +284,6 @@
 			    swal("Cancelled", "Request Cancelled", "error");
 			  }
 			});
-		});
-
-		$('#items').on('rendered.bs.select', function (e) {
-			$('#page-body').show();
-			
-			@if( Session::has("success-message") )
-			  swal("Success!","{{ Session::pull('success-message') }}","success");
-			@endif
-			@if( Session::has("error-message") )
-			  swal("Oops...","{{ Session::pull('error-message') }}","error");
-			@endif
 		});
 	});
 </script>

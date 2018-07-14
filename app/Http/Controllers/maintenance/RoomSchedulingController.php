@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
 use DB;
-use Carbon\Carbon;
 use App;
-use Illuminate\Support\Facades\Request;
+use Session;
+use Validator;
+use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class RoomSchedulingController extends Controller
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
 use App;
+use Session;
+use Validator;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class RoomCategoryController extends Controller
 {

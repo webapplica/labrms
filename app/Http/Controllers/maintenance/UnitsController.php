@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
 use App;
 use Session;
 use Validator;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class UnitsController extends Controller
 {

@@ -14,7 +14,7 @@
 require_once( base_path('routes/partials/account-management.php'));
 require_once( base_path('routes/partials/authentication.php'));
 require_once( base_path('routes/partials/inventory.php'));
-require_once( base_path('routes/partials/maintenance.php'));
+App\Http\Modules\Maintenance\Maintenance::routes();
 require_once( base_path('routes/partials/reservation.php'));
 App\Http\Modules\Reservation\Reservation::routes();
 require_once( base_path('routes/partials/software-inventory.php'));
