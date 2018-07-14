@@ -88,7 +88,7 @@ Login
               </div>
             </div>
             <hr />
-            <a href="{{ route('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a>
+            <a href="{{ url('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a>
           {{ Form::close() }}
           </div>
         </div>

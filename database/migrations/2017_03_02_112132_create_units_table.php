@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateUnitsTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *

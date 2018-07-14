@@ -2,25 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
+use App;
 use Auth;
 use Mail;
+use Session;
+use Validator;
 use Carbon\Carbon;
-use App;
-use App\ItemType;
-use App\ItemProfile;
-use App\Inventory;
-use App\Purpose;
-use App\Reservation;
-use App\ReservationItems;
-use App\ReservationItemsView;
-use App\ReservedItemsView;
-use App\SpecialEvent;
-use App\User;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ReservationController extends Controller {
 
@@ -29,9 +18,9 @@ class ReservationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 
 			$reservation = App\Reservation::orderBy('created_at','desc')
@@ -48,12 +37,20 @@ class ReservationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
-		$date = Reservation::thirdWorkingDay(Carbon::now());
+		$date = App\Reservation::thirdWorkingDay(Carbon::now());
+		$items = App\Item::enabledReservation()->pluck('property_number', 'id');
+		$rooms = App\Room::pluck('name', 'id');
+		$purposes = App\Purpose::pluck('title', 'id');
+		$faculties =  App\Faculty::all();
 
 		return view('reservation.create')
-				->with('date',$date);
+				->with('date',$date)
+				->with('items', $items)
+				->with('rooms', $rooms)
+				->with('purposes', $purposes)
+				->with('faculties', $faculties);
 	}
 
 
@@ -62,90 +59,58 @@ class ReservationController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{		
-		
-		$location = $this->sanitizeString(Input::get('location'));
-		$purpose = $this->sanitizeString(Input::get('purpose'));
-		$dateofuse = $this->sanitizeString(Input::get('dateofuse'));
-		$time_start = $this->sanitizeString(Input::get('time_start'));
-		$time_end = $this->sanitizeString(Input::get('time_end'));
-		$faculty = $this->sanitizeString(Input::get('name'));
-		$items = Input::get('items');
+		$location = $this->sanitizeString($request->get('location'));
+		$purpose = $this->sanitizeString($request->get('purpose'));
+		$dateofuse = $this->sanitizeString($request->get('dateofuse'));
+		$time_start = $this->sanitizeString($request->get('time_start'));
+		$time_end = $this->sanitizeString($request->get('time_end'));
+		$faculty = $this->sanitizeString($request->get('name'));
+		$items = $request->get('items');
 		$remark = '';
+		$description = $this->sanitizeString($request->get('description'));
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	temporary time
-		|	used for validation
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// set the default value for purpose
+		if( App\Purpose::where('id', '=', $purpose)->count() > 0 ) {
+			$purpose = App\Purpose::where('id', '=', $purpose)->pluck('title')->first();
+		} else {
+			$purpose = $description;
+		}
+
+		// temporary time
+		// used for validation
 		$time_start_temp = Carbon::parse($time_start);
 		$time_end_temp = Carbon::parse($time_end); 
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	initialize laboratory operation time
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// initialize laboratory operations time
 		$lab_start_time = Carbon::parse('7:30 AM'); 
 		$lab_end_time = Carbon::parse('9:00 PM');
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if time inputted is in laboratory operation time
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($time_start_temp->between( $lab_start_time,$lab_end_time ) && $time_end_temp->between( $lab_start_time,$lab_end_time ))
-		{
-			if($time_start_temp >= $time_end_temp)
-			{
+		
+		// checked if the time inputted is in the laboratory operations time
+		if($time_start_temp->between( $lab_start_time,$lab_end_time ) && $time_end_temp->between( $lab_start_time,$lab_end_time )) {
+			if($time_start_temp >= $time_end_temp) {
 
 				return redirect('reservation/create')
 						->withInput()
 						->withErrors(['Time start must be less than time end']);
 			}
-		}
-		else
-		{
+		} else {
 			return redirect('reservation/create')
 					->withInput()
 					->withErrors(['Reservation must occur only from 7:30 AM - 9:00 PM']);
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Laboratory Head and assistant disregard 3 day reservation rule
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// laboratory operations time does not apply to laboratory head
+		// and laboratory assistant
 		if( Auth::user()->accesslevel != 0 && Auth::user()->accesslevel != 1 ) // the original value
 		// if( true ) // debugging purpose only
 		{
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	date of use must not be greater than 3 days
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-
+			// date of use must not be greater than 3 working days
 			$current_date = Carbon::now();
 			
-			if(!Carbon::parse($dateofuse)->isSameDay(Reservation::thirdWorkingDay($current_date)))
-			{
+			if(! Carbon::parse($dateofuse)->isSameDay( Reservation::thirdWorkingDay($current_date))) {
 				return redirect('reservation/create')
 						->withInput()
 						->withErrors(['Reservation must occur 3 working days before usage']);
@@ -153,9 +118,9 @@ class ReservationController extends Controller {
 
 		}
 
-		if(Input::has('items'))
-		{
-			$items = $this->sanitizeString(implode(Input::get('items'),','));
+		// check if the request has an array of items stored
+		if($request->has('items')) {
+			$items = $this->sanitizeString( implode( $request->get('items'), ',' ) );
 		}
 
 		/*
@@ -198,80 +163,36 @@ class ReservationController extends Controller {
 		// 	$remark = 'Administrator Priviledge';
 		// }
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Administrator
-		|	if reservation exists, override the existing
-		|	check purpose if existing
-		|	check current purpose
-		|	replace if rank is higher
-		|	change remark of old to 'denied due to lower priority'
-		|	change old approval to 2
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if( Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 )
-		{
+		// Administrator
+		// if reservation exists, override the existing
+		// check purpose if existing
+		// check current purpose
+		// replace if rank is higher
+		// change remark of old to 'denied due to lower priority'
+		// change old approval to 2
+		if( Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 ) {
 			$approval = 1;
 			$remark = 'Administrator Priviledge';
 		}
 		
-		if(Auth::user()->accesslevel == 0)
-		{
+		if(Auth::user()->accesslevel == 0) {
 			//disabled
 			//process cancelled
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		|	check if purpose is user defined
-		|	or not on list
-		|	if not on list
-		|	use description field as purpose
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if(Input::has('contains'))
-		{
-			$purpose = $this->sanitizeString(Input::get('description'));
+		// check if purpose is user defined
+		// or not on list
+		// if not on list
+		// use description field as purpose
+		if($request->has('contains')) {
+			$purpose = $this->sanitizeString($request->get('description'));
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	If the user is faculty, use the users information
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if(Auth::user()->type == 'faculty')
-		{
-			$faculty = Auth::user()->lastname . ', ' . Auth::user()->firstname . " " . Auth::user()->middlename;
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	instantiate time
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// instantiate time
 		$time_start = Carbon::parse($dateofuse . " " . $time_start);
 		$time_end = Carbon::parse($dateofuse . " " . $time_end);
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check and replace existing reservation
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// Check and replace existing reservation
 		// $reservation = Reservation::hasReserved($time_start,$time_end);
 		// if( count($reservation)  > 0 && $reservation )
 		// {
@@ -293,14 +214,7 @@ class ReservationController extends Controller {
 		// 	}
 		// }
 		
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	validator ...
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		// validator ...
 		$validator = Validator::make([
 			'Items' => $items,
 			'Location' => $location,
@@ -309,79 +223,46 @@ class ReservationController extends Controller {
 			'Time end' => $time_end,
 			'Purpose' => $purpose,
 			'Faculty-in-charge' => $faculty
-		],Reservation::$rules);
+		], App\Reservation::$rules);
 
-		if($validator->fails())
-		{
+		if($validator->fails()) {
 			return redirect('reservation/create')
 					->withInput()
 					->withErrors($validator);
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	convert items type to propertynumber
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$_items = [];	
+		// checks if each item is valid for reservation
+		$temp_items = explode(",", $items);
+		$items = array();
 
-		foreach(explode(",",$items) as $item)
-		{
+		foreach( $temp_items as $item ) {
 
-			if( $this->hasData($item) == false )
-			{
-				return redirect('reservation/create')
-						->withInput()
-						->withErrors(["You need to chose a valid item for reservation"]);
-			}
+			$items[] = App\Item::where('id', '=', $item)->pluck('id')->first();
 
-			$_temp = ReservationItemsView::unreserved(
-						$dateofuse,
-						$time_start->format('h:i A'),
-						$time_end->format('h:i A')
-			)->filter($item)->pluck('id')->first();
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	no more items to borrow
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			if( count($_temp) == 0 || $_temp == null ||$_temp == '')
-			{
+			// no more items to borrow
+			if( count($items) == 0 || $items == null ) {
 				return redirect('reservation/create')
 						->withInput()
 						->withErrors(["No more $item available for reservation"]);
 			}	
-
-			array_push($_items,$_temp);
 		}
 		
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	reservation create
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$reservation = new Reservation;
+		$faculty = App\Faculty::find($faculty);
+		$faculty_id = App\User::where('lastname', '=', $faculty->lastname)->where('firstname', '=', $faculty->firstname)->where('middlename', '=', $faculty->middlename)->pluck('id')->first();
+
+		$reservation = new App\Reservation;
 		$reservation->user_id = Auth::user()->id;
-		$reservation->timein = $time_start;
-		$reservation->timeout = $time_end;
+		$reservation->start = $time_start;
+		$reservation->end = $time_end;
 		$reservation->purpose = $purpose;
 		$reservation->location = $location;
-		$reservation->approval = $approval;
-		$reservation->remark = $remark;
-		$reservation->facultyincharge = $faculty;
+		$reservation->is_approved = $approval;
+		$reservation->remarks = $remark;
+		$reservation->accountable = $faculty->full_name;
+		$reservation->faculty_id = $faculty_id;
 		$reservation->save();
 
-		$reservation->itemprofile()->attach($_items);
+		$reservation->item()->attach($items);
 
 		Session::flash('success-message','Reservation Created');
 		return redirect('reservation/create');
@@ -394,14 +275,14 @@ class ReservationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			return json_encode(Reservation::find($id));
+			return json_encode(App\Reservation::find($id));
 		}
 
-		$reservation = Reservation::find($id);
+		$reservation = App\Reservation::find($id);
 
 		if(count($reservation) <= 0)
 		{
@@ -419,7 +300,7 @@ class ReservationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
 		return view('pagenotfound');
 	}
@@ -431,7 +312,7 @@ class ReservationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
 		return view('pagenotfound');
 	}
@@ -443,7 +324,7 @@ class ReservationController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
 		return view('pagenotfound');
 	}
@@ -456,9 +337,9 @@ class ReservationController extends Controller {
 	*	@return $reservation info
 	*
 	*/
-	public function hasReserved($start,$end)
+	public function hasReserved(Request $request, $start,$end)
 	{
-		if( Request::ajax() )
+		if( $request->ajax() )
 		{
 
 			/*
@@ -469,7 +350,7 @@ class ReservationController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			$reservation = Reservation::hasReserved($time_start,$time_end);
+			$reservation = App\Reservation::hasReserved($time_start,$time_end);
 			if( count($reservation)  > 0 && $reservation )
 			{
 				return json_encode($reservation);
@@ -485,57 +366,41 @@ class ReservationController extends Controller {
 	*	@return 'success','error'
 	*
 	*/
-	public function approve($id)
+	public function approve(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			$id = $this->sanitizeString($id);
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	calls approve method in reservation
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$reservation = Reservation::approve($id);
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	if success
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			if(count($reservation) > 0)
+			$reservation = App\Reservation::approve($id);
+			$subject = 'Reservation Approval Notice';
+			$response_code = 200;
+			$success_message = [];
+			$error_message = [];
+	
+			if( $reservation->count() > 0)
 			{
-		        $user = User::findOrFail($reservation->user_id);
-		        $subject = 'Reservation Disapproval Notice';
-
-		        try{
-
-			        Mail::send(['html'=>'reservation.notice'], ['reservation' =>$reservation], function ($message) use ($subject,$user) {
-			            $message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
-			            $message->subject($subject);
-			            $message->to($user->email)->cc($user->email);
-			        });
-
-		        } catch ( Exception $e ) {}
-
-				return json_encode('success');
+				$user = App\User::findOrFail($reservation->user_id);
+	
+				try
+				{
+					Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject,$user) {
+						$message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
+						$message->subject($subject);
+						$message->to($user->email)->cc($user->email);
+					});
+	
+					$success_messages = 'Reservation successfully updated';
+				} catch ( \Exception $e) {
+					$response_code = 500;
+					$error_message = 'Emailing services failed';
+	
+				}
 			}
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	if error occurred
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			return json_encode('error');
+			return response()->json([
+				'messages' => $success_messages,
+				'errors' => $error_messages,
+			], $response_code);
 		}
 	}
 
@@ -546,275 +411,51 @@ class ReservationController extends Controller {
 	*	@return 'success','error'
 	*
 	*/
-	public function disapprove($id)
+	public function disapprove(Request $request, $id)
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
 			$id = $this->sanitizeString($id);
-			$reason = $this->sanitizeString(Input::get('reason'));
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	calls disapprove method in reservation
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$reservation = Reservation::disapprove($id,$reason);
-
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	if success
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			if(count($reservation) > 0)
+			$reason = $this->sanitizeString($request->get('reason'));
+			$reservation = App\Reservation::disapprove($id, $reason);
+			$subject = 'Reservation Disapproval Notice';
+			$response_code = 200;
+			$success_message = [];
+			$error_message = [];
+	
+			if( $reservation->count() > 0)
 			{
-		        $user = User::findOrFail($reservation->user_id);
-		        $subject = 'Reservation Disapproval Notice';
-
-		        try
-		        {
-
-			        Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject,$user) {
-			            $message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
-			            $message->subject($subject);
-			            $message->to($user->email)->cc($user->email);
-			        });
-
-		        } catch (Exception $e) {}
-
-				return json_encode('success');
+				$user = App\User::findOrFail($reservation->user_id);
+	
+				try
+				{
+					Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject,$user) {
+						$message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
+						$message->subject($subject);
+						$message->to($user->email)->cc($user->email);
+					});
+	
+					$success_message = 'Reservation successfully updated';
+				} catch ( \Exception $e) {
+					$response_code = 500;
+					$error_message = 'Emailing services failed';
+	
+				}
 			}
 
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	if error occurred
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			return json_encode('error');
+			return response()->json([
+				'messages' => $success_message,
+				'errors' => $error_message,
+			], $response_code);
 		}
 	}
 
-	public function claim()
+	public function claim(Request $request)
 	{
 
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	get the reservation id
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$id =  Input::get('id');
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	clean the reservation id
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$id = $this->sanitizeString(Input::get('id'));
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	set the reservation status to claimed
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-
+		$id =  $request->get('id');
+		$id = $this->sanitizeString($request->get('id'));
 		// $reservation = Reservation::setStatusAsClaimed($id);
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	redirect to lend log
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
 		return redirect("lend/create?reservation=$id");
-	}
-
-	/**
-	*
-	*	returns available equipment
-	*	@param start time
-	*	@param end time
-	*	@param date of use
-	*	@return all equipments
-	*
-	*/
-	public function getAvailableReservationItemType()
-	{
-		if(Request::ajax())
-		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	init all values
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$item = $this->sanitizeString(Input::get("item"));
-			$dateofuse = $this->sanitizeString(Input::get("dateofuse"));
-			$time_start = $this->sanitizeString(Input::get("time_start"));
-			$time_end = $this->sanitizeString(Input::get('time_end'));
-			// return json_encode(ReservedItemsView::all());
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_start, 'F d Y h:m A' )->format('Y-m-d H:i'));
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get all reserved items during the time given
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$ret_val = ReservedItemsView::reserved($dateofuse,$time_start,$time_end)->itemtype($item)->get();
-
-			return json_encode($ret_val);
-		}
-	}
-
-	public function getAvailableReservationItemTypeCount()
-	{
-		if(Request::ajax())
-		{
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	init all values
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-			$item = $this->sanitizeString(Input::get("item"));
-			$dateofuse = $this->sanitizeString(Input::get("dateofuse"));
-			$time_start = $this->sanitizeString(Input::get("time_start"));
-			$time_end = $this->sanitizeString(Input::get('time_end'));
-			// return json_encode(ReservedItemsView::all());
-			/*
-			|--------------------------------------------------------------------------
-			|
-			| 	get all unreserved items during the time given
-			|
-			|--------------------------------------------------------------------------
-			|
-			*/
-
-
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_start, 'F d Y h:m A' )->toDateTimeString());
-			// return json_encode(Carbon::parse($dateofuse . " " . $time_end)->format('Y-m-d h:m:s'));
-
-			return	$ret_val = ReservationItemsView::unreserved($dateofuse,$time_start,$time_end)
-													->filter($item)
-													->pluck('propertynumber');
-			return json_encode($ret_val);
-		}
-	}
-
-	public function getAllReservationItemList()
-	{
-		if(Request::ajax())
-		{
-			$reservationitems = ReservationItems::leftJoin('inventory','inventory.id','=','reservationitems.inventory_id')
-								->leftJoin('itemtype','itemtype.id','=','reservationitems.itemtype_id')
-								->select('reservationitems.id as id','itemtype.name as name','inventory.model as model','inventory.brand as brand','reservationitems.included as included','reservationitems.excluded as excluded','reservationitems.status as status')
-								->get();
-
-			return json_encode(['data'=>$reservationitems]);
-		}
-	}
-
-	/*
-	|--------------------------------------------------------------------------
-	|
-	| 	Update status of reservation item
-	|
-	|--------------------------------------------------------------------------
-	|
-	*/
-	public function updateReservationItemListStatus($id)
-	{
-		$reservationitems = ReservationItems::find($id);
-		if(count($reservationitems) > 0)
-		{
-			if($reservationitems->status == 'Disabled')
-			{
-				$reservationitems->status = 'Enabled';
-			}
-			else
-			{
-				$reservationitems->status = 'Disabled';	
-			} 
-
-			$reservationitems->save();
-			return json_encode('success');
-		}
-
-		return json_encode('error');
-	}
-
-	public function getAllReservationItemType()
-	{
-		$reservationitems = ReservationItems::with('itemtype')
-												->enabled()
-												->get()
-												->unique('itemtype_id');
-		return json_encode($reservationitems);
-	}
-
-	public function getAllReservationItemBrand()
-	{
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$itemtype = Itemtype::where('name',$itemtype)->select('id')->first();
-		if(count($itemtype) > 0)
-		{
-			$reservationitems = Inventory::where('itemtype_id',$itemtype->id)->select('brand')->get();
-			return json_encode($reservationitems);
-		}
-	}
-
-	public function getAllReservationItemModel()
-	{
-		$brand = $this->sanitizeString(Input::get('brand'));
-		$model = Inventory::where('brand',$brand)->select('model')->get();
-		return json_encode($model);
-	}
-
-	public function getAllReservationItemPropertyNumber()
-	{
-		$propertynumber = $this->sanitizeString(Input::get('propertynumber'));
-		$itemtype = $this->sanitizeString(Input::get('itemtype'));
-		$itemtype = ItemType::where('name',$itemtype)
-								->select('id')
-								->first();
-		if(count($itemtype) > 0)
-		{
-			$brand = $this->sanitizeString(Input::get('brand'));
-			$model = $this->sanitizeString(Input::get('model'));
-			$inventory = Inventory::where('brand',$brand)
-									->where('model',$model)
-									->first();
-			if(count($inventory) > 0){
-				$propertynumber = ItemProfile::where('inventory_id',$inventory->id)
-												->whereNotIn('propertynumber',explode(',',$propertynumber))
-												->select('propertynumber')
-												->get();
-				return json_encode($propertynumber);
-			}
-		}
 	}
 }

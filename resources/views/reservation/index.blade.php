@@ -41,6 +41,8 @@
 		    language: {
 		        searchPlaceholder: "Search..."
 		    },
+			serverSide: true,
+			processing: true,
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
@@ -50,28 +52,27 @@
 	        columns: [
 	            { data: "id" },
 	            { data: 'reservee_name' },
-	            { data: "faculty_name" },
+	            { data: "accountable" },
 	            { data: 'parsed_date_and_time'},
 				{ data: "purpose" },
 				{ data: "location" },
 				{ data: "status_name" },
-				{ data: 'remark' },
+				{ data: 'remarks' },
 				{ data: function(callback){
-					if(callback.approval == 0)
+					if( callback.is_cancelled || callback.is_claimed || callback.is_disapproved ) {
+						return '<p class="text-muted">No Action</p>'
+					} else if( callback.is_approved )
 					{
+						return `
+							<button data-id="`+callback.id+`" data-reason="`+callback.remark+`" class="disapprove btn btn-xs btn-danger"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i></button>
+						`
+					} else {
 						return `
 							<button data-id="`+callback.id+`" class="approve btn btn-xs btn-success"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i></button>
 							<button data-id="`+callback.id+`" data-reason="`+callback.remark+`"  class="disapprove btn btn-xs btn-danger"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i></button>
 						`
 					}
-					if(callback.approval == 1)
-					{
-						return `
-							<button data-id="`+callback.id+`" data-reason="`+callback.remark+`" class="disapprove btn btn-xs btn-danger"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i></button>
-						`
-					}
 
-					return '<p class="text-muted">No Action</p>'
 				} }
 	        ],
 	    } );
@@ -98,17 +99,15 @@
 					type: 'post',
 					url: '{{ url("reservation") }}' + "/" + id + '/approve',
 					dataType: 'json',
-					success: function(response){
-						if(response == 'success'){
-							swal('Operation Successful','Operation Complete','success')
-			        		table.ajax.reload();
-			        	}else{
-							swal('Operation Unsuccessful','Error occurred while processing your request','error')
-						}
+					success: function(response) {
+						swal('Operation Successful','Operation Complete','success')
 
-					},
-					error: function(){
+					}, 
+					error: function(response) {
 						swal('Operation Unsuccessful','Error occurred while processing your request','error')
+					}, 
+					complete: function() {
+						table.ajax.reload();
 					}
 	       		})
 			  } else {
@@ -146,30 +145,18 @@
 						'reason': inputValue
 					},
 					dataType: 'json',
-					success: function(response){
-						if(response == 'success'){
-							swal('Operation Successful','Operation Complete','success')
-			        		table.ajax.reload();
-			        	}else{
-							swal('Operation Unsuccessful','Error occurred while processing your request','error')
-						}
-
+					success: function(response) {
+						swal('Operation Successful','Operation Complete','success')
 					},
-					error: function(){
-						swal('Operation Unsuccessful','Error occurred while processing your request','error')
+					error: function(response){
+						swal('Operation Unsuccessful',response.errors,'error')
+					},
+					complete: function() {
+						table.ajax.reload();
 					}
 	       		})
 	       	})
 	    });
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-		$('#page-body').show();
 	} );
 </script>
 @stop

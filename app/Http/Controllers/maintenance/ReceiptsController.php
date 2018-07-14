@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use Illuminate\Http\Request;
-use App;
-use Validator;
 use DB;
+use App;
 use Carbon;
 use Session;
+use Validator;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ReceiptsController extends Controller
 {

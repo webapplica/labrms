@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use Validator;
-use Session;
 use DB;
 use App;
+use Session;
+use Validator;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class LostAndFoundController extends Controller
 {

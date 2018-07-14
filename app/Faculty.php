@@ -62,7 +62,8 @@ class Faculty extends \Eloquent {
 		'Middle name' => 'min:2|max:50|string',
 		'Last name' => 'required|min:2|max:50|string',
 		'Contact number' => 'size:11|string',
-		'Email' => 'email'
+		'Email' => 'email',
+		'Suffix' => 'max:3',
 	);
 
 	/**
@@ -75,7 +76,8 @@ class Faculty extends \Eloquent {
 		'Middle name' => 'min:2|max:50|string',
 		'Last name' => 'min:2|max:50|string',
 		'Contact number' => 'size:11|string',
-		'Email' => 'email'
+		'Email' => 'email',
+		'Suffix' => 'max:3',
 	);
 
 	public function roomschedule()
@@ -86,6 +88,15 @@ class Faculty extends \Eloquent {
 	public function reservation()
 	{
 		return $this->hasOne('App\Reservation','faculty');
+	}
+
+	protected $appends = [
+		'full_name',
+	];
+
+	public function getFullNameAttribute()
+	{
+		return trim("$this->lastname, $this->firstname $this->middlename");
 	}
 
 }

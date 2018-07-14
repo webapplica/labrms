@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
 use Session;
+use Validator;
 use App\SoftwareType;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class SoftwareTypesController extends Controller
 {

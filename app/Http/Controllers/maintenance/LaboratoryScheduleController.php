@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
 use DB;
+use Session;
+use App\Room;
+use Validator;
 use Carbon\Carbon;
 use App\RoomSchedule;
-use App\Room;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class LaboratoryScheduleController extends Controller {
 

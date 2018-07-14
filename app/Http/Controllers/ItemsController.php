@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Carbon;
-use Validator;
 use DB;
-use Session;
 use App;
+use Carbon;
+use Session;
+use Validator;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 
 class ItemsController extends Controller {
@@ -271,7 +271,7 @@ class ItemsController extends Controller {
 			|--------------------------------------------------------------------------
 			|
 			*/
-			if(count(App\Workstation::isWorkstation($itemprofile->propertynumber)) > 0)
+			if( isset($itemprofile->propertynumber) && App\Workstation::isWorkstation( $itemprofile->propertynumber))
 			{
 				return json_encode('connected');
 

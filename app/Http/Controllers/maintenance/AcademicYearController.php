@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maintenance;
 
-use App\Http\Controllers\Controller;
-use Validator;
 use Session;
+use Validator;
 use Carbon\Carbon;
 use App\AcademicYear;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class AcademicYearController extends Controller
 {

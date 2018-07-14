@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWorkstationsTable extends Migration {
+class CreateWorkstationsTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -65,7 +70,7 @@ class CreateWorkstationsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('workstations');
+		Schema::dropIfExists('workstations');
 	}
 
 }

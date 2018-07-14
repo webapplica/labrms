@@ -126,11 +126,12 @@
 			        	}else{
 							swal('Operation Unsuccessful','Error occurred while deleting a record','error')
 						}
-
-		        		table.ajax().reload()
 					},
 					error: function(){
 						swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+					},
+					complete: function() {
+						table.ajax.reload();
 					}
 				});
 	          } else {

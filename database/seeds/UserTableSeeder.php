@@ -19,7 +19,7 @@ class UserTableSeeder extends Seeder {
 		App\User::insert([
 			[
 			   'username' => 'admin',
-			   'password' => Hash::make('12345678'),
+			   'password' => Hash::make('123456789'),
 			   'accesslevel' =>'0',
 				 'firstname' => 'Carlo',
 				 'middlename' => '',

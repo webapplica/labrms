@@ -6,6 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateRoomCategoriesTable extends Migration
 {
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
     /**
      * Run the migrations.
      *
@@ -26,7 +30,7 @@ class CreateRoomCategoriesTable extends Migration
      * @return void
      */
     public function down()
-    {
+    {      
         Schema::dropIfExists('room_categories');
     }
 }

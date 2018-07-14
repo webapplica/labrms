@@ -262,6 +262,7 @@ class Ticket extends \Eloquent{
 			$this->attributes['author'] = $author;
 		}
 
+		$this->main_id = isset($this->main_id) ? $this->main_id : null;
 		$this->user_id = Auth::user()->id;
 
 		$this->save();

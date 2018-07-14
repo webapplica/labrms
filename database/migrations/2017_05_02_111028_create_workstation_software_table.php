@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWorkstationSoftwareTable extends Migration {
+class CreateWorkstationSoftwareTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -45,7 +50,7 @@ class CreateWorkstationSoftwareTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('workstation_software');
+		Schema::dropIfExists('workstation_software');
 	}
 
 }

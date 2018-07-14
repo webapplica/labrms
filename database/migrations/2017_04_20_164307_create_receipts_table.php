@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateReceiptsTable extends Migration {
+class CreateReceiptsTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -33,7 +38,7 @@ class CreateReceiptsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('receipts');
+		Schema::dropIfExists('receipts');
 	}
 
 }

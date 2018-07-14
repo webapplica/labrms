@@ -3,7 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePaymentsTable extends Migration {
+class CreatePaymentsTable extends Migration
+{
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 
 	/**
 	 * Run the migrations.
@@ -42,7 +47,7 @@ class CreatePaymentsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('payments');
+		Schema::dropIfExists('payments');
 	}
 
 }

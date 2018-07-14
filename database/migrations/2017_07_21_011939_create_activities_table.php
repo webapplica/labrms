@@ -3,8 +3,13 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateActivitiesTable extends Migration {
+class CreateActivitiesTable extends Migration
+{
 
+    function __construct()
+    {
+        Schema::disableForeignKeyConstraints(); 
+    }
 	/**
 	 * Run the migrations.
 	 *
@@ -34,7 +39,7 @@ class CreateActivitiesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('activities');
+		Schema::dropIfExists('activities');
 	}
 
 }
