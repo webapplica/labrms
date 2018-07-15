@@ -60,9 +60,9 @@ class ReservationItemsController extends Controller {
 		$this->item = App\Item::find($id);
 
 		if($checked) {
-			$this->item->enabledReservation();
+			$this->item->enableReservation();
 		} else {
-			$this->item->disabledReservation();
+			$this->item->disableReservation();
 		}
 		
 		if($request->ajax()) {

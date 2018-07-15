@@ -368,34 +368,18 @@ class ReservationController extends Controller {
 	*/
 	public function approve(Request $request, $id)
 	{
-		if($request->ajax())
-		{
+		if($request->ajax()) {
 			$id = $this->sanitizeString($id);
 			$reservation = App\Reservation::approve($id);
 			$subject = 'Reservation Approval Notice';
-			$response_code = 200;
-			$success_message = [];
-			$error_message = [];
 	
-			if( $reservation->count() > 0)
-			{
-				$user = App\User::findOrFail($reservation->user_id);
-	
-				try
-				{
-					Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject,$user) {
-						$message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
-						$message->subject($subject);
-						$message->to($user->email)->cc($user->email);
-					});
-	
-					$success_messages = 'Reservation successfully updated';
-				} catch ( \Exception $e) {
-					$response_code = 500;
-					$error_message = 'Emailing services failed';
-	
-				}
+			if( $reservation->count() > 0) {
+				$response = $this->sendMail($reservation, $subject);
 			}
+
+			$success_message = isset($response['success_message']) ?: "";
+			$error_message = isset($response['error_message']) ?: "";
+			$response_code = isset($response['response_code']) ?: 200;
 
 			return response()->json([
 				'messages' => $success_messages,
@@ -413,35 +397,19 @@ class ReservationController extends Controller {
 	*/
 	public function disapprove(Request $request, $id)
 	{
-		if($request->ajax())
-		{
+		if($request->ajax()) {
 			$id = $this->sanitizeString($id);
 			$reason = $this->sanitizeString($request->get('reason'));
 			$reservation = App\Reservation::disapprove($id, $reason);
 			$subject = 'Reservation Disapproval Notice';
-			$response_code = 200;
-			$success_message = [];
-			$error_message = [];
 	
-			if( $reservation->count() > 0)
-			{
-				$user = App\User::findOrFail($reservation->user_id);
-	
-				try
-				{
-					Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject,$user) {
-						$message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
-						$message->subject($subject);
-						$message->to($user->email)->cc($user->email);
-					});
-	
-					$success_message = 'Reservation successfully updated';
-				} catch ( \Exception $e) {
-					$response_code = 500;
-					$error_message = 'Emailing services failed';
-	
-				}
+			if( $reservation->count() > 0) {
+				$response = $this->sendMail($reservation, $subject);
 			}
+
+			$success_message = isset($response['success_message']) ?: "";
+			$error_message = isset($response['error_message']) ?: "";
+			$response_code = isset($response['response_code']) ?: 200;
 
 			return response()->json([
 				'messages' => $success_message,
@@ -450,6 +418,49 @@ class ReservationController extends Controller {
 		}
 	}
 
+	/**
+	 * Undocumented function
+	 *
+	 * @param [type] $reservation
+	 * @param [type] $user
+	 * @return void
+	 */
+	public function sendMail( $reservation, $subject)
+	{
+		$response_code = 200;
+		$success_message = "";
+		$error_message = "";
+
+		$user = App\User::findOrFail($reservation->user_id);
+
+		try
+		{
+			Mail::send(['html'=>'reservation.notice'],  ['reservation' =>$reservation] , function ($message) use ($subject, $user) {
+				$message->from('pup.ccis.server@gmail.com', 'PUP-CCIS Server Community');
+				$message->subject($subject);
+				$message->to($user->email)->cc($user->email);
+			});
+
+			$success_message = 'Reservation successfully updated';
+		} catch ( \Exception $e) {
+			$response_code = 500;
+			$error_message = 'Emailing services failed';
+
+		}
+
+		return [
+			'response_code' => $response_code,
+			'error_message' => $error_message,
+			'success_message' => $success_message,
+		];
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @param Request $request
+	 * @return void
+	 */
 	public function claim(Request $request)
 	{
 

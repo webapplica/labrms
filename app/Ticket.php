@@ -19,13 +19,10 @@ class Ticket extends \Eloquent{
 	protected $primaryKey = 'id';
 
 	public static $rules = array(
-
-		'Item Id' => 'required|exists:items,id',
-		'Ticket Type' => 'required|min:2|max:100',
-		'Ticket Name' => 'required|min:2|max:100',
+		'Subject' => 'required|min:2|max:100',
 		'Details' => 'required|min:2|max:500',
-		'Ticket Id' => 'exists:tickets, id',
-		'Status' => 'boolean'
+		'Staff' => 'nullable|exists:users,id',
+		'Type' => 'required|exists:ticket_types,id',
 	);
 
 	public static $complaintRules = array(

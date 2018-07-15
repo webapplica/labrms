@@ -2,11 +2,11 @@
 
 @section('style')
 
-<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/bootstrap-select.min.css">
-<link rel="stylesheet" href="http://labrms.local/css/selectize.bootstrap3.css" type="text/css">
-<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/datepicker.min.css">
-<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/bootstrap-clockpicker.min.css">
-<link media="all" type="text/css" rel="stylesheet" href="http://labrms.local/css/style.min.css">
+<link media="all" type="text/css" rel="stylesheet" href="{{ asset('css/bootstrap-select.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/selectize.bootstrap3.css') }}" type="text/css">
+<link media="all" type="text/css" rel="stylesheet" href="{{ asset('css/datepicker.min.css') }}">
+<link media="all" type="text/css" rel="stylesheet" href="{{ asset('css/bootstrap-clockpicker.min.css') }}">
+<link media="all" type="text/css" rel="stylesheet" href="{{ asset('css/style.min.css') }}">
 <style>
 	#page-body, #hide,#hide-notes,#reservation-info{
 		display:none;
@@ -19,14 +19,14 @@
 @stop
 
 @section('script-include')
-<script src="http://labrms.local/js/moment.min.js"></script>
-<script src="http://labrms.local/js/loadingoverlay.min.js"></script>
-<script src="http://labrms.local/js/loadingoverlay_progress.min.js"></script>
-<script src="http://labrms.local/js/moment.min.js"></script>
-<script src="http://labrms.local/js/datepicker.min.js"></script>
-<script src="http://labrms.local/js/datepicker.en.js"></script>
-<script src="http://labrms.local/js/bootstrap-clockpicker.min.js"></script>
-<script src="http://labrms.local/js/bootstrap-select.min.js"></script>
+<script src="{{ asset('js/moment.min.js') }}"></script>
+<script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
+<script src="{{ asset('js/loadingoverlay_progress.min.js') }}"></script>
+<script src="{{ asset('js/moment.min.js') }}"></script>
+<script src="{{ asset('js/datepicker.min.js') }}"></script>
+<script src="{{ asset('js/datepicker.en.js') }}"></script>
+<script src="{{ asset('js/bootstrap-clockpicker.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
 @stop
 
 @section('content')
@@ -225,7 +225,7 @@
             donetext: 'Select',
             twelvehour: true,
             init: function(){
-            	$('#starttime').val(moment().format("hh:mmA"))
+            	$('#starttime').val(moment({{ old('time_start') }}).format("hh:mmA"))
             },
             afterDone: function() {
             	error('#time-start-error-message','*Time started must be less than time end')
@@ -241,7 +241,7 @@
             donetext: 'Select',
             twelvehour: true,
             init: function(){
-            	$('#endtime').val(moment().add("1800000").format("hh:mmA"))
+            	$('#endtime').val(moment({{ old('time_end') }}).add("1800000").format("hh:mm A"))
             },
             afterDone: function() {
             	error('#time-end-error-message','*Time ended must be greater than time started')
