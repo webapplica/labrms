@@ -11,6 +11,7 @@ class ReservationRoutes
     {
         Route::middleware(['auth'])->group(function() {
             Route::prefix('reservation')->group(function () {
+                Route::get('/', 'ReservationController@index');
                 Route::get('create', 'ReservationController@create');
                 Route::get('{id}', 'ReservationController@show');
                 Route::post('/', 'ReservationController@store');
