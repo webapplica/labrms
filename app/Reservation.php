@@ -86,9 +86,20 @@ class Reservation extends \Eloquent{
 		return $this->belongsToMany('App\Room','room_reservation','reservation_id','room_id');
 	}
 
+	public function room_location()
+	{
+		return $this->belongsTo('App\Room', 'location', 'id');
+	}
+
 	protected $appends = [
-		'reservee_name', 'parsed_date_and_time', 'status_name'
+		'reservee_name', 'parsed_date_and_time', 'status_name', 'room_name'
 	];
+
+	public function getRoomNameAttribute()
+	{
+		$room_name = $this->room_location->name;
+		return $room_name;	
+	}
 
 	public function getStatusNameAttribute()
 	{

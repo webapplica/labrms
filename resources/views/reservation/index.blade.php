@@ -55,7 +55,7 @@
 	            { data: "accountable" },
 	            { data: 'parsed_date_and_time'},
 				{ data: "purpose" },
-				{ data: "location" },
+				{ data: "room_name" },
 				{ data: "status_name" },
 				{ data: 'remarks' },
 				{ data: function(callback){
