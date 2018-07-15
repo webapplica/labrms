@@ -90,7 +90,7 @@ Create Ticket
 		<div class="panel panel-body panel-padding">
 
 			<h3 id="ticket-header" class="text-primary line-either-side">
-				<span id="ticket-title-desc">Complaint</span> Ticket
+				Ticket
 			</h3>
 			<ul class="breadcrumb">
 				<li>
@@ -119,16 +119,16 @@ Create Ticket
 				</div>
 				<div class="form-group">
 					<div class="col-sm-3">
-                        <label>Ticket Type:</label>
+                        <label>Type:</label>
                    </div>
 					<div class="col-sm-9">
-						<div class="form-control">
-							<span id="tickettype-name" class="text-muted">Complaint</span>
-	                        <div class="material-switch pull-right">
-	                            <input id="tickettype" name="tickettype" type="checkbox"/>
-	                            <label for="tickettype" class="label-danger"></label>
-	                        </div>
-	                    </div>
+						<select name="ticket_type" class="form-control">
+						@if( !empty( $ticket_types))
+							@foreach( $ticket_types as $id=>$type )
+							<option value="{{ $id }}" {{ (old('ticket_type') == $id) ? "selected" : "" }}>{{ $type }}</option>
+							@endforeach
+						@endif
+						</select>
                    </div>
 				</div>
 				<!-- Item name -->
@@ -291,36 +291,6 @@ Create Ticket
 				}
 			})
 		})
-
-		setTicketTypeLabel()
-
-		$('#tickettype').on('click',function(){
-			setTicketTypeLabel()
-		})
-
-		function setTicketTypeLabel()
-		{
-
-			if($('#tickettype').is(':checked'))
-			{
-				$('#tickettype-name').text('Incident')
-				$('#ticket-title-desc').text('Incident')
-				$('#subject-label-info').text('Incident')
-				$('#ticket-header').addClass('text-danger')
-				$('#ticket-header').removeClass('text-primary')
-			}
-			else
-			{
-				$('#tickettype-name').text('Complaint')
-				$('#ticket-title-desc').text('Complaint')
-				$('#subject-label-info').text('Complaint')
-				$('#ticket-header').removeClass('text-danger')
-				$('#ticket-header').addClass('text-primary')
-			}
-
-		}
-
-		$('#page-body').show();
 	})
 </script>
 @stop

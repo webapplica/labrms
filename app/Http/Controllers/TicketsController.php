@@ -93,16 +93,18 @@ class TicketsController extends Controller {
 		$last_generated_ticket = App\Ticket::count() + 1;
 
 		$staff = App\User::staff()
-						->whereNotIn('id',[ Auth::user()->id, App\User::admin()->first()->id ])
-						->select(
-							'id as id',
-							DB::raw('CONCAT( firstname , " " , middlename , " " , lastname ) as name')
-						)
-						->pluck('name','id');
+					->whereNotIn('id', [ Auth::user()->id, App\User::admin()->first()->id ])
+					->select(
+						'id as id',
+						DB::raw('CONCAT( firstname , " " , middlename , " " , lastname ) as name')
+					)
+					->pluck('name','id');
+		$ticket_types = App\TicketType::pluck('name', 'id');
 
 		return view('ticket.create')
 				->with('lastticket',$last_generated_ticket)
-				->with('staff',$staff);
+				->with('staff',$staff)
+				->with('ticket_types', $ticket_types);
 	}
 
 
@@ -114,72 +116,42 @@ class TicketsController extends Controller {
 	public function store(Request $request)
 	{
 		$tag = $this->sanitizeString($request->get('tag'));
-		$type = 'complaint';
+		$ticket_type = $this->sanitizeString($request->get('ticket_type'));
+		$title = $this->sanitizeString($request->get('subject'));
 		$author = null;
 		$staff = null;
 
-		if($request->has('tickettype'))
-		{
-			$type = 'incident';
-		}
-
-		if($request->has('subject'))
-		{
-			$title = $this->sanitizeString($request->get('subject'));
-
-			if($title == '' || $title == null)
-			{
-				$title = $type;
-			}
-		}
-		else
-		{
-			$title = $type;
-		}
-
-		if($request->has('author'))
-		{
+		if($request->has('author')) {
 			$author = $this->sanitizeString($request->get('author'));
 		}
 
 		$details = $this->sanitizeString($request->get('description'));
 
-		if(Auth::user()->accesslevel <= 2)
-		{
-			if($request->has('assign-to-staff'))
-			{
+		if(Auth::user()->accesslevel <= 2) {
+			if($request->has('assign-to-staff')) {
 				$staff = $this->sanitizeString($request->get('staffassigned'));
 			}
 		}
 
 		$validator = Validator::make([
-				'Ticket Subject' => $title,
+				'Subject' => $title,
 				'Details' => $details,
-				'Staff' => $staff
-			],App\Ticket::$complaintRules);
+				'Staff' => $staff,
+				'Type' => $ticket_type
+			],App\Ticket::$rules);
 
-		if($validator->fails())
-		{
+		if($validator->fails()) {
 			return redirect('ticket/create')
 				->withInput()
 				->withErrors($validator);
 		}
 
 		DB::beginTransaction();
-		
-		/**
-		 * find the type in database
-		 * if found, return the type information
-		 * if not, create a new record
-		 */
-		$type = App\TicketType::firstOrCreate([
-			'name' => ucfirst($type)
-		]);
 
 		$ticket = new App\Ticket;
 		$ticket->title = $title;
 		$ticket->details = $details;
-		$ticket->type_id = $type->id;
+		$ticket->type_id = $ticket_type;
 		$ticket->staff_id = $staff;
 		$ticket->status = 'Open';
 		$ticket->generate($tag);
