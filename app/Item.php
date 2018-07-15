@@ -86,6 +86,22 @@ class Item extends \Eloquent{
 		$query->where('for_reservation', '=', 0);
 	}
 
+	public function disableReservation()
+	{
+		$this->for_reservation = 0;
+		$this->save();
+
+		return $this;
+	}
+
+	public function enableReservation()
+	{
+		$this->for_reservation = 1;
+		$this->save();
+
+		return $this;
+	}
+
 	public static $category = [
 		'equipment',
 		'fixtures',
