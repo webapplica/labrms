@@ -225,7 +225,7 @@
             donetext: 'Select',
             twelvehour: true,
             init: function(){
-            	$('#starttime').val(moment().format("hh:mmA"))
+            	$('#starttime').val(moment({{ old('time_start') }}).format("hh:mmA"))
             },
             afterDone: function() {
             	error('#time-start-error-message','*Time started must be less than time end')
@@ -241,7 +241,7 @@
             donetext: 'Select',
             twelvehour: true,
             init: function(){
-            	$('#endtime').val(moment().add("1800000").format("hh:mmA"))
+            	$('#endtime').val(moment({{ old('time_end') }}).add("1800000").format("hh:mm A"))
             },
             afterDone: function() {
             	error('#time-end-error-message','*Time ended must be greater than time started')
