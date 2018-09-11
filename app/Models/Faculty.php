@@ -2,10 +2,8 @@
 
 namespace App;
 
-
-use Illuminate\Database\Eloquent\Model;
-
 use Hash;
+use Illuminate\Database\Eloquent\Model;
 
 class Faculty extends \Eloquent {
 

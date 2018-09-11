@@ -1,76 +1,37 @@
 <?php
 
-namespace App;
+namespace App\Models\Items;
 
 use DB;
-// use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemType extends \Eloquent{
-	// use SoftDeletes;
+class Type extends Model 
+{
 
-	/**
-	*
-	* table name
-	*
-	*/
 	protected $table = 'item_types';
-
-	/**
-	*
-	* primary key
-	*
-	*/
 	protected $primaryKey = 'id';
-
-	/**
-	*
-	*	fields to be set as date
-	*
-	*/
-	// protected $dates = ['deleted_at'];
-
-	/**
-	*
-	* created_at and updated_at status
-	*
-	*/
 	public $timestamps = true;
 
-	/**
-	*
-	* used for create method
-	*
-	*/
 	public $fillable = [
 		'name',
 		'description',
 		'category'
 	];
 
-	/**
-	*
-	* validation rules
-	*
-	*/
-	public function rules(){
-		return array(
+	public function rules() 
+	{
+		return [
 			'name' => 'required|min:2|max:50|unique:item_types,name',
 			'description' => 'min:5|max:450'
-		);
+		];
 	}
 
-	/**
-	*
-	* update rules
-	*
-	*/
-	public function updateRules(){
-		$name = $this->name;
-		return array(
-			'name' => 'required|min:2|max:50|unique:item_types,name,'. $name .',name',
+	public function updateRules()
+	{
+		return [
+			'name' => 'required|min:2|max:50|unique:item_types,name,'. $this->name .',name',
 			'description' => 'min:5|max:450'
-		);
+		];
 	}
 
 	/**
@@ -78,9 +39,9 @@ class ItemType extends \Eloquent{
 	* exist in table rules
 	*
 	*/
-	public static $existInTableRules = array(
+	public static $existInTableRules = [
 		'id' => 'exists:item_types,id'
-	);
+	];
 
 	/**
 	*
@@ -101,12 +62,10 @@ class ItemType extends \Eloquent{
 
 	public function getCategoryAttribute($value)
 	{
-		if( isset($value) || $value !== "" || $value !== null )
-		{
+		if( isset($value) || $value !== "" || $value !== null ) {
 			return ucfirst($value);
 		}
-		else
-		{
+		else {
 			return "None";
 		}
 	}
@@ -122,10 +81,10 @@ class ItemType extends \Eloquent{
 	*	usage: ItemType::findByType('System Unit')->get();
 	*
 	*/
-  public function scopeFindByType($query, $value)
-  {
-  	return $query->where('name','=', $value);
-  }
+	public function scopeFindByType($query, $value)
+	{
+		return $query->where('name','=', $value);
+	}
 
 	/**
 	*

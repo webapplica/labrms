@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Models\Items;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LostItem extends Model
+class Lost extends Model
 {
     protected $table = 'lost_items';
     protected $primaryKey = 'id';
@@ -15,7 +15,7 @@ class LostItem extends Model
     	'Date Found' => 'required'
     ];
 
-    public function rules(){
+    public function rules() {
     	return self::$rules;
     }
 
@@ -29,7 +29,7 @@ class LostItem extends Model
         'Date Found' => 'required'
     ];
 
-    public function updateRules(){
+    public function updateRules() {
     	return self::$rules;
     }
 
@@ -38,7 +38,7 @@ class LostItem extends Model
     	'Claimant' => 'required'
     ];
 
-    public function claimRules(){
+    public function claimRules() {
     	return self::$rules;
     }
 }

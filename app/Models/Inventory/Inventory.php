@@ -1,59 +1,23 @@
 <?php
 
-namespace App;
+namespace App\Models\Inventory;
 
-use Carbon\Carbon;
 use DB;
 use Auth;
 use App\Ticket;
+use Carbon\Carbon;
 use App\ItemProfile;
 use Illuminate\Database\Eloquent\Model;
 
-class Inventory extends \Eloquent
+class Inventory extends Model
 {
 
-  /**
-  *
-  * table name
-  *
-  */
   protected $table = 'inventories';
-
-  /**
-  *
-  * used for create method
-  *
-  */
-  public $fillable = [
-    'itemtype_id',
-    'brand',
-    'model',
-    'details',
-    'unit',
-    'quantity',
-    'profileditems'
-  ];
-
-  /**
-  *
-  * created_at and updated_at status
-  *
-  */
-  public $timestamps = true;
-
-  /**
-  *
-  * The attribute that used as primary key.
-  *
-  */
   protected $primaryKey = 'id';
+  public $timestamps = true;
+  public $fillable = [ 'itemtype_id', 'brand', 'model', 'details', 'unit', 'quantity', 'profileditems'];
 
-  /**
-  *
-  * validation rules
-  *
-  */
-  public static $rules = array(
+  public static $rules = [
   	'Item Type' => 'required|exists:item_types,id',
   	'Brand' => 'min:2|max:100',
   	'Model' => 'min:2|max:100',
@@ -62,14 +26,9 @@ class Inventory extends \Eloquent
   	'Quantity' => 'required|numeric|min:1',
   	'Profiled Items' => 'numeric'
 
-  );
+  ];
 
-  /**
-  *
-  * update rules
-  *
-  */
-	public static $updateRules = array(
+	public static $updateRules = [
 		'Item Type' => 'required|min:5|max:100',
 		'Brand' => 'min:2|max:100',
 		'Model' => 'min:2|max:100',
@@ -77,16 +36,16 @@ class Inventory extends \Eloquent
 		'Unit' => 'numeric',
   	'Quantity' => 'required|numeric|min:0',
 		'Profiled Items' => 'numeric'
-	);
-
-  protected $appends = [
-    'quantity', 'unprofiled'
-  ];
+	];
 
   public static $releaseRules = [
     'purpose' => 'required|min:5|max:150',
     'quantity' => 'required|integer',
     'inventory' => 'required|exists:inventories,id'
+  ];
+
+  protected $appends = [
+    'quantity', 'unprofiled'
   ];
 
   public function getQuantityAttribute()
@@ -173,6 +132,7 @@ class Inventory extends \Eloquent
   /**
   *
   * increment profiled items
+  * 
   * @param $inventory_id accepts id
   * validate before using this function
   *

@@ -1,31 +1,32 @@
 <?php
 
-namespace App;
+namespace App\Models\Inventory;
 
-use Illuminate\Database\Eloquent\Model;
 use Auth;
 use Carbon;
+use Illuminate\Database\Eloquent\Model;
 
-class InventoryLog extends Model
+class Log extends Model
 {
     protected $table = 'inventory_transactions';
     protected $primaryKey = 'id';
 
-    function __construct()
-    {
-        if( !isset($this->user_id))
-    	   $this->user_id = Auth::user()->id;
-    }
-
     public $fillable = [
-    	'details',
-    	'quantity',
-    	'inventory_id'
+        'details',
+        'quantity',
+        'inventory_id'
     ];
 
     protected $appends = [
         'user_info', 'quantity_issued', 'quantity_received', 'parsed_date'
     ]; 
+
+    public function __construct()
+    {
+        if( !isset($this->user_id)) {
+           $this->user_id = Auth::user()->id;
+        }
+    }
 
     public function getUserInfoAttribute()
     {

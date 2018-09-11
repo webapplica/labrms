@@ -1,27 +1,18 @@
 <?php
 
-namespace App;
+namespace App\Models\Reservation;
 
 use Auth;
 use Carbon\Carbon;
-use App\SpecialEvent;
+use App\Models\Events\Special;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Reservation extends \Eloquent{
-	//Database driver
-	/*
-		1 - Eloquent (MVC Driven)
-		2 - DB (Directly query to SQL database, no model required)
-	*/
-
-	//The table in the database used by the model.
+class Reservation extends Model
+{
 	protected $table = 'reservations';
-	protected $dates = [
-		'timein',
-		'timeout'
-	];
+	protected $primaryKey = 'id';
 	public $timestamps = true;
+	protected $dates = [ 'timein', 'timeout' ];
 	public $fillable = [
 		'purpose',
 		'user_id',
@@ -33,47 +24,36 @@ class Reservation extends \Eloquent{
 		'is_claimed',
 		'is_cancelled',
 	];
-	protected $primaryKey = 'id';
 
-	/**
-	*
-	*	reservation rules
-	*	
-	*/
-	public static $rules = array(
+	public static $rules = [
 		'Items' => 'required',
 		'Location' => 'required|exists:rooms,id',
 		'Time started' => 'required|date',
 		'Time end' => 'required|date',
 		'Purpose' => 'required',
 		'Faculty-in-charge' => 'nullable|exists:faculties,id'
-	);
+	];
 
-	/**
-	*
-	*	room reservation rules
-	*	
-	*/
-	public static $roomReservationRules = array(
+	public static $roomReservationRules = [
 		'Room' => 'required|exists:room,id',
 		'Room Name' => 'required|between:4,100',
 		'Time started' => 'required|date',
 		'Time end' => 'required|date',
 		'Purpose' => 'required',
 		'Faculty-in-charge' => 'required|between:5,50'
-	);
+	];
 
-	public static $updateRules = array(
+	public static $updateRules = [
 		'Location' => 'required|between:4,100',
 		'Time started' => 'required|date',
 		'Time end' => 'required|date',
 		'Purpose' => 'required',
 		'Faculty-in-charge' => 'required|between:5,50'
-	);
+	];
 
 	public function user()
 	{
-		return $this->belongsTo('App\User','user_id','id');
+		return $this->belongsTo('App\Models\User','user_id','id');
 	}
 
 	public function item()

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Modules\Reservation\Routes;
+namespace App\Http\Modules\Reservation;
 
 use Route; 
 
-class ReservationRoutes
+class Routes
 {
 
     public static function all() 

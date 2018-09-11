@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Modules\Maintenance\Routes as Maintenance;
+use App\Http\Modules\Reservation\Routes as Reservation;
+use App\Http\Modules\Account\Routes as Account;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,11 +15,14 @@
 |
 */
 
-require_once( base_path('routes/partials/account-management.php'));
-require_once( base_path('routes/partials/authentication.php'));
-require_once( base_path('routes/partials/inventory.php'));
-App\Http\Modules\Maintenance\Maintenance::routes();
-App\Http\Modules\Reservation\Reservation::routes();
-require_once( base_path('routes/partials/software-inventory.php'));
-require_once( base_path('routes/partials/ticketing.php'));
-require_once( base_path('routes/partials/workstation.php'));
+Route::get('/', 'HomeController@dashboard');
+Route::post('/', 'HomeController@dashboard');
+
+Account::all();
+Maintenance::all();
+Reservation::all();
+
+// require_once(base_path('routes/partials/inventory.php'));
+// require_once(base_path('routes/partials/software-inventory.php'));
+// require_once(base_path('routes/partials/ticketing.php'));
+// require_once(base_path('routes/partials/workstation.php'));

@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models\Items;
 
-use Auth;
 use DB;
+use Auth;
 use Carbon;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Item extends \Eloquent{
 	use SoftDeletes;

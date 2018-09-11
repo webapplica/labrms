@@ -1,68 +1,145 @@
-@extends('layouts.app')
+@extends('layouts.teal')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Login</div>
-                <div class="panel-body">
-                    <form class="form-horizontal" method="POST" action="{{ route('login') }}">
-                        {{ csrf_field() }}
-
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">Username</label>
-
-                            <div class="col-md-6">
-                                <input id="username" type="text" class="form-control" name="username" value="{{ old('email') }}" required autofocus>
-
-                                @if ($errors->has('username'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('username') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class="col-md-4 control-label">Password</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Login
-                                </button>
-
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    Forgot Your Password?
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+<div class="container-fluid" id="page-body" style="margin-top: 50px;">
+  <div class="row">
+    <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6">
+      <div class="panel panel-body">
+        <div class="col-sm-12" id="loginPanel" style="padding: 20px 20px 0px 20px" >
+          <legend class=hidden-xs>
+            <div class="row center-block" style="margin-bottom: 10px;">
+              <div class="col-xs-4" style="padding-right:5px;">
+                <img class=" img img-responsive pull-right" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width:64px;height: auto;"/>
+              </div>
+              <div class="col-xs-8" style="padding-left:5px;">
+                <h4 class="text-muted pull-left">College of Computer and Information Sciences</h4>
+              </div>
             </div>
+          </legend>
+          <div style="margin-top: 10px;">
+            <div id="error-container"></div>
+            {{ Form::open(array('class' => 'form-horizontal','id'=>'loginForm')) }}
+            <div class="form-group">
+              <div class="col-md-12">
+                {{ Form::label('username','Username') }}
+                {{ Form::text('username',Input::old('username'),[
+                  'required',
+                  'id'=>'username',
+                  'class'=>'form-control',
+                  'placeholder'=>'Username',
+                  'id' => 'username'
+                ]) }}
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12">
+              {{ Form::label('Password') }}
+              {{ Form::password('password',[
+                  'required',
+                  'id'=>'password',
+                  'class'=>'form-control',
+                  'placeholder'=>'Password',
+              ]) }}
+              </div>
+            </div>
+            <div class="form-group text-center center-block">
+              <div class="col-md-12">
+                  <button type="submit" id="loginButton" data-loading-text="Logging in..." class="btn btn-md btn-primary btn-block" autocomplete="off">
+                  Login
+                </button>
+              </div>
+            </div>
+            <hr />
+            <a href="{{ url('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a>
+            {{ Form::close() }}
+          </div>
         </div>
-    </div>
-</div>
-@endsection
+      </div>
+    </div> <!-- centered  -->
+  </div><!-- Row -->
+</div><!-- Container -->
+@stop
+@section('script')
+{{ HTML::script(asset('js/loadingoverlay.min.js')) }}
+{{ HTML::script(asset('js/loadingoverlay_progress.min.js')) }}
+<script>
+  $(document).ready(function(){
+
+    @if( Session::has("success-message") )
+      $('#error-container').html(`
+        <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <ul class="list-unstyled" id="list-error">
+              <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
+            </ul>
+        </div>`)
+    @endif
+
+    @if( Session::has("error-message") )
+      $('#error-container').html(`
+        <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <ul class="list-unstyled" id="list-error">
+              <li><span class="glyphicon glyphicon-ok"></span> You need to login before accessing the page</li>
+            </ul>
+        </div>`)
+    @endif
+
+    $("#loginForm").submit(function(e){
+        e.preventDefault();
+        // do other things for a valid form
+        var $btn = $('#loginButton').button('loading')
+        $.ajax({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'post',
+          url:'{{ url("login") }}',
+          data:{
+            'username':$('#username').val(),
+            'password':$('#password').val()
+          },
+          success:function(response){
+            $btn.button('reset')
+            $('#password').val('')
+            if(response.toString() == 'success'){
+              $('#error-container').html(`
+                <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <ul class="list-unstyled" id="list-error">
+                      <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
+                    </ul>
+                </div>`)
+              window.location.href = '{{ url('login') }}'
+            }else{
+              $('#error-container').html(`
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <ul class="list-unstyled" id="list-error">
+                      <li><span class="glyphicon glyphicon-remove"></span> Credentials submitted does not exists</li>
+                    </ul>
+                </div>`)
+            }
+          },
+          error:function(response){
+            $btn.button('reset')
+              $('#error-container').html(`
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <ul class="list-unstyled" id="list-error">
+                      <li><span class="glyphicon glyphicon-remove"></span> Problem occurred while sending your data to the servers</li>
+                    </ul>
+                </div>`)
+          }
+        });
+    })
+
+    $(document).ajaxStart(function(){
+      $.LoadingOverlay("show");
+    });
+    $(document).ajaxStop(function(){
+        $.LoadingOverlay("hide");
+    });
+  });
+</script>
+@stop

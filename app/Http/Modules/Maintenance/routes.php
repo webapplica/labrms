@@ -4,9 +4,9 @@ namespace App\Http\Modules\Maintenance;
 
 use Route;
 
-class Maintenance
+class Routes
 {
-    public static function routes()
+    public static function all()
     {
 
         Route::namespace('maintenance')->middleware(['auth', 'laboratorystaff'])->group(function(){
@@ -20,9 +20,7 @@ class Maintenance
             Route::resource('maintenance/activity','MaintenanceActivityController');
             Route::resource('purpose','PurposeController');
             Route::resource('schedule','LaboratoryScheduleController');
-            Route::resource('software','SoftwareController',[
-                    'except'=>array('show')
-            ]);
+            Route::resource('software','SoftwareController',[ 'except' => array('show') ]);
             Route::resource('software/license','SoftwareLicenseController');
             Route::resource('software/type','SoftwareTypesController');
             Route::resource('semester','SemesterController');
