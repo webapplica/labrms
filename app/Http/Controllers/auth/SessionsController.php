@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Auth;
 use Hash;
 use Validator;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class SessionsController extends Controller 
@@ -62,36 +63,9 @@ class SessionsController extends Controller
 	{
 		$currentPassword = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
 		$newPassword = filter_var($request->get('newpassword'), FILTER_SANITIZE_STRING);
-
-		$args = [
-			'Current Password' => $currentPassword,
-			'New Password' => $newPassword
-		];
-
-		$rules = [
-			'Current Password'=>'required|min:8|max:50',
-			'New Password'=>'required|min:8|max:50'
-		];
-
-		$validator = Validator::make($args, $rules);
-		if($validator->fails() || $error) {
-			return back()->withInput()->withErrors($validator);
-		}
-
-		if(Hash::check($currentPassword, Auth::user()->password)) {
-			if(Hash::check($newPassword, Auth::user()->password)) {
-				session()->flash('error-message','Your New Password must not be the same as your Old Password');
-				return back()->withInput()->withErrors($validator);
-			}
-		} else {
-
-			session()->flash('error-message','Incorrect Password');
-			return back()->withInput();
-		}
-
-		$user->password = Hash::make($newpassword);
-		$user->save();
-
+		
+		$user->changePassword($currentPassword, $newPassword);
+		
 		session()->flash('success-message','Password updated');
 		return back();
 	}
@@ -103,13 +77,13 @@ class SessionsController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy(Request $request)
-	{
-		Session::flush();
-		Auth::logout();
+	// public function destroy(Request $request)
+	// {
+	// 	Session::flush();
+	// 	Auth::logout();
 
-		return redirect('login');
-	}
+	// 	return redirect('login');
+	// }
 
 	/**
 	 * Returns the function for resetting the user

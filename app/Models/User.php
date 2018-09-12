@@ -1,15 +1,19 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Auth;
+use Hash;
+use Session;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Managers\User\PasswordManager;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
-use Hash;
 
-class User extends \Eloquent implements Authenticatable {
-	use SoftDeletes, AuthenticableTrait;
+class User extends \Eloquent implements Authenticatable 
+{
+	use SoftDeletes, AuthenticableTrait, PasswordManager;
 
 	/**
 	*
@@ -132,77 +136,22 @@ class User extends \Eloquent implements Authenticatable {
 	}
 
 	/**
-	*
-	*	@param $username 
-	*	@param $password
-	*	@param $lastname
-	*	@param $firstname
-	*	@param $middlename
-	*	@param $contactnumber
-	*	@param $email
-	*	@param $type 
-	*		0 - labhead
-	*		1 - assistant
-	*		2 - staff
-	*		3 - faculty
-	*		4 - student
-	*	@return collection of user 
-	*
-	*/
-	public static function createRecord($username,$password,$lastname,$firstname,$middlename,$contactnumber,$email,$type)
-	{
-		$user = new User;
-		$user->lastname = $lastname;
-		$user->firstname = $firstname;
-		$user->middlename = $middlename;
-		$user->username = $username;
-		$user->contactnumber = $contactnumber;
-		$user->email = $email;
-		$user->password = Hash::make($password);
-		$user->type = $type;
-		$user->status = '1';
-		if($type == 'assistant')
-		$user->accesslevel = '1';
-		if($type == 'staff')
-		$user->accesslevel = '2';
-		if($type == 'faculty')
-		$user->accesslevel = '3';
-		if($type == 'student')
-		$user->accesslevel = '4';
-		$user->save();
-		return $user;
-	}
-
-	/**
-	*
-	*	@param $id 
-	*	@param $username 
-	*	@param $lastname
-	*	@param $firstname
-	*	@param $middlename
-	*	@param $contactnumber
-	*	@param $email
-	*	@param $type 
-	*		0 - labhead
-	*		1 - assistant
-	*		2 - staff
-	*		3 - faculty
-	*		4 - student
-	*	@return collection of user 
-	*
-	*/
-	public static function updateRecord($id,$username,$lastname,$firstname,$middlename,$contactnumber,$email,$type)
+	 * Clears authentication and session of the user
+	 *
+	 * @return void
+	 */
+	public static function clear()
 	{
 
-		$user = User::find($id);
-		$user->username = $username;
-		$user->lastname = $lastname;
-		$user->firstname = $firstname;
-		$user->middlename = $middlename;
-		$user->contactnumber = $contactnumber;
-		$user->email = $email;
-		$user->type = $type;
-		$user->save();
+		if(Auth::check()) {
+			$user = Auth::user();
+			Auth::logout();
+		} else {
+			$user = [];
+		}
+
+		Session::flush();
+
 		return $user;
 	}
 }

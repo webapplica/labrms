@@ -1,9 +1,5 @@
 <?php
 
-use App\Http\Modules\Maintenance\Routes as Maintenance;
-use App\Http\Modules\Reservation\Routes as Reservation;
-use App\Http\Modules\Account\Routes as Account;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,9 +14,20 @@ use App\Http\Modules\Account\Routes as Account;
 Route::get('/', 'HomeController@dashboard');
 Route::post('/', 'HomeController@dashboard');
 
-Account::all();
-Maintenance::all();
-Reservation::all();
+/*
+|--------------------------------------------------------------------------
+| Route Groups
+|--------------------------------------------------------------------------
+|
+| This is the list of routes the system has. Each route is handled by a class
+| under the package folder. You may look for the location of the package through
+| the use statements above. Enjoy!
+|
+*/
+
+App\Http\Modules\Account\Routes::all();
+App\Http\Modules\Maintenance\Routes::all();
+App\Http\Modules\Reservation\Routes::all();
 
 // require_once(base_path('routes/partials/inventory.php'));
 // require_once(base_path('routes/partials/software-inventory.php'));

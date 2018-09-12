@@ -16,13 +16,12 @@
               </div>
             </div>
           </legend>
-          <div style="margin-top: 10px;">
-            <div id="error-container"></div>
-            {{ Form::open(array('class' => 'form-horizontal','id'=>'loginForm')) }}
+          <div id="form-body" class="form-container" style="margin-top: 10px;">
+            {{ Form::open(['class' => 'form-horizontal', 'id'=>'loginForm']) }}
             <div class="form-group">
               <div class="col-md-12">
                 {{ Form::label('username','Username') }}
-                {{ Form::text('username',Input::old('username'),[
+                {{ Form::text('username',Input::old('username'), [
                   'required',
                   'id'=>'username',
                   'class'=>'form-control',
@@ -34,7 +33,7 @@
             <div class="form-group">
               <div class="col-md-12">
               {{ Form::label('Password') }}
-              {{ Form::password('password',[
+              {{ Form::password('password', [
                   'required',
                   'id'=>'password',
                   'class'=>'form-control',
@@ -44,8 +43,13 @@
             </div>
             <div class="form-group text-center center-block">
               <div class="col-md-12">
-                  <button type="submit" id="loginButton" data-loading-text="Logging in..." class="btn btn-md btn-primary btn-block" autocomplete="off">
-                  Login
+                  <button 
+                    type="submit" 
+                    id="loginButton" 
+                    data-loading-text="Logging in..." 
+                    class="btn btn-md btn-primary btn-block" 
+                    autocomplete="off">
+                    Login
                 </button>
               </div>
             </div>
@@ -73,30 +77,8 @@
 <script>
   $(document).ready(function(){
 
-    @if( Session::has("success-message") )
-      $('#error-container').html(`
-        <div class="alert alert-success alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <ul class="list-unstyled" id="list-error">
-            <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
-          </ul>
-        </div>
-      `)
-    @endif
-
-    @if( Session::has("error-message") )
-      $('#error-container').html(`
-        <div class="alert alert-danger alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <ul class="list-unstyled" id="list-error">
-              <li><span class="glyphicon glyphicon-ok"></span> You need to login before accessing the page</li>
-            </ul>
-        </div>`)
-    @endif
-
     $("#loginForm").submit(function(e){
         e.preventDefault();
-        // do other things for a valid form
         var $btn = $('#loginButton').button('loading')
         $.ajax({
           headers: {
@@ -109,34 +91,18 @@
             'password':$('#password').val()
           },
           success:function(response){
-            if(response.toString() == 'success'){
-              $('#error-container').html(`
-                <div class="alert alert-success alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <ul class="list-unstyled" id="list-error">
-                      <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
-                    </ul>
-                </div>`)
-              window.location.href = '{{ url('login') }}'
-            }else{
-              $('#error-container').html(`
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <ul class="list-unstyled" id="list-error">
-                      <li><span class="glyphicon glyphicon-remove"></span> Credentials submitted does not exists</li>
-                    </ul>
-                </div>`)
+            if(response.toString() == 'success') {
+              alert('successs', 'Succeed with authentication. You will now be redirected to Dashboard');
+              
+              (setInterval(function(){
+                window.location.href = '{{ url('login') }}';
+              }, 2000));
+            } else {
+              alert('danger', 'Credentials submitted does not exists');
             }
           },
           error:function(response){
-              $('#error-container').html(`
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <ul class="list-unstyled" id="list-error">
-                    <li><span class="glyphicon glyphicon-remove"></span> Problem occurred while sending your data to the servers</li>
-                  </ul>
-                </div>
-              `)
+              alert('danger', 'Problem occurred while sending your data to the servers');
           },
           complete: function(response) {
             $btn.button('reset')
@@ -144,6 +110,17 @@
           },
         });
     })
+
+    function alert(type, message) {
+      $('.form-container').prepend(`
+          <div class="alert alert-` + type + ` alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <ul class="list-unstyled" id="list-error">
+              <li><span class="glyphicon glyphicon-remove"></span>` + message + `</li>
+            </ul>
+          </div>
+      `)
+    }
 
     $(document).ajaxStart(function(){
       $.LoadingOverlay("show");
