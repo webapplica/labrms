@@ -10,10 +10,11 @@ use App\Http\Managers\User\PasswordManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
+use App\Http\Managers\User\Navigation\NavigationEntriesManager;
 
 class User extends \Eloquent implements Authenticatable 
 {
-	use SoftDeletes, AuthenticableTrait, PasswordManager;
+	use SoftDeletes, AuthenticableTrait, PasswordManager, NavigationEntriesManager;
 
 	/**
 	*
