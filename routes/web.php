@@ -11,11 +11,25 @@
 |
 */
 
-require_once( base_path('routes/partials/account-management.php'));
-require_once( base_path('routes/partials/authentication.php'));
-require_once( base_path('routes/partials/inventory.php'));
-App\Http\Modules\Maintenance\Maintenance::routes();
-App\Http\Modules\Reservation\Reservation::routes();
-require_once( base_path('routes/partials/software-inventory.php'));
-require_once( base_path('routes/partials/ticketing.php'));
-require_once( base_path('routes/partials/workstation.php'));
+Route::get('/', 'HomeController@dashboard');
+Route::post('/', 'HomeController@dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Route Groups
+|--------------------------------------------------------------------------
+|
+| This is the list of routes the system has. Each route is handled by a class
+| under the package folder. You may look for the location of the package through
+| the use statements above. Enjoy!
+|
+*/
+
+App\Http\Modules\Account\Routes::all();
+App\Http\Modules\Maintenance\Routes::all();
+App\Http\Modules\Reservation\Routes::all();
+
+// require_once(base_path('routes/partials/inventory.php'));
+// require_once(base_path('routes/partials/software-inventory.php'));
+// require_once(base_path('routes/partials/ticketing.php'));
+// require_once(base_path('routes/partials/workstation.php'));

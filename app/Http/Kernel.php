@@ -51,12 +51,12 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'session_start' => \App\Http\Middleware\BeforeSessionStartMiddleware::class,
-        'labhead' => \App\Http\Middleware\LaboratoryHeadMiddleware::class,
-        'labassistant' => \App\Http\Middleware\LaboratoryAssistantMiddleware::class,
-        'laboratorystaff' => \App\Http\Middleware\LaboratoryStaffMiddleware::class,
+        'lab.head' => \App\Http\Middleware\LaboratoryHeadMiddleware::class,
+        'lab.assistant' => \App\Http\Middleware\LaboratoryAssistantMiddleware::class,
+        'lab.staff' => \App\Http\Middleware\LaboratoryStaffMiddleware::class,
         'faculty' => \App\Http\Middleware\FacultyMiddleware::class,
         'student' => \App\Http\Middleware\StudentMiddleware::class,
-        'laboratoryuser' => \App\Http\Middleware\LaboratoryUsersMiddleware::class,
+        'lab.user' => \App\Http\Middleware\LaboratoryUsersMiddleware::class,
         // 'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth' => \App\Http\Middleware\AuthenticationMiddleware::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,

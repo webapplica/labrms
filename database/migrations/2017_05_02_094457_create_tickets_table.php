@@ -81,6 +81,7 @@ class CreateTicketsTable extends Migration
 	        $table->string('nature')->nullable();
 			$table->string('status');
 			$table->timestamps();
+            $table->softDeletes();
 		});
 	}
 

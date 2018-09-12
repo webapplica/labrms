@@ -268,8 +268,7 @@ class ReportsController extends Controller {
 
 	public function setReportName()
 	{
-		if($this->report == 'equipmentmasterlist')
-		{
+		if($this->report == 'equipmentmasterlist') {
 			$this->reportname = "Equipment Masterlist";
 		}
 

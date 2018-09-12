@@ -11,18 +11,26 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 	
-	public	function sanitizeString($var)
+	protected function sanitizeString($var)
 	{
 		$var = strip_tags($var);
 		$var = htmlentities($var);
 		$var = stripslashes($var);
+
 		return stripslashes(htmlentities(strip_tags($var)));
 	}
 
-	public function hasData($input)
+	protected function hasData($input)
 	{
-		if($input == null || empty($input) || $input == "" || $input == 'null')
+		if($input == null || empty($input) || $input == "" || $input == 'null') {
 			return false;
+		}
+
 		return true;
+	}
+
+	protected function jsonResponse(array $args, $code)
+	{
+		return response()->json($args, $code);
 	}
 }
