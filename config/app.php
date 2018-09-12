@@ -2,35 +2,6 @@
 
 return [
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Company Details
-    |--------------------------------------------------------------------------
-    |
-    | The value inputted in the field is equivalent to the clients basic information
-    | To change the values, you need to update the environment variable for it to work
-    */
-
-    'company' => [
-
-        'header' => env('COMPANY_HEADER','Main Header'),
-
-        'subheader' => env('COMPANY_SUBHEADER','Secondary Header'),
-
-        'department' => env('COMPANY_SUBHEADER','Main Department'), 
-
-        'subdepartment' => env('COMPANY_SUBDEPARTMENT','Secondary Department'),
-
-        'image' => env('COMPANY_IMAGE','Main Image Link'),
-
-        'subimage' => env('COMPANY_SUBIMAGE','Secondary Image Link')
-    ],
-
-    'local' => [
-        'constant' => env('LOCAL_CONST'),
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -41,7 +12,9 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => env('APP_NAME', 'LabRMS'),
+    'name' => env('APP_NAME', 'Resource Management System'),
+    
+    'abbr' => env('APP_ABBR', 'RMS'),
 
     /*
     |--------------------------------------------------------------------------

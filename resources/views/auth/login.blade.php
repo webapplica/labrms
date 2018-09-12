@@ -1,7 +1,7 @@
 @extends('layouts.teal')
 
 @section('content')
-<div class="container-fluid" id="page-body" style="margin-top: 50px;">
+<div class="container-fluid" id="login" style="margin-top: 50px;">
   <div class="row">
     <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6">
       <div class="panel panel-body">
@@ -9,7 +9,7 @@
           <legend class=hidden-xs>
             <div class="row center-block" style="margin-bottom: 10px;">
               <div class="col-xs-4" style="padding-right:5px;">
-                <img class=" img img-responsive pull-right" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width:64px;height: auto;"/>
+                <img class=" img img-responsive pull-right" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width: 64px;height: auto;"/>
               </div>
               <div class="col-xs-8" style="padding-left:5px;">
                 <h4 class="text-muted pull-left">College of Computer and Information Sciences</h4>
@@ -60,19 +60,20 @@
 </div><!-- Container -->
 @stop
 @section('script')
-{{ HTML::script(asset('js/loadingoverlay.min.js')) }}
-{{ HTML::script(asset('js/loadingoverlay_progress.min.js')) }}
+<script type="text/javascript" src="{{ asset('js/loadingoverlay/loadingoverlay.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/loadingoverlay/loadingoverlay_progress.min.js') }}"></script>
 <script>
   $(document).ready(function(){
 
     @if( Session::has("success-message") )
       $('#error-container').html(`
         <div class="alert alert-success alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <ul class="list-unstyled" id="list-error">
-              <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
-            </ul>
-        </div>`)
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <ul class="list-unstyled" id="list-error">
+            <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
+          </ul>
+        </div>
+      `)
     @endif
 
     @if( Session::has("error-message") )
@@ -100,12 +101,10 @@
             'password':$('#password').val()
           },
           success:function(response){
-            $btn.button('reset')
-            $('#password').val('')
             if(response.toString() == 'success'){
               $('#error-container').html(`
                 <div class="alert alert-success alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <ul class="list-unstyled" id="list-error">
                       <li><span class="glyphicon glyphicon-ok"></span> You will be now redirected to Dashboard</li>
                     </ul>
@@ -114,7 +113,7 @@
             }else{
               $('#error-container').html(`
                 <div class="alert alert-danger alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <ul class="list-unstyled" id="list-error">
                       <li><span class="glyphicon glyphicon-remove"></span> Credentials submitted does not exists</li>
                     </ul>
@@ -122,15 +121,19 @@
             }
           },
           error:function(response){
-            $btn.button('reset')
               $('#error-container').html(`
                 <div class="alert alert-danger alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <ul class="list-unstyled" id="list-error">
-                      <li><span class="glyphicon glyphicon-remove"></span> Problem occurred while sending your data to the servers</li>
-                    </ul>
-                </div>`)
-          }
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <ul class="list-unstyled" id="list-error">
+                    <li><span class="glyphicon glyphicon-remove"></span> Problem occurred while sending your data to the servers</li>
+                  </ul>
+                </div>
+              `)
+          },
+          complete: function(response) {
+            $btn.button('reset')
+            $('#password').val('')
+          },
         });
     })
 
