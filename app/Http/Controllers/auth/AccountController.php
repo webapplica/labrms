@@ -46,14 +46,14 @@ class AccountsController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$lastname = $this->sanitizeString($request->get('lastname'));
-		$firstname = $this->sanitizeString($request->get('firstname'));
-		$middlename = $this->sanitizeString($request->get('middlename'));
-		$username = $this->sanitizeString($request->get('username'));
-		$contactnumber = $this->sanitizeString($request->get('contactnumber'));
-		$email = $this->sanitizeString($request->get('email'));
-		$password = $this->sanitizeString($request->get('password'));
-		$type = $this->sanitizeString($request->get('type'));
+		$lastname = $this->clean($request->lastname);
+		$firstname = $this->clean($request->get('firstname'));
+		$middlename = $this->clean($request->get('middlename'));
+		$username = $this->clean($request->get('username'));
+		$contactnumber = $this->clean($request->get('contactnumber'));
+		$email = $this->clean($request->get('email'));
+		$password = $this->clean($request->get('password'));
+		$type = $this->clean($request->get('type'));
 
 		$validator = Validator::make([
 			'Last name' => $lastname,
@@ -63,13 +63,10 @@ class AccountsController extends Controller
 			'Contact number' => $contactnumber,
 			'Email' => $email,
 			'Password' => $password
-		],User::$rules);
+		], User::$rules);
 
-		if($validator->fails())
-		{
-			return redirect('account/create')
-				->withErrors($validator)
-				->withInput();
+		if($validator->fails()) {
+			return back()->withErrors($validator)->withInput();
 		}
 
 		User::createRecord($username,$password,$lastname,$firstname,$middlename,$contactnumber,$email,$type);

@@ -11,7 +11,7 @@ use App;
 use DB;
 use Illuminate\Http\Request;
 
-class TicketsController extends Controller {
+class TicketController extends Controller {
 
 	private $ticket_status = [
 		'Open',

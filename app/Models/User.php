@@ -123,6 +123,11 @@ class User extends \Eloquent implements Authenticatable
 		4 => 'images/logo/Student/student-logo-16.png',
 	];
 
+	protected function getCorrespondingView()
+	{
+		// return [];
+	}
+
 	protected static function getStaffIds()
 	{
 		return self::$staffIds;
