@@ -1,29 +1,27 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\User;
-use Validator;
-use Session;
 use Auth;
 use Hash;
+use Session;
+use Validator;
+use App\Models\User;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Input;
 
-class AccountsController extends Controller {
+class AccountsController extends Controller
+{
 
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		if(Request::ajax())
-		{
-			$user = User::all();
-			return json_encode([ 'data' => $user ]);
+		if($request->ajax()) {
+			return datatables(User::all())->toJson();
 		}
 
 		return view('account.index');
@@ -35,7 +33,7 @@ class AccountsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function create()
+	public function create(Request $request)
 	{
 		return view('account.create');
 	}
@@ -46,16 +44,16 @@ class AccountsController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		$lastname = $this->sanitizeString(Input::get('lastname'));
-		$firstname = $this->sanitizeString(Input::get('firstname'));
-		$middlename = $this->sanitizeString(Input::get('middlename'));
-		$username = $this->sanitizeString(Input::get('username'));
-		$contactnumber = $this->sanitizeString(Input::get('contactnumber'));
-		$email = $this->sanitizeString(Input::get('email'));
-		$password = $this->sanitizeString(Input::get('password'));
-		$type = $this->sanitizeString(Input::get('type'));
+		$lastname = $this->sanitizeString($request->get('lastname'));
+		$firstname = $this->sanitizeString($request->get('firstname'));
+		$middlename = $this->sanitizeString($request->get('middlename'));
+		$username = $this->sanitizeString($request->get('username'));
+		$contactnumber = $this->sanitizeString($request->get('contactnumber'));
+		$email = $this->sanitizeString($request->get('email'));
+		$password = $this->sanitizeString($request->get('password'));
+		$type = $this->sanitizeString($request->get('type'));
 
 		$validator = Validator::make([
 			'Last name' => $lastname,
@@ -88,7 +86,7 @@ class AccountsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 		$user = User::find($id);
 		return view('account.show')
@@ -102,7 +100,7 @@ class AccountsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit(Request $request, $id)
 	{
 		if(isset($id)){
 			$user = User::find($id);
@@ -118,16 +116,16 @@ class AccountsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		$id = $this->sanitizeString(Input::get('id'));
-		$lastname = $this->sanitizeString(Input::get('lastname'));
-		$firstname = $this->sanitizeString(Input::get('firstname'));
-		$middlename = $this->sanitizeString(Input::get('middlename'));
-		$contactnumber = $this->sanitizeString(Input::get('contactnumber'));
-		$email = $this->sanitizeString(Input::get('email'));
-		$type = $this->sanitizeString(Input::get('type'));
-		$username = $this->sanitizeString(Input::get('username'));
+		$id = $this->sanitizeString($request->get('id'));
+		$lastname = $this->sanitizeString($request->get('lastname'));
+		$firstname = $this->sanitizeString($request->get('firstname'));
+		$middlename = $this->sanitizeString($request->get('middlename'));
+		$contactnumber = $this->sanitizeString($request->get('contactnumber'));
+		$email = $this->sanitizeString($request->get('email'));
+		$type = $this->sanitizeString($request->get('type'));
+		$username = $this->sanitizeString($request->get('username'));
 
 		$validator = Validator::make([
 			'last name' => $lastname,
@@ -135,11 +133,8 @@ class AccountsController extends Controller {
 			'middle name' => $middlename,
 			'contact number' => $contactnumber,
 			'email' => $email,
-			'password' => 'dummypassword',
-			'username' => 'sampleusernameonly',
-			'accesslevel' => '2',
 			'type' => $type
-		],User::$updateRules);
+		], User::$updateRules);
 
 		if($validator->fails())
 		{
@@ -161,9 +156,9 @@ class AccountsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy(Request $request, $id)
 	{
-		if(Request::ajax()){
+		if($request->ajax()){
 			try{
 
 				$user = User::select('id')->get();
@@ -179,15 +174,11 @@ class AccountsController extends Controller {
 			} catch (Exception $e) {}
 		}
 
-		try{
-			$user = User::find($id);
-			$user->delete();
-		} catch (Exception $e) {
-			Session::flash('error_message','Error Ocurred while processing your data');
-			return redirect()->back();
-		}
-		Session::flash('success-message','Account deleted!');
-		return redirect('account/view/delete');
+		$user = User::find($id);
+		$user->delete();
+
+		Session::flash('success-message','An account has been successfully deleted.');
+		return redirect('account/deleted');
 	}
 
 	/**
@@ -197,13 +188,12 @@ class AccountsController extends Controller {
 	 */
 	public function retrieveDeleted()
 	{
-		if(Request::ajax()){
-			return User::onlyTrashed()->get();
+		if($request->ajax()){
+			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
-		$user = User::onlyTrashed()->get();
 		return view('account.restore')
-			->with('user',$user);
+			->with('user', $user);
 
 	}
 
@@ -213,20 +203,15 @@ class AccountsController extends Controller {
 	 *
 	 */
 
-	public function restore($id)
+	public function restore(Request $request, $id)
 	{
-		$id = $this->sanitizeString($id);
+		$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-		//validates if id exist in database
-		if(count(User::withTrashed()->find($id)) == 0)
-		{
-			Session::flash('error-message','Invalid ID');
-			return redirect('account/view/deleted');
-		}
 		$user = User::onlyTrashed()->find($id);
 		$user->restore();
+
 		Session::flash('success-message',"Account restored!");
-        return redirect('account/view/deleted');
+        return redirect('account/deleted');
 	}
 
 	/**
@@ -236,25 +221,21 @@ class AccountsController extends Controller {
 	 *@param  int  $id
 	 * @return Response
 	 */
-	public function activateAccount($id)
+	public function activate(Request $request, $id)
 	{
-		if(Request::ajax())
-		{
-			if($id == Auth::user()->id){
+		if($request->ajax()) {
+			if($id == Auth::user()->id) {
 				return json_encode('self');
-			}else{
+			} else {
 
-				$type = $this->sanitizeString(Input::get('type'));
+				$type = $this->sanitizeString($request->get('type'));
 				$user = User::find($id);
 
-				if($type == 'activate')
-				{
+				if($type == 'activate') {
 					$user->status = 1;
 					$user->save();
 					return json_encode('activated');
-				} 
-				else if($type == 'deactivate') 
-				{
+				} else if($type == 'deactivate') {
 					$user->status = 0;
 					$user->save();
 					return json_encode('deactivated');
@@ -271,9 +252,9 @@ class AccountsController extends Controller {
 	 */
 	public function resetPassword()
 	{
-		if(Request::ajax())
+		if($request->ajax())
 		{
-			$id = $this->sanitizeString(Input::get('id'));
+			$id = $this->sanitizeString($request->get('id'));
 		 	$user = User::find($id);
 		 	$user->password = Hash::make('12345678');
 		 	$user->save();
@@ -284,12 +265,12 @@ class AccountsController extends Controller {
 
 	public function changeAccessLevel()
 	{
-		$id = $this->sanitizeString(Input::get("id"));
-		$access = $this->sanitizeString(Input::get('newaccesslevel'));
+		$id = $this->sanitizeString($request->get("id"));
+		$access = $this->sanitizeString($request->get('newaccesslevel'));
 
 		try {
 
-			if(Auth::user()->accesslevel != 0){
+			if(Auth::user()->accesslevel != 0) {
 
 				Session::flash('error-message','You do not have enough priviledge to switch to this level');
 				return redirect('account');
@@ -316,8 +297,7 @@ class AccountsController extends Controller {
 	*/
 	public function getAllUsers()
 	{
-		if(Request::ajax())
-		{
+		if($request->ajax()) {
 			$user = User::all();
 			return json_encode([ 'data' => $user ]);
 		}
@@ -334,15 +314,13 @@ class AccountsController extends Controller {
 	*/
 	public function getAllLaboratoryUsers()
 	{
-		if(Request::ajax())
-		{
+		if($request->ajax()) {
 			/**
 			*
 			*	Note: Current user is not included
 			*
 			*/
-			$user = User::select('id','username','lastname','firstname','middlename','email','contactnumber','type','accesslevel','status')
-					->whereIn('accesslevel',[0,1,2])
+			$user = User::whereIn('accesslevel',[0,1,2])
 					->where('id','!=',Auth::user()->id)
 					->get();
 			return json_encode([ 'data' => $user ]);
