@@ -1,6 +1,6 @@
-@extends('layouts.teal')
+@extends('layouts.app')
 
-@section('content')
+@section('body-content')
 <div class="container-fluid" id="login" style="margin-top: 50px;">
   <div class="row">
     <div class="col-md-offset-4 col-md-4 col-sm-offset-3 col-sm-6">
@@ -50,7 +50,15 @@
               </div>
             </div>
             <hr />
-            <a href="{{ url('reset') }}" class="text-center text-muted" type="button" role="button" style="text-decoration: none;"><small style="letter-spacing: 2px;">Forgot your password?</small></a>
+            <a 
+              href="{{ url('reset') }}" 
+              class="text-center text-muted center-block" 
+              type="button" 
+              role="button" 
+              style="text-decoration: none;" >
+
+              <small style="letter-spacing: 2px;">Forgot your password?</small>
+            </a>
             {{ Form::close() }}
           </div>
         </div>

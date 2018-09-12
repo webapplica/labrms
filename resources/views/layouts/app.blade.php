@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ ( isset($title) ? $title . '::' : '' ) . config('app.name') }}</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}"  />
+    <title>{{ ( isset($title) ? $title . ' - ' : '' ) . config('app.name') }}</title>
     
     <!-- styles -->
-    <link rel="stylesheet" href="{{ asset('css/jquery-ui.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/sweetalert.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}"  />
     <link rel="stylesheet" href="{{ asset('css/dataTables.bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/nav.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/sweetalert.css') }}" />
     @yield('style-include')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -45,18 +45,20 @@
     <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/dataTables.bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery.validate.min.js') }}"></script>
     @yield('scripts-include')
 
   </head>
   <body id="page-body" class="page page-body page-parent-container">
     @yield('styles-prepend')
     {{-- include the partial navigation bar --}}
+    @if(Auth::check())
     <nav id="navigation" class="page-navigation">
-      @include('partials.nav')
+      @include('layouts.partials.nav')
     </nav>
+    @endif
     {{-- display the content page --}}
     <section id="content" class="page-content">
       @yield('body-content')
@@ -66,16 +68,16 @@
 
     {{-- footer section --}}
     <footer id="footer" class="page-footer">
-      @include('partials.footer')
+      @include('layouts.partials.footer')
     </footer>
 
     {{-- additional scripts used globally --}}
     <script type="text/javascript">
-      @if( Session::has("success-message") )
-          swal("Success!","{{ Session::pull('success-message') }}","success");
+      @if( session()->has("success-message") )
+        swal("Success!","{{ session()->pull('success-message') }}","success");
       @endif
-      @if( Session::has("error-message") )
-          swal("Oops...","{{ Session::pull('error-message') }}","error");
+      @if( session()->has("error-message") )
+        swal("Oops...","{{ session()->pull('error-message') }}","error");
       @endif
     </script>
   </body>
