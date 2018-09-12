@@ -98,6 +98,14 @@ class User extends \Eloquent implements Authenticatable
 		'email' => 'email'
 	);
 
+	private static $staffIds = [
+		0, 1, 2	
+	];
+
+	private static $clientIds = [
+		3, 4
+	];
+
 	public static $roles = [
 		0 => 'head',
 		1 => 'assistant',
@@ -106,13 +114,36 @@ class User extends \Eloquent implements Authenticatable
 		4 => 'student'
 	];
 
-	protected $appends = [
-		'fullname'
+	private static $avatarUrl = [
+		0 => 'images/logo/LabHead/labhead-icon-16.png',
+		1 => 'images/logo/LabAssistant/assistant-logo-16.png',
+		2 => 'images/logo/LabStaff/staff-logo-16.png',
+		3 => 'images/logo/Faculty/faculty-logo-16.png',
+		4 => 'images/logo/Student/student-logo-16.png',
 	];
 
-	public function getFullnameAttribute()
+	protected static function getStaffIds()
+	{
+		return self::$staffIds;
+	}
+
+	protected static function getAvatarUrl($id)
+	{
+		return isset(self::$avatarUrl[$id]) ? self::$avatarUrl[$id] : 'None';
+	}
+
+	protected $appends = [
+		'full_name', 'image_url'
+	];
+
+	public function getFullNameAttribute()
 	{
 		return  "$this->lastname,$this->firstname $this->middlename";
+	}
+
+	public function getImageUrlAttribute()
+	{
+		return User::getAvatarUrl($this->accesslevel);
 	}
 
 	public function reservation()
@@ -130,9 +161,9 @@ class User extends \Eloquent implements Authenticatable
 		return $query->where('accesslevel','=',0);
 	}
 
-	public function scopeStaff($query)
+	public function scopeStaffId($query)
 	{
-		return $query->whereIn('accesslevel',[0,1,2]);
+		return $query->whereIn('accesslevel', [0, 1, 2]);
 	}
 
 	/**
@@ -143,15 +174,19 @@ class User extends \Eloquent implements Authenticatable
 	public static function clear()
 	{
 
+		$user = [];
 		if(Auth::check()) {
 			$user = Auth::user();
 			Auth::logout();
-		} else {
-			$user = [];
 		}
 
 		Session::flush();
 
 		return $user;
+	}
+
+	public function isStaff()
+	{
+		return ( in_array( $this->accesslevel, User::getStaffIds() ) );
 	}
 }

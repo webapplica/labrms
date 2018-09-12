@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Auth;
 use Hash;
 use Validator;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -19,24 +20,6 @@ class SessionsController extends Controller
 	 */
 	public function show(Request $request)
 	{
-		// $person = Auth::user(); 
-		// $reservation = App\Reservation::withInfo()->user(Auth::user()->id)->get()->count();
-		// $approved = App\Reservation::withInfo()->approved()->user(Auth::user()->id)->get()->count();
-		// $disapproved = App\Reservation::withInfo()->disapproved()->user(Auth::user()->id)->get()->count();
-		// $claimed = App\Reservation::unclaimed()->user(Auth::user()->id)->get()->count();
-		// $tickets = App\Ticket::selfAuthored()->get()->count();
-		// $assigned = App\Ticket::selfAssigned(Auth::user()->id)->findByType('Complaint')->count();
-		// $complaints = App\Ticket::selfAuthored()->findByType('Complaint')->count();
-
-		// return view('user.index')
-		// 	->with('person',$person)
-		// 	->with('reservation',$reservation)
-		// 	->with('tickets',$tickets)
-		// 	->with('approved',$approved)
-		// 	->with('disapproved',$disapproved)
-		// 	->with('complaints',$complaints)
-		// 	->with('assigned',$assigned)
-		// 	->with('claimed',$claimed);
 		return view('dashboard.admin.index');
 	}
 
@@ -64,26 +47,11 @@ class SessionsController extends Controller
 		$currentPassword = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
 		$newPassword = filter_var($request->get('newpassword'), FILTER_SANITIZE_STRING);
 		
-		$user->changePassword($currentPassword, $newPassword);
+		User::changePassword($currentPassword, $newPassword);
 		
-		session()->flash('success-message','Password updated');
+		session()->flash('success-message','Your password has successfully been updated');
 		return back();
 	}
-
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	// public function destroy(Request $request)
-	// {
-	// 	Session::flush();
-	// 	Auth::logout();
-
-	// 	return redirect('login');
-	// }
 
 	/**
 	 * Returns the function for resetting the user

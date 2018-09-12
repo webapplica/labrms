@@ -151,24 +151,15 @@
     <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">
         <a href="#" class="dropdown-toggle text-capitalize" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-        <img class="img"
-        @if(Auth::user()->accesslevel == 0)
-        src="{{ asset('images/logo/LabHead/labhead-icon-16.png') }}"
-        @elseif(Auth::user()->accesslevel == 1)
-        src="{{ asset('images/logo/LabAssistant/assistant-logo-16.png') }}"
-        @elseif(Auth::user()->accesslevel == 2)
-        src="{{ asset('images/logo/LabStaff/staff-logo-16.png') }}"
-        @elseif(Auth::user()->accesslevel == 3)
-        src="{{ asset('images/logo/Student/student-logo-16.png') }}"
-        @elseif(Auth::user()->accesslevel == 4)
-        src="{{ asset('images/logo/Student/student-logo-16.png') }}"
-        @endif
+        <img 
+            class="img"
+            src="{{ Auth::user()->imageUrl }}"
             style="width:25px;height:25px;margin-right: 5px;">{{{ Auth::user()->firstname }}} {{{ Auth::user()->lastname }}}<span class="caret"></span></a>
         <!-- dropdown items -->
         <ul class="dropdown-menu">
             <li>{{ link_to('profile','Profile') }}</li>
             <li>{{ link_to('settings','Password') }}</li>
-            @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
+            @if(Auth::user()->isStaff())
             <li>{{ link_to('reports','Reports') }}</li>
             <li>{{ link_to('help','Help') }}</li>
             @endif
