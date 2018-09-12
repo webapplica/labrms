@@ -118,7 +118,7 @@ class User extends \Eloquent implements Authenticatable
 		0 => 'images/logo/LabHead/labhead-icon-16.png',
 		1 => 'images/logo/LabAssistant/assistant-logo-16.png',
 		2 => 'images/logo/LabStaff/staff-logo-16.png',
-		3 => 'images/logo/Faculty/faculty-logo-16.png',
+		3 => 'images/logo/Student/student-logo-16.png',
 		4 => 'images/logo/Student/student-logo-16.png',
 	];
 

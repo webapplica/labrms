@@ -7,6 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ ( isset($title) ? $title . ' - ' : '' ) . config('app.name') }}</title>
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
     
     <!-- styles -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}"  />
