@@ -25,7 +25,10 @@ class LoginController extends Controller
 	 */
 	public function form(Request $request)
 	{
-		return view('auth.login');
+		return view('auth.login', [
+			'title' => 'Login',
+			'isLoginPage' => true,
+		]);
 	}
 
 	/**

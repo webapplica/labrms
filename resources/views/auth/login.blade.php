@@ -12,7 +12,7 @@
                 <img class=" img img-responsive pull-right" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width: 64px;height: auto;"/>
               </div>
               <div class="col-xs-8" style="padding-left:5px;">
-                <h4 class="text-muted pull-left">College of Computer and Information Sciences</h4>
+                <h4 class="text-muted pull-left">{{ config('company.department') }}</h4>
               </div>
             </div>
           </legend>
