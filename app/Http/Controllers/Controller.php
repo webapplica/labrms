@@ -11,26 +11,15 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 	
-	protected function sanitizeString($var)
+	/**
+	 * Removes html and php tags, converts to html entities, and
+	 * Strip the slashes from the var
+	 *
+	 * @param String $var
+	 * @return String cleansed variable
+	 */
+	protected function clean($var)
 	{
-		$var = strip_tags($var);
-		$var = htmlentities($var);
-		$var = stripslashes($var);
-
 		return stripslashes(htmlentities(strip_tags($var)));
-	}
-
-	protected function hasData($input)
-	{
-		if($input == null || empty($input) || $input == "" || $input == 'null') {
-			return false;
-		}
-
-		return true;
-	}
-
-	protected function jsonResponse(array $args, $code)
-	{
-		return response()->json($args, $code);
 	}
 }
