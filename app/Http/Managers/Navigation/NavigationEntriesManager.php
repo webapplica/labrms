@@ -6,33 +6,19 @@ use App\Http\Interfaces\NavigationEntries\NavigationEntriesInterface;
 
 class NavigationEntriesManager implements NavigationEntriesInterface
 {
-    private $basePath;
+    private static $defaultEntryPoint = 0;
+    private static $entry = [
+        'app.navigation.admin',
+        'app.navigation.assistant',
+        'app.navigation.staff',
+        'app.navigation.faculty',
+        'app.navigation.student',
+    ];
 
-    public function __construct()
-    {
-        $this->basePath = app_path();
-    }
-
-    public function get($id)
+    public function get(int $id)
     {
         $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-        switch($id) {
-            case 0: 
-                $list = config('app.navigation.admin');
-                break;
-            case 1: 
-                $list = config('app.navigation.admin');
-                break;
-            case 2: 
-                $list = config('app.navigation.admin');
-                break;
-            case 3: 
-                $list = config('app.navigation.admin');
-                break;
-            case 4: 
-                $list = config('app.navigation.admin');
-                break;
-        }
+        return config( isset(self::$entry[$id]) ? self::$entry[$id] : self::$entry[ self::$defaultEntryPoint ] );
     }
 
 
