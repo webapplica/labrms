@@ -179,6 +179,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+        App\Providers\ComposerServiceProvider::class,
 
         /*
         * Backpack Service Providers...
@@ -186,19 +187,15 @@ return [
         Backpack\Base\BaseServiceProvider::class,
         Backpack\CRUD\CrudServiceProvider::class,
         Backpack\LangFileManager\LangFileManagerServiceProvider::class,
-
         Spatie\Backup\BackupServiceProvider::class,
         Backpack\BackupManager\BackupManagerServiceProvider::class,
-
         Backpack\LogManager\LogManagerServiceProvider::class,   
-
         Backpack\Settings\SettingsServiceProvider::class,
-
         Cviebrock\EloquentSluggable\ServiceProvider::class, 
         Backpack\PageManager\PageManagerServiceProvider::class,
 
-
         Yajra\DataTables\DataTablesServiceProvider::class,
+        
 
     ],
 
