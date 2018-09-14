@@ -24,6 +24,7 @@ class HomeController extends Controller
      */
     public function dashboard()
     {
-        return redirect('dashboard.admin.index');
+        // dd(Auth::user());
+        // return view('dashboard.admin.index');
     }
 }

@@ -28,7 +28,7 @@ class Routes
             Route::get('logout','LogoutController@logout');
             Route::post('logout','LogoutController@logout');
             
-            Route::get('{user}', 'SessionsController@show');
+            Route::get('user/{user}', 'SessionsController@show');
             Route::get('settings', 'SessionsController@edit');
             Route::post('settings', 'SessionsController@update');
 

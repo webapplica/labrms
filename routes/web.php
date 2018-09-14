@@ -11,8 +11,8 @@
 |
 */
 
-Route::get('/', 'HomeController@dashboard');
-Route::post('/', 'HomeController@dashboard');
+// Route::get('/', 'HomeController@dashboard');
+// Route::post('/', 'HomeController@dashboard');
 
 /*
 |--------------------------------------------------------------------------

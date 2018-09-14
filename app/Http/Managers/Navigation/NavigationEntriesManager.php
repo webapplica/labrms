@@ -2,7 +2,7 @@
 
 namespace App\Http\Managers\Navigation;
 
-use App\Http\Interfaces\NavigationEntries\NavigationEntriesInterface;
+use App\Http\Interfaces\Navigation\NavigationEntriesInterface;
 
 class NavigationEntriesManager implements NavigationEntriesInterface
 {
@@ -15,7 +15,7 @@ class NavigationEntriesManager implements NavigationEntriesInterface
         'app.navigation.student',
     ];
 
-    public function get(int $id)
+    public static function get(int $id)
     {
         $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
         return config( isset(self::$entry[$id]) ? self::$entry[$id] : self::$entry[ self::$defaultEntryPoint ] );
