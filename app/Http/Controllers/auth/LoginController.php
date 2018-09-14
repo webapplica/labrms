@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use Auth;
 use Illuminate\Http\Request;
-use App\Http\Classes\LoginRequest;
 use App\Http\Controllers\Controller;
 
 class LoginController extends Controller
@@ -31,7 +30,7 @@ class LoginController extends Controller
 	 * 
 	 * @return
 	 */
-	public function login(LoginRequest $request)
+	public function login(Request $request)
 	{
 		$username = filter_var($request->get('username'), FILTER_SANITIZE_STRING);
 		$password = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
