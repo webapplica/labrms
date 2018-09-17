@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inventory;
 
-use App\Http\Controllers\Controller;
+use DB;
 use App;
 use Auth;
-use DB;
 use Session;
 use Validator;
+use App\Models\Unit;
+use App\Models\Items\Type;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
+use App\Models\Inventory\Inventory;
+use App\Http\Controllers\Controller;
 
-class ItemInventoryController extends Controller {
+class InventoryController extends Controller {
 
 	/**
 	 * Display a listing of the resource.
@@ -22,12 +24,12 @@ class ItemInventoryController extends Controller {
 	{
 		if($request->ajax())
 		{
-			$inventory = App\Inventory::with('itemtype')->get();
+			$inventory = Inventory::with('itemtype')->get();
 			return datatables($inventory)->toJson();
 		}
 
 		return view('inventory.item.index')
-						->with('title','Inventory');
+				->with('title','Inventory');
 	}
 
 
@@ -38,10 +40,8 @@ class ItemInventoryController extends Controller {
 	 */
 	public function create(Request $request)
 	{
-		$units = [ null => 'None' ];
-
-		$itemtypes = App\ItemType::pluck('name','id');
-		$units = $units + App\Unit::pluck('abbreviation','abbreviation')->toArray();
+		$itemtypes = Type::pluck('name','id');
+		$units = Unit::pluck('abbreviation','abbreviation')->toArray()->prependNull('None');
 
 		return view('inventory.item.create')
 					->with('itemtypes',$itemtypes)

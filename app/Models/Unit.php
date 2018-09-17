@@ -34,4 +34,9 @@ class Unit extends Model
 		return $query->where('abbreviation', '=', $value);
 	}
 
+	public function prependNull($value)
+	{
+		return $this + [null => 'None'];
+	}
+
 }
