@@ -16,7 +16,8 @@ class GlobalComposer {
      */
     public function compose(View $view)
     {
-        $view->with('navigation', NavigationManager::search(Auth::id())->extract());
+        $access = (null !== Auth::id()) ? Auth::user()->accesslevel : 5;
+        $view->with('navigation', NavigationManager::search($access)->extract());
     }
 
 }

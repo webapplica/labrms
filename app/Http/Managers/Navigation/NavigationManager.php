@@ -2,13 +2,19 @@
 
 namespace App\Http\Managers\Navigation;
 
+use App\Http\Modules\Navigation\AdminNavigation;
+use App\Http\Modules\Navigation\StaffNavigation;
+use App\Http\Modules\Navigation\GuestNavigation;
+use App\Http\Modules\Navigation\FacultyNavigation;
+use App\Http\Modules\Navigation\StudentNavigation;
+use App\Http\Modules\Navigation\AssistantNavigation;
 use App\Http\Interfaces\Navigation\NavigationInterface;
 
 class NavigationManager implements NavigationInterface
 {
+    private $path;
     private static $defaultEntryPoint = 0;
     private static $guestEntryPoint = 5;
-    private $path;
     private static $_instance;
     private static $entry = [
         'navigation.admin',
@@ -84,7 +90,9 @@ class NavigationManager implements NavigationInterface
      */
     public function extract()
     {
-        return config($this->path);
+        $app = app_path() . '\\' . 'Http\Managers\Navigation\navigation';
+        $navigation = include($app);
+        dd($navigation);
     }
 
 

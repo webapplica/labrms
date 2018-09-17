@@ -176,7 +176,7 @@
         <!-- navbar right -->
         <ul class="nav navbar-nav navbar-right">
             
-            {{ dd($navigation) }} 
+            {{ $navigation }} 
 
         </ul><!-- end of navbar right -->
     </div><!-- /.navbar-collapse -->
