@@ -5,49 +5,23 @@ namespace App\Models;
 use Auth;
 use Hash;
 use Session;
+use App\Models\Item;
+use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Managers\User\PasswordManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable;
+use App\Http\Modules\Account\AccountMaintenance;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
 class User extends \Eloquent implements Authenticatable 
 {
-	use SoftDeletes, AuthenticableTrait, PasswordManager;
+	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance;
 
-	/**
-	*
-	* table name
-	*
-	*/	
 	protected $table  = 'users';
-
-	/**
-	*
-	*	fields to be set as date
-	*
-	*/
-	protected $dates = ['deleted_at'];
-
-	/**
-	*
-	* primary key
-	*
-	*/
 	protected $primaryKey = 'id';
-
-	/**
-	*
-	* created_at and updated_at status
-	*
-	*/
+	protected $dates = ['deleted_at'];
 	public $timestamps = true;
-
-	/**
-	*
-	* used for create method
-	*
-	*/  
 	protected $fillable = [
 		'lastname',
 		'firstname',
@@ -61,27 +35,7 @@ class User extends \Eloquent implements Authenticatable
 		'accesslevel'
 	];
 
-	/**
-	*
-	* not shown when querying
-	*
-	*/  
 	protected $hidden = ['password','remember_token'];
-
-	/**
-	*
-	* validation rules
-	*
-	*/
-	public static $rules = array(
-		'Username' => 'required_with:password|min:4|max:20|unique:users,username',
-		'Password' => 'required|min:8|max:50',
-		'First name' => 'required|between:2,100|string',
-		'Middle name' => 'min:2|max:50|string',
-		'Last name' => 'required|min:2|max:50|string',
-		'Contact number' => 'required|size:11|string',
-		'Email' => 'required|email'
-	);
 
 	/**
 	*
@@ -132,6 +86,11 @@ class User extends \Eloquent implements Authenticatable
 		return self::$staffIds;
 	}
 
+	protected static function getAdminId()
+	{
+		return 0;
+	}
+
 	protected static function getAvatarUrl($id)
 	{
 		return isset(self::$avatarUrl[$id]) ? self::$avatarUrl[$id] : 'None';
@@ -153,22 +112,27 @@ class User extends \Eloquent implements Authenticatable
 
 	public function reservation()
 	{
-		return $this->hasOne('App\Reservation','user_id');
+		return $this->hasOne(Reservation::class, 'user_id');
 	}
 
 	public function itemprofile()
 	{
-		return $this->belongsToMany('App\ItemProfile','Reservation','user_id','item_id');
+		return $this->belongsToMany(Item::class, Reservation::class, 'user_id', 'item_id');
 	}
 
 	public function scopeAdmin($query)
 	{
-		return $query->where('accesslevel','=',0);
+		return $query->where('accesslevel', '=', 0);
+	}
+
+	public function scopeallLaboratoryUsersExceptCurrentUser($query)
+	{
+		return $query->whereIn('accesslevel', User::getStaffIds())->where('id', '!=', Auth::user()->id);
 	}
 
 	public function scopeStaffId($query)
 	{
-		return $query->whereIn('accesslevel', [0, 1, 2]);
+		return $query->whereIn('accesslevel', User::getStaffIds());
 	}
 
 	/**
@@ -178,20 +142,34 @@ class User extends \Eloquent implements Authenticatable
 	 */
 	public static function clear()
 	{
-
-		$user = [];
 		if(Auth::check()) {
 			$user = Auth::user();
 			Auth::logout();
 		}
 
 		Session::flush();
-
-		return $user;
+		return isset($user) ? $user : [];
 	}
 
 	public function isStaff()
 	{
 		return ( in_array( $this->accesslevel, User::getStaffIds() ) );
+	}
+
+	public function validateCreate($request)
+	{
+		$validator = $this->validate([
+			'username' => 'required_with:password|min:4|max:20|unique:' . $this->table . ',username',
+			'firstname' => 'required|between:2,100|string',
+			'middlename' => 'min:2|max:50|string',
+			'lastname' => 'required|min:2|max:50|string',
+			'contactnumber' => 'required|size:11|string',
+			'email' => 'required|email'
+		]);
+	}
+
+	public function updateAccessLevel($new)
+	{
+		$this->accesslevel = $new;
 	}
 }

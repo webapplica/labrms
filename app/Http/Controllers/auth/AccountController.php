@@ -69,10 +69,11 @@ class AccountsController extends Controller
 			return back()->withErrors($validator)->withInput();
 		}
 
+		User::insertValidation()->save();
+
 		User::createRecord($username,$password,$lastname,$firstname,$middlename,$contactnumber,$email,$type);
 
 		Session::flash("success-message","Account successfully created!");
-
 		return redirect('account');
 	}
 
@@ -99,11 +100,9 @@ class AccountsController extends Controller
 	 */
 	public function edit(Request $request, $id)
 	{
-		if(isset($id)){
-			$user = User::find($id);
-			return view('account.update')
-				->with('user',$user);
-		}
+		$user = User::find($id);
+		return view('account.update')
+			->with('user',$user);
 	}
 
 
@@ -170,12 +169,8 @@ class AccountsController extends Controller
 				}
 			} catch (Exception $e) {}
 		}
-
-		$user = User::find($id);
-		$user->delete();
-
-		Session::flash('success-message','An account has been successfully deleted.');
-		return redirect('account/deleted');
+		Session::flash('success-message', __('account.task_performed_successfully'));
+		return redirect('account');
 	}
 
 	/**
@@ -183,9 +178,9 @@ class AccountsController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function retrieveDeleted()
+	public function retrieveDeleted(Request $request)
 	{
-		if($request->ajax()){
+		if($request->ajax()) {
 			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
@@ -203,7 +198,6 @@ class AccountsController extends Controller
 	public function restore(Request $request, $id)
 	{
 		$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-
 		$user = User::onlyTrashed()->find($id);
 		$user->restore();
 
@@ -220,24 +214,39 @@ class AccountsController extends Controller
 	 */
 	public function activate(Request $request, $id)
 	{
+		$response = [];
+		$code = 200;
 		if($request->ajax()) {
+			$type = $this->clean($request->get('type'));
+			$id = $this->clean($request->get('id'));
+			$user = User::find($id);
+
 			if($id == Auth::user()->id) {
-				return json_encode('self');
-			} else {
+				$response = [
+					'message' => __('account.activation.invalid'),
+				];
 
-				$type = $this->sanitizeString($request->get('type'));
-				$user = User::find($id);
-
-				if($type == 'activate') {
-					$user->status = 1;
-					$user->save();
-					return json_encode('activated');
-				} else if($type == 'deactivate') {
-					$user->status = 0;
-					$user->save();
-					return json_encode('deactivated');
-				}
+				$code = 500;
 			}
+
+			if($type == 'activate') {
+				$user->status = 1;
+
+				$response = [
+					'message' => __('account.activated'),
+				];
+			}
+
+			if($type == 'deactivate') {
+				$user->status = 0;
+
+				$response = [
+					'message' => __('account.deactivated'),
+				];
+			}
+
+			$user->save();
+			return response()->json($response, $code);
 		}
 	}
 	
@@ -251,76 +260,54 @@ class AccountsController extends Controller
 	{
 		if($request->ajax())
 		{
-			$id = $this->sanitizeString($request->get('id'));
-		 	$user = User::find($id);
-		 	$user->password = Hash::make('12345678');
-		 	$user->save();
+			$id = $request->id;
+		 	$user = User::find($request->id)->passwordReset();
 
-		 	return json_encode('success');
+		 	return response([
+		 		'message' => __('account.task_performed_successfully')
+		 	], 200);
 		}
 	}
 
 	public function changeAccessLevel()
 	{
-		$id = $this->sanitizeString($request->get("id"));
-		$access = $this->sanitizeString($request->get('newaccesslevel'));
+		$id = $this->clean($request->id);
+		$newAccessLevel = $this->clean($request->newaccesslevel);
 
-		try {
-
-			if(Auth::user()->accesslevel != 0) {
-
-				Session::flash('error-message','You do not have enough priviledge to switch to this level');
-				return redirect('account');
-			}
-			
-			$user = User::find($id);
-			$user->accesslevel = $access;
-			$user->save();
-
-			Session::flash('success-message','Access Level Switched');
-			return redirect('account');
-		} catch (Exception $e){
-
-			Session::flash('error-message','Error occurred while switching access level');
-			return redirect('account');
+		if(Auth::user()->accesslevel != User::getAdminId()) {
+			Session::flash('error-message', __('account.not_enough_priviledge'));
 		}
+			
+		$user = User::find($id)->updateAccessLevel($newAccessLevel)->save();
+		Session::flash('success-message', __('account.task_performed_successfully'));
+		return redirect('account');
 	}
 
 	/**
 	*
-	*	@return list of username
 	*	return value: 'data' => array(users)
+	*	
+	*	@return list of username
 	*
 	*/
 	public function getAllUsers()
 	{
-		if($request->ajax()) {
-			$user = User::all();
-			return json_encode([ 'data' => $user ]);
-		}
+		return datatables([ 'data' => User::all() ])->toJson();
 	}
 
 	/**
 	*
-	*	@return laboratory users
 	*	laboratory users ranges from 0 - 2
+	*	Not included the current user
 	*	0 - laboratory head
 	*	1 - laboratory assistant
 	*	2 - laboratory staff
+	*	
+	*	@return laboratory users
 	*
 	*/
-	public function getAllLaboratoryUsers()
+	public function getAllLaboratoryUsersExceptCurrentUser()
 	{
-		if($request->ajax()) {
-			/**
-			*
-			*	Note: Current user is not included
-			*
-			*/
-			$user = User::whereIn('accesslevel',[0,1,2])
-					->where('id','!=',Auth::user()->id)
-					->get();
-			return json_encode([ 'data' => $user ]);
-		}
+		return datatables([ 'data' => User::allLaboratoryUsersExceptCurrentUser()->get() ])->toJson();
 	}
 }
