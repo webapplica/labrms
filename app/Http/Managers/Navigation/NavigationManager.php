@@ -25,7 +25,7 @@ class NavigationManager implements NavigationInterface
      * @param integer $id
      * @return void
      */
-    public static function search($id)
+    public static function search(int $id)
     {
         if(self::$_instance === null) {
             self::$_instance = new self;
