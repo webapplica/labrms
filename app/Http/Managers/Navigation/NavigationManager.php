@@ -7,6 +7,7 @@ use App\Http\Interfaces\Navigation\NavigationInterface;
 class NavigationManager implements NavigationInterface
 {
     private static $defaultEntryPoint = 0;
+    private static $guestEntryPoint = 5;
     private $path;
     private static $_instance;
     private static $entry = [
@@ -15,6 +16,7 @@ class NavigationManager implements NavigationInterface
         'navigation.staff',
         'navigation.faculty',
         'navigation.student',
+        'navigation.guest',
     ];
 
     /**
@@ -23,14 +25,14 @@ class NavigationManager implements NavigationInterface
      * @param integer $id
      * @return void
      */
-    public static function search(int $id)
+    public static function search($id)
     {
         if(self::$_instance === null) {
             self::$_instance = new self;
         }
 
         $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-        self::$_instance->path = self::$entry[$id];
+        self::$_instance->path = isset(self::$entry[$id]) ? self::$entry[$id] : self::$guestEntryPoint;
 
         return self::$_instance;
     }
