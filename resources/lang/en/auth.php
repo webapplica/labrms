@@ -16,5 +16,5 @@ return [
     'failed' => 'These credentials do not match our records.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'success' => 'User is permitted to access the system. Redirecting you to home page',
-
+    'logout' => 'Successfully logged out of the system',
 ];

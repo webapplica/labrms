@@ -169,6 +169,7 @@ class AccountsController extends Controller
 				}
 			} catch (Exception $e) {}
 		}
+		
 		Session::flash('success-message', __('account.task_performed_successfully'));
 		return redirect('account');
 	}

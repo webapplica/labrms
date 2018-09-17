@@ -21,7 +21,7 @@ class LogoutController extends Controller
 	{
 		if(Auth::check()) {
 			User::clear();
-			session()->flash('success-message', 'Successfully logged out of the system');
+			session()->flash('success-message', __('auth.logout'));
 		}
 
 		return redirect('login');

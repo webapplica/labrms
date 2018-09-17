@@ -32,8 +32,8 @@ class LoginController extends Controller
 	 */
 	public function login(Request $request)
 	{
-		$username = filter_var($request->get('username'), FILTER_SANITIZE_STRING);
-		$password = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
+		$username = filter_var($request->username, FILTER_SANITIZE_STRING);
+		$password = filter_var($request->password, FILTER_SANITIZE_STRING);
 		
 		$user = [	
 			'username' => $username,
