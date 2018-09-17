@@ -8,14 +8,6 @@ use App\Http\Controllers\Controller;
 
 class LoginController extends Controller
 {
-	private $args = [
-        'status' => 'error',
-        'errors' => [],
-        'message' => 'Error occured while processing your request',
-        'title' => 'Error!',
-    ];
-
-	private $statusCode = 500;
 
 	/**
 	 * Form for login
@@ -40,9 +32,8 @@ class LoginController extends Controller
 	 */
 	public function login(Request $request)
 	{
-		$username = $this->sanitizeString($request->get('username'), FILTER_SANITIZE_STRING);
-		$password = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
-		$allowed = false;
+		$username = filter_var($request->username, FILTER_SANITIZE_STRING);
+		$password = filter_var($request->password, FILTER_SANITIZE_STRING);
 		
 		$user = [	
 			'username' => $username,
@@ -50,30 +41,10 @@ class LoginController extends Controller
  		];
 
 		if(Auth::attempt($user)) {
- 			$allowed = true;
+			session()->flash('success-message','Invalid login credentials');
+			return redirect('/')->with('success-message', __('auth.success'));
  		}
 
-		if($request->ajax()) {
-			if($allowed) {
-
-	            $this->args = [
-	                'status' => 'success',
-	                'errors' => [],
-	                'message' => 'User is now permitted to access the system. Redirecting....',
-	                'title' => 'Success!',
-	            ];
-
-	            $this->statusCode = 200;
-			} 
-
-            $this->jsonResponse($this->args, $this->statusCode);
-		}
-
- 		if($allowed) {
-			return redirect('dashboard');
- 		}
-
-		session()->flash('error-message','Invalid login credentials');
-		return redirect('login');
+		return redirect('login')->with('error-message', __('auth.failed'));
 	}
 }

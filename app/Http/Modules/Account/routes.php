@@ -2,7 +2,8 @@
 
 namespace App\Http\Modules\Account; 
 
-use Route; 
+use Route;
+use App\Http\Modules\Account\Auth\Routes as AuthenticationRoutes; 
 
 class Routes
 {
@@ -17,7 +18,7 @@ class Routes
 
         });
 
-        Auth\Routes::all();
+        AuthenticationRoutes::all();
 
     }
 }

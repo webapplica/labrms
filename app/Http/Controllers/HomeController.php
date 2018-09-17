@@ -24,6 +24,6 @@ class HomeController extends Controller
      */
     public function dashboard()
     {
-        return redirect('dashboard.admin.index');
+        return view('dashboard.admin.index');
     }
 }

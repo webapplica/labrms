@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Maintenance;
 
 use Session;
-use Validator;
 use Carbon\Carbon;
 use App\AcademicYear;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Request;
+use App\Http\Classes\Requests\Maintenance\AcademicYearRequest;
 
 class AcademicYearController extends Controller
 {
@@ -17,11 +16,10 @@ class AcademicYearController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Request::ajax())
-        {
-            return json_encode([ 'data' => AcademicYear::all() ]);
+        if($request->ajax()) {
+            return datatables(AcademicYear::all())->toJson();
         }
 
         return view('academicyear.index');
@@ -34,7 +32,7 @@ class AcademicYearController extends Controller
      */
     public function create()
     {
-        //
+        return view('academicyear.create');
     }
 
     /**
@@ -45,7 +43,7 @@ class AcademicYearController extends Controller
      */
     public function store(Request $request)
     {
-        $start = $this->sanitizeString(Input::get('start'));
+        $start = $this->sanitizeString(Input::get('date_started'));
         $end = $this->sanitizeString(Input::get('end'));
 
         $start = Carbon::parse($start);
@@ -56,8 +54,7 @@ class AcademicYearController extends Controller
             'Date Ended' => $end
         ],AcademicYear::$rules);
 
-        if($validator->fails())
-        {
+        if($validator->fails()) {
             Session::flash('error-message','Invalid Information Received');
             return redirect('academicyear');
         }
@@ -104,7 +101,7 @@ class AcademicYearController extends Controller
     public function update($id)
     {
 
-        if(Request::ajax())
+        if($request->ajax())
         {
             $id = $this->sanitizeString(Input::get('id'));
             $start = $this->sanitizeString(Input::get('start'));
@@ -168,7 +165,7 @@ class AcademicYearController extends Controller
      */
     public function destroy($id)
     {
-        if(Request::ajax())
+        if($request->ajax())
         {
             $academicyear = AcademicYear::find($id);
             $academicyear->delete();

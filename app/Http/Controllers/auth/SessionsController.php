@@ -46,10 +46,9 @@ class SessionsController extends Controller
 	{
 		$currentPassword = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
 		$newPassword = filter_var($request->get('newpassword'), FILTER_SANITIZE_STRING);
-		
 		User::changePassword($currentPassword, $newPassword);
 		
-		session()->flash('success-message','Your password has successfully been updated');
+		session()->flash('success-message', __('account.successful_password_update'));
 		return back();
 	}
 

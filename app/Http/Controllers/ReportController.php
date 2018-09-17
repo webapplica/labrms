@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
+use DB;
+use App;
 use Auth;
 use Mail;
+use Session;
+use Validator;
 use Carbon\Carbon;
-use App;
-use DB;
-use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 class ReportsController extends Controller {
 
