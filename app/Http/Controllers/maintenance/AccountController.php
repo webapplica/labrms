@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\Maintenance;
 
 use Auth;
-use Hash;
-use Session;
-use Validator;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

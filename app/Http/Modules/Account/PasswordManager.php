@@ -11,26 +11,15 @@ trait PasswordManager
 {
     
     /**
-     * Change the password of the given user
+     * Assign the new password to the current password
+     * hash the password
      *
-     * @param String $currentPassword
      * @param String $newPassword
      * @return object
      */
-    public function changePassword(String $currentPassword, String $newPassword)
+    public function passwordReset(String $newPassword)
     {
-        
-		$args = [
-			'Current Password' => $currentPassword,
-			'New Password' => $newPassword
-		];
-
-		if($validator->fails()) {
-			return back()->withInput()->withErrors($validator);
-		}
-
 		$this->password = Hash::make($newpassword);
-        $this->save();
         
         return $this;
     }

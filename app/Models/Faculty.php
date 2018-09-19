@@ -2,45 +2,17 @@
 
 namespace App;
 
-use Hash;
 use Illuminate\Database\Eloquent\Model;
 
-class Faculty extends \Eloquent {
+class Faculty extends Model 
+{
 
-	/**
-	*
-	* table name
-	*
-	*/	
 	protected $table  = 'faculties';
-
-	/**
-	*
-	* primary key
-	*
-	*/
 	protected $primaryKey = 'id';
-
-	/**
-	*
-	* created_at and updated_at status
-	*
-	*/
 	public $timestamps = true;
-
-	/**
-	*
-	* used for create method
-	*
-	*/  
 	protected $fillable = [
-		'lastname',
-		'firstname',
-		'middlename',
-		'title',
-		'suffix',
-		'contactnumber',
-		'email',
+		'lastname', 'firstname', 'middlename', 'title',
+		'suffix', 'contactnumber', 'email',
 	];
 
 	/**
