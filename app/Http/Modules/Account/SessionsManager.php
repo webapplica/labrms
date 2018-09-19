@@ -13,7 +13,7 @@ trait SessionsManager
 	 *
 	 * @return void
 	 */
-	protected static function clear()
+	public static function clear()
 	{
 		if(Auth::check()) {
 			$user = Auth::user();
@@ -30,7 +30,7 @@ trait SessionsManager
 	 * 
 	 * @return
 	 */
-	protected function verifyIfActivated()
+	public function verifyIfActivated()
 	{
         if($this->status == 0) {
             return redirect('logout', __('account.activation_required'));

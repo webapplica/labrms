@@ -8,19 +8,25 @@ trait AccountRoles
 {	
 
 	/**
-	 * Returns list of staff id
+	 * Returns list of staff id with exemption if provided
+	 * 
+	 * @param  array except values to be ignored
 	 * @return array id
 	 */
-	protected static function getStaffIds()
+	public static function getStaffIds(array $except = [])
 	{
-		return self::$staffIds;
+		$filtered = array_filter(self::$staffIds, function($callback) use($except) {
+			return ! in_array($callback, $except) ? true : false;
+		});
+
+		return $filtered;
 	}
 
 	/**
 	 * Returns id for admin
 	 * @return array id
 	 */
-	protected static function getAdminId()
+	public static function getAdminId()
 	{
 		return self::$adminId;
 	}
@@ -82,12 +88,25 @@ trait AccountRoles
 	/**
 	 * Check if the access if for staff and returns true
 	 * if the corresponding level belongs to staff
-	 * 
+	 *
+	 * @param  array except values to be ignored
 	 * @return boolean 
 	 */
 	public function isStaff()
 	{
 		return ( in_array( $this->accesslevel, User::getStaffIds() ) );
+	}
+
+	/**
+	 * Check if the access if for staff and returns true
+	 * if the corresponding level belongs to staff
+	 *
+	 * @param  array except values to be ignored
+	 * @return boolean 
+	 */
+	public function isStaffExcept(array $except)
+	{
+		return ( in_array( $this->accesslevel, User::getStaffIds($except) ) );
 	}
 
 	/**

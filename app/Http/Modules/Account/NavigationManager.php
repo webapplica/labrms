@@ -25,7 +25,7 @@ trait NavigationManager
 	 * 
 	 * @return 
 	 */
-	protected function allowedOnAdminNavigationLayout()
+	public function allowedOnAdminNavigationLayout()
 	{
 		if($this->isAdmin()) {
 			$this->navigationLayout = 'layouts.partials.navigation.admin';
@@ -39,7 +39,7 @@ trait NavigationManager
 	 * 
 	 * @return 
 	 */
-	protected function allowedOnAssistantNavigationLayout()
+	public function allowedOnAssistantNavigationLayout()
 	{
 		if($this->isAssistant()) {
 			$this->navigationLayout = 'layouts.partials.navigation.assistant';
@@ -53,9 +53,9 @@ trait NavigationManager
 	 * 
 	 * @return 
 	 */
-	protected function allowedOnStaffNavigationLayout()
+	public function allowedOnStaffNavigationLayout()
 	{
-		if($this->isStaff()) {
+		if($this->isStaffExcept([0, 1])) {
 			$this->navigationLayout = 'layouts.partials.navigation.staff';
 		}
 
@@ -67,7 +67,7 @@ trait NavigationManager
 	 * 
 	 * @return 
 	 */
-	protected function allowedOnClientNavigationLayout()
+	public function allowedOnClientNavigationLayout()
 	{
 		if($this->isStudent() || $this->isFaculty()) {
 			$this->navigationLayout = 'layouts.partials.navigation.client';
@@ -81,7 +81,7 @@ trait NavigationManager
 	 * 
 	 * @return 
 	 */
-	protected function defaultNavigationLayout()
+	public function defaultNavigationLayout()
 	{
 		$this->navigationLayout = 'layouts.partials.navigation.client';
 

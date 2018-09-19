@@ -17,7 +17,7 @@ trait PasswordManager
      * @param String $newPassword
      * @return object
      */
-    protected function changePassword(String $currentPassword, String $newPassword)
+    public function changePassword(String $currentPassword, String $newPassword)
     {
         
 		$args = [
@@ -25,17 +25,16 @@ trait PasswordManager
 			'New Password' => $newPassword
 		];
 
-		$rules = [
-			'Current Password'=>'required|min:8|max:50',
-			'New Password'=> [
+		$validator = Validator::make($args, [
+            'Current Password'=>'required|min:8|max:50',
+            'New Password'=> [
                 'required',
                 'min:8',
                 'max:50',
-                Rule::notIn([$currentPassword])
+                Rule::notIn([ $currentPassword ]),
             ]
-		];
+        ]);
 
-		$validator = Validator::make($args, $rules);
 		if($validator->fails()) {
 			return back()->withInput()->withErrors($validator);
 		}
