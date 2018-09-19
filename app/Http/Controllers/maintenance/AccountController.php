@@ -8,11 +8,11 @@ use Session;
 use Validator;
 use App\Models\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
-class AccountsController extends Controller
+class AccountController extends Controller
 {
-
+	private $viewBasePath = 'maintenance.account.';
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -24,7 +24,7 @@ class AccountsController extends Controller
 			return datatables(User::all())->toJson();
 		}
 
-		return view('account.index');
+		return view( $this->viewBasePath . 'index');
 	}
 
 
@@ -35,7 +35,7 @@ class AccountsController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		return view('account.create');
+		return view( $this->viewBasePath . 'create');
 	}
 
 
@@ -46,7 +46,17 @@ class AccountsController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		User::insertValidation()->save();
+
+		$this->validate([
+			'username' => 'required_with:password|min:4|max:20|unique:' . $this->table . ',username',
+			'firstname' => 'required|between:2,100|string',
+			'middlename' => 'min:2|max:50|string',
+			'lastname' => 'required|min:2|max:50|string',
+			'contactnumber' => 'required|size:11|string',
+			'email' => 'required|email'
+		]);
+
+		User::create($request);
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -60,7 +70,7 @@ class AccountsController extends Controller
 	public function show(Request $request, $id)
 	{
 		$user = User::find($id);
-		return view('account.show')
+		return view( $this->viewBasePath . 'show')
 					->with('person',$user);
 	}
 
@@ -74,7 +84,7 @@ class AccountsController extends Controller
 	public function edit(Request $request, $id)
 	{
 		$user = User::find($id);
-		return view('account.update')
+		return view( $this->viewBasePath . 'update')
 			->with('user',$user);
 	}
 
@@ -131,7 +141,7 @@ class AccountsController extends Controller
 			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
-		return view('account.restore')
+		return view( $this->viewBasePath . 'restore')
 			->with('user', $user);
 
 	}

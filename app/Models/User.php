@@ -135,6 +135,31 @@ class User extends \Eloquent implements Authenticatable
 		return $query->whereIn('accesslevel', User::getStaffIds());
 	}
 
+	public function isAdmin()
+	{
+		return $this->accesslevel == 0;
+	}
+
+	public function isAssistant()
+	{
+		return $this->accesslevel == 1;
+	}
+
+	public function isStaff()
+	{
+		return $this->accesslevel == 2;
+	}
+
+	public function isFaculty()
+	{
+		return $this->accesslevel == 3;
+	}
+
+	public function isStudent()
+	{
+		return $this->accesslevel == 4;
+	}
+
 	/**
 	 * Clears authentication and session of the user
 	 *
@@ -154,20 +179,6 @@ class User extends \Eloquent implements Authenticatable
 	public function isStaff()
 	{
 		return ( in_array( $this->accesslevel, User::getStaffIds() ) );
-	}
-
-	public function validateCreate($request)
-	{
-		$this->validate([
-			'username' => 'required_with:password|min:4|max:20|unique:' . $this->table . ',username',
-			'firstname' => 'required|between:2,100|string',
-			'middlename' => 'min:2|max:50|string',
-			'lastname' => 'required|min:2|max:50|string',
-			'contactnumber' => 'required|size:11|string',
-			'email' => 'required|email'
-		]);
-
-		return $this;
 	}
 
 	public function updateAccessLevel($new)

@@ -18,15 +18,24 @@
         <ul class="nav navbar-nav">
             <!-- home tab -->
             <li>
-                <a 
-                    href="{{ url('dashboard') }}">
-                    <img 
-                        class="img" 
+                <a href="{{ url('dashboard') }}">
+                    <img class="img" 
                         src="{{ asset('images/logo/Dashboard/dashboard-16.png') }}" 
                         style="width: 25px; height: 25px; margin-right: 5px;" /> 
                         Dashboard
                 </a>
             </li>
+            @if(Auth::user()->isAdmin())
+                @include('layouts.partials.navigation.admin')
+            @elseif(Auth::user()->isAssistant())
+                @include('layouts.partials.navigation.admin')
+            @elseif(Auth::user()->isStaff())
+                @include('layouts.partials.navigation.admin')
+            @elseif(Auth::user()->isFaculty())
+                @include('layouts.partials.navigation.admin')
+            @elseif(Auth::user()->isStudent())
+                @include('layouts.partials.navigation.admin')
+            @endif
 
             @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 
@@ -175,8 +184,24 @@
         </ul>
         <!-- navbar right -->
         <ul class="nav navbar-nav navbar-right">
-            
-            {{ $navigation }} 
+            <li class="dropdown">
+            <a href="#" class="dropdown-toggle text-capitalize" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <img 
+                class="img"
+                src="{{ Auth::user()->imageUrl }}"
+                style="width:25px;height:25px;margin-right: 5px;">{{{ Auth::user()->firstname }}} {{{ Auth::user()->lastname }}}<span class="caret"></span></a>
+            <!-- dropdown items -->
+            <ul class="dropdown-menu">
+                <li>{{ link_to('profile','Profile') }}</li>
+                <li>{{ link_to('settings','Password') }}</li>
+                @if(Auth::user()->isStaff())
+                <li>{{ link_to('reports','Reports') }}</li>
+                <li>{{ link_to('help','Help') }}</li>
+                @endif
+                <li role="separator" class="divider"></li>
+                <li>{{ link_to('logout','Logout') }}</li>
+            </ul> <!-- end of dropdown items -->
+            </li> <!-- end of maintenance dropdown tab -->
 
         </ul><!-- end of navbar right -->
     </div><!-- /.navbar-collapse -->
