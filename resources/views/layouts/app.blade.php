@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/nav.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/sweetalert.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}" />
     @yield('style-include')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
