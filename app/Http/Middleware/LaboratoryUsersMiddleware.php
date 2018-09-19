@@ -16,7 +16,9 @@ class LaboratoryUsersMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(! (Auth::user()->accesslevel >= 3 && Auth::user()->accesslevel <= 4) ) return redirect('dashboard');
+        if( ! (Auth::user()->isStudent() || Auth::user()->isFaculty()) ) {
+            return redirect('dashboard');
+        }
 
         return $next($request);
     }

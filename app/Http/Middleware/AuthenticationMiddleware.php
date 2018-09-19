@@ -25,8 +25,6 @@ class AuthenticationMiddleware
                 
             return redirect('login')->with('error-message', __('auth.insufficient_permission'));
         }
-        
-        Auth::user()->verifyIfActivated();
 
         return $next($request);
     }
