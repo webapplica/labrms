@@ -25,16 +25,6 @@ trait PasswordManager
 			'New Password' => $newPassword
 		];
 
-		$validator = Validator::make($args, [
-            'Current Password'=>'required|min:8|max:50',
-            'New Password'=> [
-                'required',
-                'min:8',
-                'max:50',
-                Rule::notIn([ $currentPassword ]),
-            ]
-        ]);
-
 		if($validator->fails()) {
 			return back()->withInput()->withErrors($validator);
 		}

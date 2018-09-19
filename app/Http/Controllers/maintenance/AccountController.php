@@ -7,12 +7,14 @@ use Hash;
 use Session;
 use Validator;
 use App\Models\User;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class AccountController extends Controller
 {
 	private $viewBasePath = 'maintenance.account.';
+	private $baseUrl = 'account';
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -47,8 +49,8 @@ class AccountController extends Controller
 	public function store(Request $request)
 	{
 
-		$this->validate([
-			'username' => 'required_with:password|min:4|max:20|unique:' . $this->table . ',username',
+		$this->validate($request, [
+			'username' => 'required_with:password|min:4|max:20|unique:users,username',
 			'firstname' => 'required|between:2,100|string',
 			'middlename' => 'min:2|max:50|string',
 			'lastname' => 'required|min:2|max:50|string',
@@ -57,6 +59,7 @@ class AccountController extends Controller
 		]);
 
 		User::create($request);
+
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -69,9 +72,14 @@ class AccountController extends Controller
 	 */
 	public function show(Request $request, $id)
 	{
+		$args = [ 'id' => $id ];
+		$this->validate($args, [
+			'id' => 'required|exists:users,id|not_in:' . Auth::user()->id . '|numeric',
+		]);
+
 		$user = User::find($id);
 		return view( $this->viewBasePath . 'show')
-					->with('person',$user);
+					->with('person', $user);
 	}
 
 
@@ -83,6 +91,11 @@ class AccountController extends Controller
 	 */
 	public function edit(Request $request, $id)
 	{
+		$args = [ 'id' => $id ];
+		$this->validate($args, [
+			'id' => 'required|exists:users,id|not_in:' . Auth::user()->id . '|numeric',
+		]);
+
 		$user = User::find($id);
 		return view( $this->viewBasePath . 'update')
 			->with('user',$user);
@@ -97,7 +110,26 @@ class AccountController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		User::updateRecord($id,$username,$lastname,$firstname,$middlename,$contactnumber,$email,$type);
+		$user = User::find($id);
+
+		$this->validate($request + ['id' => $id], [
+			'id' => 'required|integer|exists:users,id',
+			'username' => 'required_with:password|min:4|max:20|unique:users,username,' . $user->username . ',username',
+			'firstname' => 'required|between:2,100|string',
+			'middlename' => 'min:2|max:50|string',
+			'lastname' => 'required|min:2|max:50|string',
+			'contact_number' => 'required|size:11|string',
+			'email' => 'required|email'
+		]);
+
+		$user->lastname = $request->lastname;
+		$user->firstname = $request->firstname;
+		$user->middlename = $request->middlename;
+		$user->contact_number = $request->contact_number;
+		$user->email = $request->email;
+		$user->username = $request->username;
+		$user->save();
+
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -110,24 +142,20 @@ class AccountController extends Controller
 	 */
 	public function destroy(Request $request, $id)
 	{
-		if($request->ajax()){
-			try{
+		$args = [ 'id' => $id ];
+		$this->validate($args, [
+			'id' => 'required|exists:users,id|not_in:' . Auth::user()->id . '|numeric',
+		]);
 
-				$user = User::select('id')->get();
-				if($id == Auth::user()->id){
-					return json_encode('self');
-				}else if(count($user) <= 1){
-					return json_encode('invalid');
-				}else{
-					$user = User::find($id);
-					$user->delete();
-					return json_encode('success');
-				}
-			} catch (Exception $e) {}
+		User::find($id)->delete();
+
+		if($request->ajax()) {
+			return response()->json([
+				'message' => __('tasks.success')
+			], 200);
 		}
 		
-		Session::flash('success-message', __('account.task_performed_successfully'));
-		return redirect('account');
+		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
 	/**
@@ -154,9 +182,12 @@ class AccountController extends Controller
 
 	public function restore(Request $request, $id)
 	{
-		$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-		$user = User::onlyTrashed()->find($id);
-		$user->restore();
+		$args = [ 'id' => $id ];
+		$this->validate($args, [
+			'id' => 'required|exists:users,id|not_in:' . Auth::user()->id . '|numeric',
+		]);
+
+		User::onlyTrashed()->find($id)->restore();
 
 		Session::flash('success-message',"Account restored!");
         return redirect('account/deleted');
@@ -171,40 +202,13 @@ class AccountController extends Controller
 	 */
 	public function activate(Request $request, $id)
 	{
-		$response = [];
-		$code = 200;
-		if($request->ajax()) {
-			$type = $this->clean($request->get('type'));
-			$id = $this->clean($request->get('id'));
-			$user = User::find($id);
+		$args = [ 'id' => $id ];
+		$this->validate($args, [
+			'id' => 'required|exists:users,id|not_in:' . Auth::user()->id . '|numeric',
+		]);
 
-			if($id == Auth::user()->id) {
-				$response = [
-					'message' => __('account.activation.invalid'),
-				];
-
-				$code = 500;
-			}
-
-			if($type == 'activate') {
-				$user->status = 1;
-
-				$response = [
-					'message' => __('account.activated'),
-				];
-			}
-
-			if($type == 'deactivate') {
-				$user->status = 0;
-
-				$response = [
-					'message' => __('account.deactivated'),
-				];
-			}
-
-			$user->save();
-			return response()->json($response, $code);
-		}
+		$user = User::find($id)->toggleStatusByAction($type)->save();
+		return redirect($this->baseUrl);
 	}
 	
 	/**
@@ -213,58 +217,45 @@ class AccountController extends Controller
 	 * user id
 	 *@param  int  $id
 	 */
-	public function resetPassword()
+	public function resetPassword(Request $request)
 	{
-		if($request->ajax())
-		{
-			$id = $request->id;
-		 	$user = User::find($request->id)->passwordReset();
+		$validator = $this->validate($request, [
+			'id' => 'integer|exists:users,id|required',
+            'current_password'=>'required|min:8|max:50',
+            'new_password'=> [
+                'required',
+                'min:8',
+                'max:50',
+                Rule::notIn([ $request->current_password ]),
+            ],
+        ]);
 
+	 	$user = User::find($request->id)->passwordReset()->save();
+
+		if($request->ajax()) {
 		 	return response([
 		 		'message' => __('account.task_performed_successfully')
 		 	], 200);
 		}
+
+		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
 	public function changeAccessLevel()
 	{
-		$id = $this->clean($request->id);
-		$newAccessLevel = $this->clean($request->newaccesslevel);
+		$id = $request->id;
+		$newAccessLevel = $this->clean($request->new_access_level);
+
+		$this->validate($request, [
+			'id' => 'required|integer|exists:user,id',
+			'new_access_level' => 'required|integer',
+		]);
 
 		if(Auth::user()->accesslevel != User::getAdminId()) {
-			Session::flash('error-message', __('account.not_enough_priviledge'));
+			return back()->with('error-message', __('account.not_enough_priviledge'));
 		}
 			
 		$user = User::find($id)->updateAccessLevel($newAccessLevel)->save();
-		Session::flash('success-message', __('account.task_performed_successfully'));
-		return redirect('account');
-	}
-
-	/**
-	*
-	*	return value: 'data' => array(users)
-	*	
-	*	@return list of username
-	*
-	*/
-	public function getAllUsers()
-	{
-		return datatables([ 'data' => User::all() ])->toJson();
-	}
-
-	/**
-	*
-	*	laboratory users ranges from 0 - 2
-	*	Not included the current user
-	*	0 - laboratory head
-	*	1 - laboratory assistant
-	*	2 - laboratory staff
-	*	
-	*	@return laboratory users
-	*
-	*/
-	public function getAllLaboratoryUsersExceptCurrentUser()
-	{
-		return datatables([ 'data' => User::allLaboratoryUsersExceptCurrentUser()->get() ])->toJson();
+		return redirect('account')->with('success-message', __('account.task_performed_successfully'));
 	}
 }
