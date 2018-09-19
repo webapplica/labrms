@@ -13,8 +13,8 @@ return [
     |
     */
    
-    'task_performed_successfully' => 'The request has been successfully completed',
-    'general_error_message' => 'An error occurred while processing your request',
+    'success' => 'The request has been successfully completed',
+    'error' => 'An error occurred while processing your request',
     'not_enough_priviledge' => 'You do not have enough priviledge to perform this task',
 
 ];

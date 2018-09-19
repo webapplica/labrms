@@ -90,9 +90,9 @@ class NavigationManager implements NavigationInterface
      */
     public function extract()
     {
-        $app = app_path() . '\\' . 'Http\Managers\Navigation\navigation';
-        $navigation = include($app);
-        dd($navigation);
+        // $app = app_path() . '\\' . 'Http\Managers\Navigation\navigation';
+        // $navigation = include($app);
+        // dd($navigation);
     }
 
 

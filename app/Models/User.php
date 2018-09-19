@@ -158,7 +158,7 @@ class User extends \Eloquent implements Authenticatable
 
 	public function validateCreate($request)
 	{
-		$validator = $this->validate([
+		$this->validate([
 			'username' => 'required_with:password|min:4|max:20|unique:' . $this->table . ',username',
 			'firstname' => 'required|between:2,100|string',
 			'middlename' => 'min:2|max:50|string',
@@ -166,6 +166,8 @@ class User extends \Eloquent implements Authenticatable
 			'contactnumber' => 'required|size:11|string',
 			'email' => 'required|email'
 		]);
+
+		return $this;
 	}
 
 	public function updateAccessLevel($new)

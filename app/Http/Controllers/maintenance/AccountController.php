@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Maintenance;
 
 use Auth;
 use Hash;
@@ -46,35 +46,8 @@ class AccountsController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$lastname = $this->clean($request->lastname);
-		$firstname = $this->clean($request->get('firstname'));
-		$middlename = $this->clean($request->get('middlename'));
-		$username = $this->clean($request->get('username'));
-		$contactnumber = $this->clean($request->get('contactnumber'));
-		$email = $this->clean($request->get('email'));
-		$password = $this->clean($request->get('password'));
-		$type = $this->clean($request->get('type'));
-
-		$validator = Validator::make([
-			'Last name' => $lastname,
-			'First name' => $firstname,
-			'Middle name' => $middlename,
-			'Username' => $username,
-			'Contact number' => $contactnumber,
-			'Email' => $email,
-			'Password' => $password
-		], User::$rules);
-
-		if($validator->fails()) {
-			return back()->withErrors($validator)->withInput();
-		}
-
 		User::insertValidation()->save();
-
-		User::createRecord($username,$password,$lastname,$firstname,$middlename,$contactnumber,$email,$type);
-
-		Session::flash("success-message","Account successfully created!");
-		return redirect('account');
+		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
 
@@ -88,7 +61,7 @@ class AccountsController extends Controller
 	{
 		$user = User::find($id);
 		return view('account.show')
-			->with('person',$user);
+					->with('person',$user);
 	}
 
 
@@ -114,35 +87,8 @@ class AccountsController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		$id = $this->sanitizeString($request->get('id'));
-		$lastname = $this->sanitizeString($request->get('lastname'));
-		$firstname = $this->sanitizeString($request->get('firstname'));
-		$middlename = $this->sanitizeString($request->get('middlename'));
-		$contactnumber = $this->sanitizeString($request->get('contactnumber'));
-		$email = $this->sanitizeString($request->get('email'));
-		$type = $this->sanitizeString($request->get('type'));
-		$username = $this->sanitizeString($request->get('username'));
-
-		$validator = Validator::make([
-			'last name' => $lastname,
-			'first name' => $firstname,
-			'middle name' => $middlename,
-			'contact number' => $contactnumber,
-			'email' => $email,
-			'type' => $type
-		], User::$updateRules);
-
-		if($validator->fails())
-		{
-			return redirect('login')
-				->withInput()
-				->withErrors($validator);
-		}
-
 		User::updateRecord($id,$username,$lastname,$firstname,$middlename,$contactnumber,$email,$type);
-
-		Session::flash('success-message','Account information updated');
-		return redirect('account');
+		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
 
