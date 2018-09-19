@@ -14,5 +14,5 @@ return [
     */
 
     'successful_password_update' => 'Your password has successfully been updated',
-
+    'activation_required' => 'This account requires activation to proceed! Please contact the administrator for more information',
 ];

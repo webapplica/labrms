@@ -18,7 +18,8 @@ use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
 class User extends \Eloquent implements Authenticatable 
 {
-	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance, AccountRoles, NavigationManager;
+	use SoftDeletes, AuthenticableTrait, PasswordManager; 
+	use AccountMaintenance, AccountRoles, NavigationManager;
 
 	protected $table  = 'users';
 	protected $primaryKey = 'id';

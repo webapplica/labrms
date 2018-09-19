@@ -17,4 +17,5 @@ return [
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'success' => 'User is permitted to access the system. Redirecting you to home page',
     'logout' => 'Successfully logged out of the system',
+    'insufficient_permission' => 'You don\'t have enough permission to access this.',
 ];
