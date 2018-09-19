@@ -38,21 +38,6 @@ class User extends \Eloquent implements Authenticatable
 
 	protected $hidden = ['password','remember_token'];
 
-	/**
-	*
-	* update rules
-	*
-	*/
-	public static $updateRules = array(
-		'Username' => 'min:4|max:20',
-		'Password' => 'min:6|max:50',
-		'First name' => 'min:2|max:100|string',
-		'Middle name' => 'min:2|max:50|string',
-		'Last name' => 'min:2|max:50|string',
-		'Contact number' => 'size:11|string',
-		'email' => 'email'
-	);
-
 	private static $adminId = 0;
 	private static $staffIds = [
 		0, 1, 2	
@@ -105,26 +90,5 @@ class User extends \Eloquent implements Authenticatable
 	public function itemprofile()
 	{
 		return $this->belongsToMany(Item::class, Reservation::class, 'user_id', 'item_id');
-	}
-
-	/**
-	 * Clears authentication and session of the user
-	 *
-	 * @return void
-	 */
-	public static function clear()
-	{
-		if(Auth::check()) {
-			$user = Auth::user();
-			Auth::logout();
-		}
-
-		Session::flush();
-		return isset($user) ? $user : [];
-	}
-
-	public function updateAccessLevel($new)
-	{
-		$this->accesslevel = $new;
 	}
 }
