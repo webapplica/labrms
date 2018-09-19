@@ -10,7 +10,7 @@ trait NavigationManager
 	 * 
 	 * @returns String navigation link
 	 */
-	protected function getCorrespondingNavigation()
+	public function getCorrespondingNavigation()
 	{
 		$this->allowedOnAdminNavigationLayout()
 			->allowedOnAssistantNavigationLayout()
@@ -30,6 +30,8 @@ trait NavigationManager
 		if($this->isAdmin()) {
 			$this->navigationLayout = 'layouts.partials.navigation.admin';
 		}
+
+		return $this;
 	}
 
 	/**
@@ -42,6 +44,8 @@ trait NavigationManager
 		if($this->isAssistant()) {
 			$this->navigationLayout = 'layouts.partials.navigation.assistant';
 		}
+
+		return $this;
 	}
 
 	/**
@@ -54,6 +58,8 @@ trait NavigationManager
 		if($this->isStaff()) {
 			$this->navigationLayout = 'layouts.partials.navigation.staff';
 		}
+
+		return $this;
 	}
 
 	/**
@@ -66,6 +72,8 @@ trait NavigationManager
 		if($this->isStudent() || $this->isFaculty()) {
 			$this->navigationLayout = 'layouts.partials.navigation.client';
 		}
+
+		return $this;
 	}
 
 	/**
@@ -76,5 +84,7 @@ trait NavigationManager
 	protected function defaultNavigationLayout()
 	{
 		$this->navigationLayout = 'layouts.partials.navigation.client';
+
+		return $this;
 	}
 }

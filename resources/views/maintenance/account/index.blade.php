@@ -1,11 +1,5 @@
-@extends('layouts.master-blue')
-@section('title')
-Accounts
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
+@extends('layouts.app')
+
 @section('style')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 <link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
@@ -15,11 +9,15 @@ Accounts
 	}
 </style>
 @stop
+
+@section('modal')
+	{{-- @include('modal.account.create')
+	@include('modal.account.edit')
+	@include('modal.account.access') --}}
+@endsection
+
 @section('content')
 <div class="container-fluid" id="page-body">
-	@include('modal.account.create')
-	@include('modal.account.edit')
-	@include('modal.account.access')
 	<div class="col-sm-12 panel panel-default" id="account-info" style="padding-top: 20px;">
 		<div class="col-sm-12 panel-body  table-responsive">
 			<legend><h3 class="text-muted">Accounts</h3></legend>

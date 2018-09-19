@@ -15,13 +15,6 @@
         <li>{{ link_to('maintenance/activity','Maintenance Activities') }}</li>
         <li>{{ link_to('event','Event') }}</li>
         <li>{{ link_to('faculty','Faculty') }}</li>
-        <li>{{ link_to('item/type','Item Types') }}</li>
-        <li>{{ link_to('room/category','Laboratory Room Category') }}</li>
-        <li>{{ link_to('schedule','Laboratory Schedule') }}</li>
-        <li>{{ link_to('room','Laboratory Room') }}</li>
-        <li>{{ link_to('purpose','Reservation Purpose') }}</li>
-        <li>{{ link_to('semester','Semester') }}</li>
-        <li>{{ link_to('unit','Unit') }}</li>
         <li>{{ link_to('software','Software') }}</li>
         <li>{{ link_to('software/type','Software Types') }}</li>
     </ul> <!-- end of dropdown items -->
@@ -96,21 +89,3 @@
 
     </ul> <!-- end of dropdown items -->
 </li> <!-- end of dropdown tab -->
-
-<!-- utilities dropdown tab -->
-<li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-    <img 
-        class="img" 
-        src="{{ asset('images/logo/Utilities/utilities-16.png') }}" 
-        style="width: 25px; height: 25px; margin-right: 5px;"> 
-        Utilities 
-        <span class="caret"></span>
-    </a>
-    <!-- dropdown items -->
-    <ul class="dropdown-menu">
-        <!-- utilities tab -->
-        <li>{{ link_to('account','Accounts') }}</li>
-        <li>{{ link_to('admin/backup','Backup and Restore') }}</li>
-    </ul> <!-- end of dropdown items -->
-</li> <!-- end of utilities dropdown tab -->
