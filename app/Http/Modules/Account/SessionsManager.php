@@ -2,6 +2,9 @@
 
 namespace App\Http\Modules\Account;
 
+use Auth;
+use Session;
+
 trait SessionsManager
 {
 

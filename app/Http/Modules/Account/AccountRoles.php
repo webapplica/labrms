@@ -2,6 +2,8 @@
 
 namespace App\Http\Modules\Account;
 
+use App\Models\User;
+
 trait AccountRoles
 {	
 
