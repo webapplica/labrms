@@ -10,11 +10,11 @@ class Routes
 
     public static function all() 
     {
-        Route::middleware(['auth','lab.staff'])->group(function() {
-            Route::resource('account','AccountsController');
-            Route::put('account/access/update', 'AccountsController@changeAccessLevel');
-            Route::post('account/password/reset','AccountsController@resetPassword');
-            Route::post('account/activate/{id}','AccountsController@activateAccount');
+        Route::middleware(['auth','lab.staff'])->namespace('maintenance')->group(function() {
+            Route::resource('account','AccountController');
+            Route::put('account/access/update', 'AccountController@changeAccessLevel');
+            Route::post('account/password/reset','AccountController@resetPassword');
+            Route::post('account/activate/{id}','AccountController@activateAccount');
 
         });
 

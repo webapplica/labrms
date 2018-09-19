@@ -1,4 +1,4 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 @section('title')
 Create
 @stop

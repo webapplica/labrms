@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Accounts Language Lines
+    | Tasks Language Lines
     |--------------------------------------------------------------------------
     |
     | The following language lines are used on accounts for various
@@ -12,7 +12,9 @@ return [
     | these language lines according to your application's requirements.
     |
     */
+   
+    'success' => 'The request has been successfully completed',
+    'error' => 'An error occurred while processing your request',
+    'not_enough_priviledge' => 'You do not have enough priviledge to perform this task',
 
-    'successful_password_update' => 'Your password has successfully been updated',
-    'activation_required' => 'This account requires activation to proceed! Please contact the administrator for more information',
 ];

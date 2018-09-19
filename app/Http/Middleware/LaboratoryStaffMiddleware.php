@@ -16,7 +16,9 @@ class LaboratoryStaffMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(! (Auth::user()->accesslevel >= 0 || Auth::user()->accesslevel <= 2) ) return redirect('dashboard');
+        if ( ! Auth::user()->isStaff() ) {
+            return redirect('dashboard');
+        }
 
         return $next($request);
     }

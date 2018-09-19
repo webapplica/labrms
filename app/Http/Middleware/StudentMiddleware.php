@@ -16,7 +16,9 @@ class StudentMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::user()->accesslevel != 4 ) return redirect('dashboard');
+        if( ! Auth::user()->isStudent() ) {
+            return redirect('dashboard');
+        }
 
         return $next($request);
     }

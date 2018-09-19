@@ -16,7 +16,9 @@ class LaboratoryAssistantMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if( ! (Auth::user()->accesslevel >= 0 Auth::user()->accesslevel <= 1) ) return redirect('dashboard');
+        if ( ! (Auth::user()->isAssistant() || Auth::user()->isAdmin()) ) {
+            return redirect('dashboard');
+        }
 
         return $next($request);
     }
