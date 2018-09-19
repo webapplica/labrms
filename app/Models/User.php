@@ -12,47 +12,38 @@ use App\Http\Modules\Account\AccountRoles;
 use App\Http\Modules\Account\PasswordManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable;
+use App\Http\Modules\Account\NavigationManager;
 use App\Http\Modules\Account\AccountMaintenance;
 use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
 class User extends \Eloquent implements Authenticatable 
 {
-	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance, AccountRoles;
+	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance, AccountRoles, NavigationManager;
 
 	protected $table  = 'users';
 	protected $primaryKey = 'id';
 	protected $dates = ['deleted_at'];
 	public $timestamps = true;
 	protected $fillable = [
-		'lastname',
-		'firstname',
-		'middlename',
-		'username',
-		'password',
-		'contactnumber',
-		'email',
-		'type',
-		'status',
-		'accesslevel'
+		'lastname', 'firstname', 'middlename', 'username', 'password', 
+		'contactnumber', 'email', 'type', 'status', 'accesslevel'
 	];
-
+	
 	protected $hidden = ['password','remember_token'];
-
+	private $navigationLayout = null;
 	private static $adminId = 0;
-	private static $staffIds = [
-		0, 1, 2	
-	];
-
-	private static $clientIds = [
-		3, 4
-	];
-
+	private static $staffIds = [ 0, 1, 2 ];
+	private static $clientIds = [ 3, 4 ];
 	public static $roles = [
 		0 => 'head',
 		1 => 'assistant',
 		2 => 'staff',
 		3 => 'faculty',
 		4 => 'student'
+	];
+
+	protected $appends = [
+		'full_name', 'image_url'
 	];
 
 	private static $avatarUrl = [
@@ -67,10 +58,6 @@ class User extends \Eloquent implements Authenticatable
 	{
 		return isset(self::$avatarUrl[$id]) ? self::$avatarUrl[$id] : 'None';
 	}
-
-	protected $appends = [
-		'full_name', 'image_url'
-	];
 
 	public function getFullNameAttribute()
 	{
