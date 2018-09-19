@@ -26,6 +26,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Company Address
+    |--------------------------------------------------------------------------
+    |
+    | The value inputted in the field is equivalent to the clients basic information
+    | To change the values, you need to update the environment variable for it to work
+    */
+    
+    'address' => env('COMPANY_ADDRESS','Address'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Company Department
     |--------------------------------------------------------------------------
     |
