@@ -25,17 +25,8 @@
                         Dashboard
                 </a>
             </li>
-            @if(Auth::user()->isAdmin())
-                @include('layouts.partials.navigation.admin')
-            @elseif(Auth::user()->isAssistant())
-                @include('layouts.partials.navigation.admin')
-            @elseif(Auth::user()->isStaff())
-                @include('layouts.partials.navigation.admin')
-            @elseif(Auth::user()->isFaculty())
-                @include('layouts.partials.navigation.admin')
-            @elseif(Auth::user()->isStudent())
-                @include('layouts.partials.navigation.admin')
-            @endif
+
+            @include( Auth::user()->getCorrespondingNavigation() );
 
             @if(Auth::user()->accesslevel == 0 || Auth::user()->accesslevel == 1 || Auth::user()->accesslevel == 2)
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Managers\User;
+namespace App\Http\Modules\Account;
 
 use Auth;
 use Hash;

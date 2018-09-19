@@ -8,7 +8,8 @@ use Session;
 use App\Models\Item;
 use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Managers\User\PasswordManager;
+use App\Http\Modules\Account\AccountRoles;
+use App\Http\Modules\Account\PasswordManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\Http\Modules\Account\AccountMaintenance;
@@ -16,7 +17,7 @@ use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
 class User extends \Eloquent implements Authenticatable 
 {
-	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance;
+	use SoftDeletes, AuthenticableTrait, PasswordManager, AccountMaintenance, AccountRoles;
 
 	protected $table  = 'users';
 	protected $primaryKey = 'id';
@@ -52,6 +53,7 @@ class User extends \Eloquent implements Authenticatable
 		'email' => 'email'
 	);
 
+	private static $adminId = 0;
 	private static $staffIds = [
 		0, 1, 2	
 	];
@@ -75,21 +77,6 @@ class User extends \Eloquent implements Authenticatable
 		3 => 'images/logo/Student/student-logo-16.png',
 		4 => 'images/logo/Student/student-logo-16.png',
 	];
-
-	protected function getCorrespondingView()
-	{
-		// return [];
-	}
-
-	protected static function getStaffIds()
-	{
-		return self::$staffIds;
-	}
-
-	protected static function getAdminId()
-	{
-		return 0;
-	}
 
 	protected static function getAvatarUrl($id)
 	{
@@ -120,46 +107,6 @@ class User extends \Eloquent implements Authenticatable
 		return $this->belongsToMany(Item::class, Reservation::class, 'user_id', 'item_id');
 	}
 
-	public function scopeAdmin($query)
-	{
-		return $query->where('accesslevel', '=', 0);
-	}
-
-	public function scopeallLaboratoryUsersExceptCurrentUser($query)
-	{
-		return $query->whereIn('accesslevel', User::getStaffIds())->where('id', '!=', Auth::user()->id);
-	}
-
-	public function scopeStaffId($query)
-	{
-		return $query->whereIn('accesslevel', User::getStaffIds());
-	}
-
-	public function isAdmin()
-	{
-		return $this->accesslevel == 0;
-	}
-
-	public function isAssistant()
-	{
-		return $this->accesslevel == 1;
-	}
-
-	public function isStaff()
-	{
-		return $this->accesslevel == 2;
-	}
-
-	public function isFaculty()
-	{
-		return $this->accesslevel == 3;
-	}
-
-	public function isStudent()
-	{
-		return $this->accesslevel == 4;
-	}
-
 	/**
 	 * Clears authentication and session of the user
 	 *
@@ -174,11 +121,6 @@ class User extends \Eloquent implements Authenticatable
 
 		Session::flush();
 		return isset($user) ? $user : [];
-	}
-
-	public function isStaff()
-	{
-		return ( in_array( $this->accesslevel, User::getStaffIds() ) );
 	}
 
 	public function updateAccessLevel($new)
