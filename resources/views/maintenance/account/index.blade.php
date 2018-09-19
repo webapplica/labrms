@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('style')
+@section('styles-include')
 {{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 <link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
 <style type="text/css">
-	#page-body,#edit,#access,#activate,#reset,#delete{
+	#edit,#access,#activate,#reset,#delete{
 		display: none;
 	}
 </style>
@@ -16,7 +16,7 @@
 	@include('modal.account.access') --}}
 @endsection
 
-@section('content')
+@section('body-content')
 <div class="container-fluid" id="page-body">
 	<div class="col-sm-12 panel panel-default" id="account-info" style="padding-top: 20px;">
 		<div class="col-sm-12 panel-body  table-responsive">
@@ -43,20 +43,14 @@
 	</div>
 </div>
 @stop
-@section('script')
+@section('scripts-include')
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script>
 	$(document).ready(function() {
-
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 		
 	  	var table = $('#userTable').DataTable({
 			"pageLength": 100,
+			'serverSide': true,
 	  		select: {
 	  			style: 'single'
 	  		},
@@ -77,44 +71,15 @@
 			  { data: "email" },
 			  { data: "contactnumber" },
 			  { data: "type" },
-			  { data: function(param){
-			  	if(param.accesslevel == 0){
-			  		return 'Laboratory Head';
-			  	}
-
-			  	if(param.accesslevel == 1){
-			  		return 'Laboratory Assistant';
-			  	}
-
-
-			  	if(param.accesslevel == 2){
-			  		return 'Laboratory Staff';
-			  	}
-
-
-			  	if(param.accesslevel == 3){
-			  		return 'Faculty';
-			  	}
-
-			  	if(param.accesslevel == 4){
-			  		return 'Student';
-			  	}
-			  }},
-
-			  { data: function(param){
-
-			  	if(param.status == 0){
-			  		return 'Inactive';
-			  	}else{
-			  		return 'Activated';
-			  	}
-
-			  }},
+			  { data: "access_type"},
+			  { data: "status_name" },
 			],
     	});
 
 	 	$("div.toolbar").html(`
- 			<button id="new" class="btn btn-primary btn-flat" style="margin-right:5px;padding: 5px 10px;" data-target="reservationItemsAddModal" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span>  New</button>
+ 			<a href="{{ url('account/create') }}" id="new" class="btn btn-primary">
+ 				<span class="glyphicon glyphicon-plus"></span>  New
+			</a>
  			<button id="edit" class="btn btn-default btn-flat" style="margin-right:5px;padding: 6px 10px;"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
  			<button id="access" class="btn btn-success btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-task"></span> Change Access Level</button>
  			<button id="activate" class="btn btn-warning btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-check"></span> Activate | Deactivate</button>
@@ -133,8 +98,6 @@
             $('#delete').show()
         } )
         .on( 'deselect', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' <i>de</i>selection</b> - '+JSON.stringify( rowData )+'</div>' );
             $('#edit').hide()
             $('#access').hide()
             $('#activate').hide()
@@ -151,10 +114,6 @@
 	          $(this).addClass('selected');
 	      }
 	    } );
-
-	    $('#new').on('click',function(){
-	    	$('#createNewAccountModal').modal('show');
-	    });
 
 	    $('#edit').on('click',function(){
 			try{
@@ -356,8 +315,6 @@
 				swal('Oops..','You must choose atleast 1 row','error');
 			}
 	    });
-
-		$('#page-body').show();
 	} );
 </script>
 @stop

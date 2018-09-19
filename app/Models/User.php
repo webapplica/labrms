@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Modules\Account\AccountRoles;
 use App\Http\Modules\Account\PasswordManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Modules\Account\SessionsManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\Http\Modules\Account\NavigationManager;
 use App\Http\Modules\Account\AccountMaintenance;
@@ -19,7 +20,7 @@ use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 class User extends \Eloquent implements Authenticatable 
 {
 	use SoftDeletes, AuthenticableTrait, PasswordManager; 
-	use AccountMaintenance, AccountRoles, NavigationManager;
+	use AccountMaintenance, AccountRoles, NavigationManager, SessionsManager;
 
 	protected $table  = 'users';
 	protected $primaryKey = 'id';
@@ -35,7 +36,7 @@ class User extends \Eloquent implements Authenticatable
 	private static $adminId = 0;
 	private static $staffIds = [ 0, 1, 2 ];
 	private static $clientIds = [ 3, 4 ];
-	public static $roles = [
+	private static $roles = [
 		0 => 'head',
 		1 => 'assistant',
 		2 => 'staff',
@@ -43,8 +44,13 @@ class User extends \Eloquent implements Authenticatable
 		4 => 'student'
 	];
 
+	private static $statusList = [
+		0 => 'Inactive',
+		1 => 'Active'
+	];
+
 	protected $appends = [
-		'full_name', 'image_url'
+		'full_name', 'image_url', 'access_type', 'status_name'
 	];
 
 	private static $avatarUrl = [
@@ -63,6 +69,16 @@ class User extends \Eloquent implements Authenticatable
 	public function getFullNameAttribute()
 	{
 		return  "$this->lastname,$this->firstname $this->middlename";
+	}
+
+	public function getAccessTypeAttribute()
+	{
+		return camel_case($this->getCurrentUsersEquivalentRole());
+	}
+
+	public function getStatusNameAttribute()
+	{
+		return camel_case(User::$statusList[ $this->status ]);
 	}
 
 	public function getImageUrlAttribute()

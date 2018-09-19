@@ -2,10 +2,21 @@
 
 namespace App\Http\Modules\Account;
 
+use Auth;
 use App\Models\User;
 
 trait AccountRoles
 {	
+
+	/**
+	 * Returns the equivalent name for the current users role
+	 * 
+	 * @return String role
+	 */
+	public function getCurrentUsersEquivalentRole()
+	{
+		return User::$roles[ Auth::user()->accesslevel ];
+	}
 
 	/**
 	 * Returns list of staff id with exemption if provided
