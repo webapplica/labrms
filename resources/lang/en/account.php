@@ -12,10 +12,7 @@ return [
     | these language lines according to your application's requirements.
     |
     */
-   
-    'task_performed_successfully' => 'The request has been successfully completed',
-    'general_error_message' => 'An error occurred while processing your request',
-    'not_enough_priviledge' => 'You do not have enough priviledge to perform this task',
+
     'successful_password_update' => 'Your password has successfully been updated',
 
 ];
