@@ -19,8 +19,8 @@ class LoginController extends Controller
 	{
 		return view('auth.login', [
 			'title' => 'Login',
-			'isLoginPage' => true,
-			'bodyColor' => '#22313f',
+			'isPlainBackground' => true,
+			'bodyBackgroundColor' => '#22313f',
 		]);
 	}
 

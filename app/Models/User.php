@@ -68,7 +68,7 @@ class User extends \Eloquent implements Authenticatable
 
 	public function getFullNameAttribute()
 	{
-		return  "$this->lastname,$this->firstname $this->middlename";
+		return  $this->lastname . ', ' . $this->firstname . ' ' . trim($this->middlename);
 	}
 
 	public function getAccessTypeAttribute()

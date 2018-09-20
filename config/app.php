@@ -15,6 +15,8 @@ return [
     'name' => env('APP_NAME', 'Resource Management System'),
     
     'abbr' => env('APP_ABBR', 'RMS'),
+    'lang' => env('APP_LANG', 'en'),
+    'charset' => env('APP_CHARSET', 'utf-8'),
 
     /*
     |--------------------------------------------------------------------------

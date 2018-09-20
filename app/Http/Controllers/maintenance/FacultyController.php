@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Maintenance;
 use App\Models\Faculty;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FacultyRequest\FacultyStoreRequest;
+use App\Http\Requests\FacultyRequest\FacultyUpdateRequest;
 
 class FacultyController extends Controller
 {
@@ -22,7 +24,7 @@ class FacultyController extends Controller
     public function index(Request $request)
     {
         if($request->ajax()) {
-            return datatables(Faculty::all())->toJson();
+            return datatables( Faculty::all() )->toJson();
         }
 
         return view('faculty.index');
@@ -44,18 +46,8 @@ class FacultyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(FacultyStoreRequest $request)
     {
-
-        $this->validate($request, [
-            'firstname' => 'required|between:2,100|string',
-            'middlename' => 'min:2|max:50|string',
-            'lastname' => 'required|min:2|max:50|string',
-            'contact_number' => 'size:11|string',
-            'email' => 'email',
-            'suffix' => 'max:3',
-        ]);
-
         Faculty::create($request);
         return redirect('faculty')->with('success-message', __('tasks.success'));
     }
@@ -68,17 +60,8 @@ class FacultyController extends Controller
      */
     public function edit($id)
     {
-        $faculty = App\Faculty::find($id);
-
-        if( $faculty->count() <= 0 )
-        {
-        Session::flash('success-message','Invalid Faculty Information');
-            return redirect('faculty');
-        }
-
         return view('faculty.edit')
-                ->with('title','Faculty')
-                ->with('faculty',$faculty);
+                ->with('faculty', Faculty::findOrFail($id));
     }
 
     /**
@@ -88,29 +71,9 @@ class FacultyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(FacultyUpdateRequest $request, $id)
     {
-
-        $this->validate($request + ['id' => $id], [
-            'id' => 'required|integer|exists:faculties,id',
-            'firstname' => 'required|between:2,100|string',
-            'middlename' => 'min:2|max:50|string',
-            'lastname' => 'required|min:2|max:50|string',
-            'contact_number' => 'size:11|string',
-            'email' => 'email',
-            'suffix' => 'max:3',
-        ]);
-
-        $faculty = Faculty::find($id);
-        $faculty->title = $title;
-        $faculty->firstname = $firstname;
-        $faculty->middlename = $middlename;
-        $faculty->lastname = $lastname;
-        $faculty->contactnumber = $contactnumber;
-        $faculty->email = $email;
-        $faculty->suffix = $suffix;
-        $faculty->save();
-
+        $faculty = Faculty::findOrFail($id)->update($request);
         return redirect('faculty')->with('success-message', __('tasks.success'));
     }
 
@@ -120,19 +83,9 @@ class FacultyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $this->validate(['id' => $id], [
-            'id' => 'required|integer|exists:faculties,id',
-        ]);
-
-        Faculty::find($id)->delete();
-        if($request->ajax()) {
-            return response()->json([
-                'message' => __('tasks.success')
-            ], 200);
-        }
-
+        Faculty::findOrFail($id)->delete();
         return redirect('faculty')->with('success-message', __('tasks.success'));
     }
 }

@@ -9,6 +9,28 @@ trait AccountRoles
 {	
 
 	/**
+	 * uppercase first letter of each roles
+	 * 
+	 * @return array
+	 */
+	public function camelCaseRoles()
+	{
+		return array_map(function ($callback) {
+			return ucfirst($callback);
+		}, $this->roles());
+	}
+
+	/**
+	 * Returns list of roles specified on the model
+	 * 
+	 * @return array
+	 */
+	public function roles()
+	{
+		return User::$roles;
+	}
+
+	/**
 	 * Returns the equivalent name for the current users role
 	 * 
 	 * @return String role
