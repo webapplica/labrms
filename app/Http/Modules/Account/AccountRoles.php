@@ -59,7 +59,7 @@ trait AccountRoles
 	 */
 	public function getCurrentUsersEquivalentRole()
 	{
-		return User::$roles[ Auth::user()->accesslevel ];
+		return User::$roles[ $this->accesslevel ];
 	}
 
 	/**
