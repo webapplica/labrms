@@ -5,7 +5,7 @@
     <div class="col-sm-2 col-md-2 center-block" style="align-items: center; display: flex;">
       <img 
         class=" img img-responsive" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" 
-        style="width: auto; height: auto; max-height: 120px; min-height: 80px; min-width: 80px;" />
+        style="width: auto; height: auto; max-height: 100px; min-height: 80px; min-width: 80px;" />
     </div>
     <div class="col-sm-9 col-md-p hidden-xs">
       <h4 class="text-muted" style="color: white;">{{ config('company.header') }}</h4>
