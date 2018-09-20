@@ -46,7 +46,7 @@ class AccountController extends Controller
 	{
 		return view($this->viewBasePath . 'create')
 					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->camelCaseTypes());
+					->with('types', $user->types());
 	}
 
 
@@ -87,7 +87,7 @@ class AccountController extends Controller
 		return view($this->viewBasePath . 'update')
 					->with('user', $user)
 					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->camelCaseTypes());
+					->with('types', $user->types());
 	}
 
 
