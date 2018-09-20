@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\User;
 
-use App\Commands;
 use App\Models\User;
 use Illuminate\Http\Request;
 

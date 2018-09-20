@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Maintenance;
 use Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Commands\RegisterUser;
+use App\Commands\User\RegisterUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountRequest\AccountStoreRequest;
 use App\Http\Requests\AccountRequest\AccountUpdateRequest;
