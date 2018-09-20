@@ -1,7 +1,6 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
 @section('content')
-@include('modal.room.create')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-12" id="room-info">
 		<div class="panel panel-body table-responsive">
