@@ -13,7 +13,7 @@ class AccountUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class AccountUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $user = User::find($request->id);
+        $user = User::findOrFail($this->request->id);
         return [
             'id' => 'required|integer|exists:users,id',
             'username' => 'required_with:password|min:4|max:20|unique:users,username,' . $user->username . ',username',
