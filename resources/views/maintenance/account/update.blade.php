@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+@section('body-content')
 <div class="container-fluid col-md-offset-3 col-md-6 panel panel-body">
   <legend>
     <h3>Account: {{ $user->full_name }}</h3>
@@ -10,16 +10,13 @@
 	  <li>
       <a href="{{ url('account') }}">Account</a>
     </li>
-	  <li>
-      <a href="{{ url('account/view/update') }}">Update</a>
-    </li>
 	  <li class="active">{{ $user->id }}</li>
+    <li class="active">Edit</li>
 	</ol>
 
   {{ Form::model($user, [
         'route' => array('account.update', $user->id), 
         'method'=>'PUT',
-        'class' => 'form-horizontal',
         'id' => 'update-user-form'
       ]
   ) }}
