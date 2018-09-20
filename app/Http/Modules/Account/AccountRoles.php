@@ -13,6 +13,28 @@ trait AccountRoles
 	 * 
 	 * @return array
 	 */
+	public function camelCaseTypes()
+	{
+		return array_map(function ($callback) {
+			return ucfirst($callback);
+		}, $this->types());
+	}
+
+	/**
+	 * Returns list of types the user can choose
+	 * 
+	 * @return array
+	 */
+	public function types()
+	{
+		return self::$types;
+	}
+
+	/**
+	 * uppercase first letter of each roles
+	 * 
+	 * @return array
+	 */
 	public function camelCaseRoles()
 	{
 		return array_map(function ($callback) {

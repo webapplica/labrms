@@ -11,6 +11,15 @@ trait PasswordManager
 {
     
     /**
+     * Gets the current password defined by 
+     * $defaultPassword variable
+     */
+    public function getDefaultPassword()
+    {
+        return self::$defaultPassword;
+    }
+
+    /**
      * Assign the new password to the current password
      * hash the password
      *

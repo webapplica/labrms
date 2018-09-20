@@ -36,12 +36,17 @@ class User extends \Eloquent implements Authenticatable
 	private static $adminId = 0;
 	private static $staffIds = [ 0, 1, 2 ];
 	private static $clientIds = [ 3, 4 ];
+	private static $defaultPassword = '123456789';
 	private static $roles = [
 		0 => 'head',
 		1 => 'assistant',
 		2 => 'staff',
 		3 => 'faculty',
 		4 => 'student'
+	];
+
+	private static $types = [
+		'faculty', 'student'
 	];
 
 	private static $statusList = [
