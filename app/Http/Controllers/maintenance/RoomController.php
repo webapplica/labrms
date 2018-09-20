@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Models\Room\Category as Category;
 use App\Http\Requests\RoomRequest\RoomStoreRequest;
 
-class RoomsController extends Controller {
+class RoomController extends Controller {
 
 	/**
 	 * Display a listing of the resource.
