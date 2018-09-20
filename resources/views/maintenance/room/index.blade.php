@@ -1,27 +1,23 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container-fluid" id="page-body">
-	<div class="col-md-12" id="room-info">
-		<div class="panel panel-body table-responsive">
-			<legend><h3 class="text-muted">Laboratory Room</h3></legend>
+@section('body-content')
+<div class="container-fluid col-md-12 panel panel-body table-responsive">
+	<legend><h3 class="text-muted">Laboratory Room</h3></legend>
 
-			<table class="table table-hover table-condensed table-striped table-bordered" id="roomTable">
-				<thead>
-					<th class=>ID</th>
-					<th class=>Name</th>
-					<th class=>Description</th>
-					<th class="no-sort"></th>
-				</thead>
-			</table>
-		</div>
-	</div>
+	<table class="table table-hover table-striped table-bordered" id="roomTable">
+		<thead>
+			<th class=>ID</th>
+			<th class=>Name</th>
+			<th class=>Description</th>
+			<th class="no-sort"></th>
+		</thead>
+	</table>
 </div>
 @endsection
 
-@section('script')
+@section('scripts-include')
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(document).ready(function () {
 		var table = $('#roomTable').DataTable( {
 			serverSide: true,
 			processing: true,
@@ -42,9 +38,15 @@
 	            { data: "description" },
 	            { data: function(callback){
 	            	return `
-	            		<a href="` + '{{ url('room') }}' + '/' + callback.id +`" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> View</a>
-			 			<a href="{{ url('room') }}/`+callback.id+`/edit" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-pencil"></span>  Update</a>
-			 			<button data-id="`+callback.id+`" class="delete btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Remove</button>
+	            		<a href="` + '{{ url('room') }}' + '/' + callback.id +`" class="btn btn-default btn-sm">
+	            			<span class="glyphicon glyphicon-th-list"></span> View
+            			</a>
+			 			<a href="{{ url('room') }}/`+callback.id+`/edit" class="btn btn-warning btn-sm">
+			 				<span class="glyphicon glyphicon-pencil"></span>  Update
+		 				</a>
+			 			<button data-id="`+callback.id+`" class="delete btn btn-danger btn-sm">
+			 				<span class="glyphicon glyphicon-trash"></span> Remove
+		 				</button>
 	            	`;
 	            } }
 	        ],
@@ -55,54 +57,43 @@
     	`)
 
 	    $('#roomTable').on('click', '.delete', function(){
-				id = $(this).data('id');
-			try{
-				console.log(id)
-				if(id != null)
-				{
-			        swal({
-			          title: "Are you sure?",
-			          text: "This room will be removed from database?",
-			          type: "warning",
-			          showCancelButton: true,
-			          confirmButtonText: "Yes, delete it!",
-			          cancelButtonText: "No, cancel it!",
-			          closeOnConfirm: false,
-			          closeOnCancel: false
-			        },
-			        function(isConfirm){
-			          if (isConfirm) {
-     					$.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-							type: 'delete',
-							url: '{{ url("room/") }}' + "/" + id,
-							data: {
-								'id': id
-							},
-							dataType: 'json',
-							success: function(response){
-								swal('Operation Successful','Room removed from database','success')
-							},
-							error: function(){
-								swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-							},
-							complete: function(){
-								table.ajax.reload();
-					            $('#edit').hide()
-					            $('#delete').hide()
-							}
-						});
-			          } else {
-			            swal("Cancelled", "Operation Cancelled", "error");
-			          }
-			        })
-				}
-			}catch( error ){
-				console.log(error)
-				swal('Oops..','You must choose a row','error');
-			}
+			id = $(this).data('id');
+	        swal({
+	          title: "Are you sure?",
+	          text: "This room will be removed from database?",
+	          type: "warning",
+	          showCancelButton: true,
+	          confirmButtonText: "Yes, delete it!",
+	          cancelButtonText: "No, cancel it!",
+	          closeOnConfirm: false,
+	          closeOnCancel: false
+	        },
+	        function(isConfirm){
+	          if (isConfirm) {
+					$.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+					type: 'delete',
+					url: '{{ url("room/") }}' + "/" + id,
+					data: {
+						'id': id
+					},
+					dataType: 'json',
+					success: function(response){
+						swal('Operation Successful','Room removed from database','success')
+					},
+					error: function(){
+						swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+					},
+					complete: function(){
+						table.ajax.reload();
+					}
+				});
+	          } else {
+	            swal("Cancelled", "Operation Cancelled", "error");
+	          }
+	        });
 	    });
 	} );
 </script>

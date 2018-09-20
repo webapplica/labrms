@@ -1,4 +1,4 @@
-@extends('layouts.app')
+w@extends('layouts.app')
 
 @section('body-content')
 <div class="container-fluid panel panel-body  table-responsive">
