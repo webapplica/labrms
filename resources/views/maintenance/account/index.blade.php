@@ -1,30 +1,16 @@
 @extends('layouts.app')
 
-@section('styles-include')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
-<style type="text/css">
-	#edit,#access,#activate,#reset,#delete{
-		display: none;
-	}
-</style>
-@stop
-
-@section('modal')
-	{{-- @include('modal.account.create')
-	@include('modal.account.edit')
-	@include('modal.account.access') --}}
-@endsection
-
 @section('body-content')
-<div class="container-fluid" id="page-body">
-	<div class="col-sm-12 panel panel-default" id="account-info" style="padding-top: 20px;">
-		<div class="col-sm-12 panel-body  table-responsive">
+	<div class="container-fluid">
+		<div class=" panel panel-body table-responsive" style="padding: 20px;">
 			<legend><h3 class="text-muted">Accounts</h3></legend>
-			<p class="text-muted">Note: Other actions will be shown when a row has been selected</p>
-			<p class="text-muted">Note: You can restore removed accounts by clicking <a href="{{ url('account/view/deleted') }}" role="button">here</a>. <span class="text-danger">Be careful when restoring deleted accounts </span> 
-			</p>
-			<table id='userTable' class="table table-bordered table-hover table-striped table-condensed">
+			<ul class="breadcrumb">
+				<li class="">
+					<a href="{{ url('/') }}">Home</a>
+				</li>
+				<li class="active">Account</li>
+			</ul>
+			<table id='users-table' class="table table-hover table-striped" width="100%">
 				<thead>
 					<th>ID</th>
 					<th>Username</th>
@@ -36,28 +22,29 @@
 					<th>Type</th>
 					<th>Privilege</th>
 					<th>Status</th>
+					<th class="no-sort"></th>
 				</thead>
 				<tbody></tbody>
 			</table>
 		</div>
 	</div>
-</div>
 @stop
 @section('scripts-include')
-{{ HTML::script(asset('js/dataTables.select.min.js')) }}
-<script>
+<script type="text/javascript">
 	$(document).ready(function() {
-		
-	  	var table = $('#userTable').DataTable({
+	  	var table = $('#users-table').DataTable({
 			"pageLength": 100,
 			'serverSide': true,
 	  		select: {
 	  			style: 'single'
 	  		},
+	    	columnDefs:[
+				{ targets: 'no-sort', orderable: false },
+	    	],
 		    language: {
 		        searchPlaceholder: "Search..."
 		    },
-	    	"dom": "<'row'<'col-sm-9'<'toolbar'>><'col-sm-3'f>>" +
+	    	"dom": "<'row'<'col-sm-2'l><'col-sm-7'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
@@ -73,247 +60,104 @@
 			  { data: "type" },
 			  { data: "access_type"},
 			  { data: "status_name" },
+			  { data: function(callback) {
+			  	return `
+		 			<a href="{{ url('account') }}/` + callback.id + `/id" class="btn btn-default">
+		 				Update Info
+					</a>
+		 			<button id="access" class="btn btn-success">
+		 				Set Access
+					</button>
+		 			<button class="activation-btn btn btn-warning">
+		 				Activation
+					</button>
+		 			<button class="password-reset-btn btn btn-info">
+		 				Reset Password
+					</button>
+		 			<button class="remove-btn btn btn-danger" data-id='` + callback.id + `'>
+		 				Remove
+					</button>
+				`;
+			  }}
 			],
     	});
 
 	 	$("div.toolbar").html(`
  			<a href="{{ url('account/create') }}" id="new" class="btn btn-primary">
- 				<span class="glyphicon glyphicon-plus"></span>  New
+ 				Add New Account
 			</a>
- 			<button id="edit" class="btn btn-default btn-flat" style="margin-right:5px;padding: 6px 10px;"><span class="glyphicon glyphicon-pencil"></span>  Update</button>
- 			<button id="access" class="btn btn-success btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-task"></span> Change Access Level</button>
- 			<button id="activate" class="btn btn-warning btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-check"></span> Activate | Deactivate</button>
- 			<button id="reset" class="btn btn-info btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon"></span> Reset Password</button>
- 			<button id="delete" class="btn btn-danger btn-flat" style="margin-right:5px;padding: 5px 10px;"><span class="glyphicon glyphicon-trash"></span> Remove</button>
 		`);
- 
-    table
-        .on( 'select', function ( e, dt, type, indexes ) {
-            // var rowData = table.rows( indexes ).data().toArray();
-            // events.prepend( '<div><b>'+type+' selection</b> - '+JSON.stringify( rowData )+'</div>' );
-            $('#edit').show()
-            $('#access').show()
-            $('#activate').show()
-            $('#reset').show()
-            $('#delete').show()
-        } )
-        .on( 'deselect', function ( e, dt, type, indexes ) {
-            $('#edit').hide()
-            $('#access').hide()
-            $('#activate').hide()
-            $('#reset').hide()
-            $('#delete').hide()
-        } );
 
-	    $('#table tbody').on( 'click', 'tr', function () {
-	      if ( $(this).hasClass('selected') ) {
-	          $(this).removeClass('selected');
-	      }
-	      else {
-	          table.$('tr.selected').removeClass('selected');
-	          $(this).addClass('selected');
-	      }
-	    } );
-
-	    $('#edit').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					$('#update-username').val(table.row('.selected').data().username);
-					$('#update-lastname').val(table.row('.selected').data().lastname);
-					$('#update-firstname').val(table.row('.selected').data().firstname);
-					$('#update-middlename').val(table.row('.selected').data().middlename);
-					$('#update-type').val(table.row('.selected').data().type);
-					$('#update-email').val(table.row('.selected').data().email);
-					$('#update-contactnumber').val(table.row('.selected').data().contactnumber);
-					$('#update-id').val(table.row('.selected').data().id);
-	    			$('#editAccountModal').modal('show');
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
-	    });
-
-	    $('#access').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					$('#accesslevel-id').val(table.row('.selected').data().id)
-					$('#accesslevel-name').val(table.row('.selected').data().firstname + " " + 
-					table.row('.selected').data().middlename + " " + 
-					table.row('.selected').data().lastname)
-					$('#accesslevel-oldaccesslevel').val(
-						function(){
-						  	if(table.row('.selected').data().accesslevel == 0){
-						  		return 'Laboratory Head';
-						  	}
-
-						  	if(table.row('.selected').data().accesslevel == 1){
-						  		return 'Laboratory Assistant';
-						  	}
-
-
-						  	if(table.row('.selected').data().accesslevel == 2){
-						  		return 'Laboratory Staff';
-						  	}
-
-
-						  	if(table.row('.selected').data().accesslevel == 3){
-						  		return 'Faculty';
-						  	}
-
-						  	if(table.row('.selected').data().accesslevel == 4){
-						  		return 'Student';
-						  	}
-						})
-	    			$('#changeAccessLevelModal').modal('show');
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
-	    });
-
-	    $('#activate').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
- 					$.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
+	    $('#users-table').on('click', '.password-reset-btn', function () {
+			swal({
+				title: "Are you sure?",
+				text: "This will reset this accounts password to the default '12345678'?",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonText: "Yes, reset it!",
+				cancelButtonText: "No, cancel it!",
+				closeOnConfirm: false,
+				closeOnCancel: false
+				},
+				function (isConfirm) {
+					if (isConfirm) {
+						$.ajax({
+						headers: {
+							'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+						},
 						type: 'post',
-						url: '{{ url("account/activate") }}' + "/" + table.row('.selected').data().id,
+						url: '{{ url("account/password/reset") }}',
 						data: {
-							'type': function(){
-								if ( table.row('.selected').data().status == 1 )
-								{
-									return 'deactivate';
-								}else{
-									return 'activate';
-								}
-							}
+							'id': table.row('.selected').data().id
 						},
 						dataType: 'json',
 						success: function(response){
-							if(response == 'activated'){
-								swal('Operation Successful','Account activated','success')
-								table.ajax.reload();
-							}else if(response == 'deactivated'){
-								swal('Operation Successful','Account deactivated','success')
-								table.ajax.reload();
-							}else if(response == 'self'){
-									swal('Operation Unsuccessful','You cannot change your own accounts status','error')
-							}else{
-								swal('Operation Unsuccessful','Error occurred while changing a records status','error')
-							}
+							swal('Operation Successful', response.message ,'success')
 						},
-						error: function(){
-							swal('Operation Unsuccessful','Error occurred while deleting a record','error')
+						error: function(response){
+							swal('Operation Unsuccessful', response.message ,'error')
 						}
 					});
+				} else {
+					swal("Cancelled", "Operation Cancelled", "error");
 				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+			});
 	    });
 
-	    $('#reset').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-					swal({
-					title: "Are you sure?",
-					text: "This will reset this accounts password to the default '12345678'?",
-					type: "warning",
-					showCancelButton: true,
-					confirmButtonText: "Yes, reset it!",
-					cancelButtonText: "No, cancel it!",
-					closeOnConfirm: false,
-					closeOnCancel: false
+	    $('#users-table').on('click', 'remove-btn', function () {
+	        swal({
+	          title: "Are you sure?",
+	          text: "Account will be removed from database?",
+	          type: "warning",
+	          showCancelButton: true,
+	          confirmButtonText: "Yes, delete it!",
+	          cancelButtonText: "No, cancel it!",
+	          closeOnConfirm: false,
+	          closeOnCancel: false
+	        },
+	        function (isConfirm) {
+	          if (isConfirm) {
+					$.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+					type: 'delete',
+					url: '{{ url("account/") }}' + "/" + table.row('.selected').data().id,
+					data: {
+						'id': table.row('.selected').data().id
 					},
-					function(isConfirm){
-					if (isConfirm) {
-							$.ajax({
-							headers: {
-								'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-							},
-							type: 'post',
-							url: '{{ url("account/password/reset") }}',
-							data: {
-								'id': table.row('.selected').data().id
-							},
-							dataType: 'json',
-							success: function(response){
-								if(response == 'success'){
-									swal('Operation Successful','Password has been reset','success')
-								}else{
-									swal('Operation Unsuccessful','Error occurred while resetting the password','error')
-								}
-							},
-							error: function(){
-								swal('Operation Unsuccessful','Error occurred while resetting the password','error')
-							}
-						});
-					} else {
-						swal("Cancelled", "Operation Cancelled", "error");
+					dataType: 'json',
+					success: function(response){
+						swal('Operation Successful', response.message ,'success')
+					},
+					error: function(response){
+						swal('Operation Unsuccessful', response.message ,'error')
 					}
-					})
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
-	    });
-
-	    $('#delete').on('click',function(){
-			try{
-				if(table.row('.selected').data().id != null && table.row('.selected').data().id  && table.row('.selected').data().id >= 0)
-				{
-			        swal({
-			          title: "Are you sure?",
-			          text: "Account will be removed from database?",
-			          type: "warning",
-			          showCancelButton: true,
-			          confirmButtonText: "Yes, delete it!",
-			          cancelButtonText: "No, cancel it!",
-			          closeOnConfirm: false,
-			          closeOnCancel: false
-			        },
-			        function(isConfirm){
-			          if (isConfirm) {
-     					$.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-							type: 'delete',
-							url: '{{ url("account/") }}' + "/" + table.row('.selected').data().id,
-							data: {
-								'id': table.row('.selected').data().id
-							},
-							dataType: 'json',
-							success: function(response){
-								if(response == 'success'){
-									swal('Operation Successful','Account removed from database','success')
-					        		table.row('.selected').remove().draw( false );
-					        	}else if(response == 'invalid'){
-									swal('Operation Unsuccessful','You need to have atleast one account','error')
-								}else if(response == 'self'){
-									swal('Operation Unsuccessful','You cannot remove your own account','error')
-								}else{
-									swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-								}
-							},
-							error: function(){
-								swal('Operation Unsuccessful','Error occurred while deleting a record','error')
-							}
-						});
-			          } else {
-			            swal("Cancelled", "Operation Cancelled", "error");
-			          }
-			        })
-				}
-			}catch( error ){
-				swal('Oops..','You must choose atleast 1 row','error');
-			}
+				});
+	          } else {
+	            swal("Cancelled", "Operation Cancelled", "error");
+	          }
+	        })
 	    });
 	} );
 </script>

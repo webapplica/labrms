@@ -37,9 +37,10 @@ class AccountController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function create(Request $request)
+	public function create(Request $request, User $user)
 	{
-		return view( $this->viewBasePath . 'create');
+		return view( $this->viewBasePath . 'create')
+					->with('roles', $user->camelCaseRoles());
 	}
 
 
@@ -50,7 +51,7 @@ class AccountController extends Controller
 	 */
 	public function store(AccountStoreRequest $request)
 	{
-		User::save($request);
+		User::create($request->toArray());
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -79,7 +80,8 @@ class AccountController extends Controller
 	{
 		$user = User::find($id);
 		return view( $this->viewBasePath . 'update')
-					->with('user',$user);
+					->with('user',$user)
+					->with('roles', $user->camelCaseRoles());
 	}
 
 

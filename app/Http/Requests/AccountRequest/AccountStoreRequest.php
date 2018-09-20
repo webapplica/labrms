@@ -22,13 +22,13 @@ class AccountStoreRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
+    {  
         return [
             'username' => 'required_with:password|min:4|max:20|unique:users,username',
             'firstname' => 'required|between:2,100|string',
             'middlename' => 'min:2|max:50|string',
             'lastname' => 'required|min:2|max:50|string',
-            'contact_number' => 'required|size:11|string',
+            'contactnumber' => 'required|size:11|string',
             'email' => 'required|email'
         ];
     }
