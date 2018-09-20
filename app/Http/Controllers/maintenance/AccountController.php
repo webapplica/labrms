@@ -99,7 +99,7 @@ class AccountController extends Controller
 	 */
 	public function update(AccountUpdateRequest $request, $id)
 	{
-		User::findOrFail($id)->update($request);
+		User::findOrFail($id)->update($request->toArray());
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
