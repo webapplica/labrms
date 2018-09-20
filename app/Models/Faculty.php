@@ -16,14 +16,11 @@ class Faculty extends Model
 	];
 
 	protected $hidden = ['password','remember_token'];
-
-	protected $appends = [
-		'full_name',
-	];
+	protected $appends = [ 'full_name', ];
 
 	public function getFullNameAttribute()
 	{
-		return trim("$this->lastname, $this->firstname $this->middlename");
+		return $this->lastname . ', ' . $this->firstname . trim($this->middlename);
 	}
 
 }

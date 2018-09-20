@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Faculty;
 use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
@@ -31,7 +32,7 @@ class Schedule extends Model
 
 	public function faculty()
 	{
-		return $this->belongsTo('App\Faculty','faculty','id');
+		return $this->belongsTo(Faculty::class,'faculty','id');
 	}
 
 
