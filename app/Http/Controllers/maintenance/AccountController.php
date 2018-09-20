@@ -64,7 +64,7 @@ class AccountController extends Controller
 	 */
 	public function show(AccountShowRequest $request, $id)
 	{
-		$user = User::find($id);
+		$user = User::findOrFail($id);
 		return view( $this->viewBasePath . 'show')
 				->with('person', $user);
 	}
@@ -76,11 +76,11 @@ class AccountController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit(AccountEditRequest $request, $id)
+	public function edit(Request $request, $id)
 	{
-		$user = User::find($id);
+		$user = User::findOrFail($id);
 		return view( $this->viewBasePath . 'update')
-					->with('user',$user)
+					->with('user', $user)
 					->with('roles', $user->camelCaseRoles());
 	}
 
@@ -93,7 +93,7 @@ class AccountController extends Controller
 	 */
 	public function update(AccountUpdateRequest $request, $id)
 	{
-		User::find($id)->update($request);
+		User::findOrFail($id)->update($request);
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -106,7 +106,7 @@ class AccountController extends Controller
 	 */
 	public function destroy(AccountDestroyRequest $request, $id)
 	{
-		User::find($id)->delete();
+		User::findOrFail($id)->delete();
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 

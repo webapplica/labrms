@@ -62,7 +62,7 @@
 			  { data: "status_name" },
 			  { data: function(callback) {
 			  	return `
-		 			<a href="{{ url('account') }}/` + callback.id + `/id" class="btn btn-default">
+		 			<a href="{{ url('account') }}/` + callback.id + `/edit" class="btn btn-default">
 		 				Update Info
 					</a>
 		 			<button id="access" class="btn btn-success">
