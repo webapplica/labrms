@@ -57,6 +57,14 @@
 </div>
 
 <div class="form-group">
-  {{ Form::label('type','Role') }}
-  {{ Form::select('type', isset($roles) ? $roles : [], old('type'), [ 'class'=>'form-control' ]) }}
+  {{ Form::label('accesslevel','Role') }}
+  <select class="form-control" name="accesslevel" id="access-level">
+  @foreach($roles as $key => $value)
+  <option 
+    value="{{ $key }}"
+    {{ ((isset($user->accesslevel) && $user->accesslevel == $key ) || old('accesslevel') == $key ) ? 'selected' : '' }}>
+    {{ $value }}
+  </option>
+  @endforeach
+  </select>
 </div>

@@ -28,6 +28,7 @@
     {{-- display body color on page load --}}
     <style type="text/css">
       body {
+        background-color: #8e8e8e;
         background-color: {{ isset($bodyColor) ? $bodyColor : '' }};
       }
     </style>
@@ -50,8 +51,7 @@
     <script type="text/javascript" src="{{ asset('js/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/dataTables.bootstrap.min.js') }}"></script>
-    @yield('scripts-include')
-
+    @yield('scripts-prepend')
   </head>
   <body id="page-body" class="page page-body page-parent-container">
     @yield('styles-prepend')
@@ -73,6 +73,8 @@
       @include('layouts.partials.footer')
     </footer>
 
+    @yield('scripts-include')
+    
     {{-- additional scripts used globally --}}
     <script type="text/javascript">
       @if( session()->has("success-message") )
