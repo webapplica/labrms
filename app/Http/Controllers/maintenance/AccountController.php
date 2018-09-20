@@ -113,6 +113,13 @@ class AccountController extends Controller
 	public function destroy(Request $request, $id)
 	{
 		User::findOrFail($id)->delete();
+		
+		if($request->ajax()) {
+			return response()->json([
+				'message' => __('tasks.success')
+			], 200);
+		}
+
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
