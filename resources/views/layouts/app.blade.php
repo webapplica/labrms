@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ config('app.lang') }}">
   <head>
-    <meta charset="utf-8">
+    <meta charset="{{ config('app.charset') }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
@@ -13,10 +13,11 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}"  />
     <link rel="stylesheet" href="{{ asset('css/dataTables.bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/nav.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/nav-styles.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/sweetalert.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}" />
-    @yield('style-include')
+
+    @yield('styles-prepend')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -24,18 +25,18 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    @if(isset($isLoginPage) && $isLoginPage)
+    @if(isset($isPlainBackground) && $isPlainBackground)
     {{-- display body color on page load --}}
     <style type="text/css">
       body {
-        background-color: #8e8e8e;
-        background-color: {{ isset($bodyColor) ? $bodyColor : '' }};
+        background-color: {{ isset($bodyBackgroundColor) ? $bodyBackgroundColor : '' }};
       }
     </style>
     @else
     {{-- display an image --}}
     <style>
         body {
+          background-color: #8e8e8e;
           background-size: auto auto;
           background-image: url('{{ asset("images/background_v3.jpg")  }}');
         }
@@ -46,15 +47,15 @@
 
     <!-- scripts -->
     <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/dataTables.bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
     @yield('scripts-prepend')
   </head>
   <body id="page-body" class="page page-body page-parent-container">
-    @yield('styles-prepend')
+    @yield('styles-body-prepend')
     {{-- include the partial navigation bar --}}
     @if(Auth::check())
     <nav id="navigation" class="page-navigation">
