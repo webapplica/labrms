@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
   <div class="col-md-offset-3 col-md-6" style="padding: 25px auto; margin-top: 50px; margin-bottom: 50px;">
     <div class="col-sm-12 col-md-2 center-block" style="align-items: center; display: flex;">
       <img class=" img img-responsive" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width: auto; height: auto; max-height: 120px;"/>
