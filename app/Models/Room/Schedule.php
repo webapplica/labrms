@@ -11,7 +11,10 @@ class Schedule extends Model
 	protected $table = 'room_schedules';
 	protected $primaryKey = 'id';
 	public $timestamps = false;
-	public $fillable = ['room_id','faculty','academicyear','semester','day','timein','timeout','subject','section'];
+	public $fillable = [
+		'room_id', 'faculty', 'academicyear', 'semester', 
+		'day', 'timein', 'timeout', 'subject', 'section'
+	];
 
 	public static $rules = array(
 		'Subject' => 'required|min:2|max:50',
