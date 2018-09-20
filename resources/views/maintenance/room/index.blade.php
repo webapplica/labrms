@@ -1,8 +1,10 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
 <div class="container-fluid col-md-12 panel panel-body table-responsive">
-	<legend><h3 class="text-muted">Laboratory Room</h3></legend>
+	<legend>
+		<h3 class="text-muted">Laboratory Room</h3>
+	</legend>
 
 	<table class="table table-hover table-striped table-bordered" id="roomTable">
 		<thead>

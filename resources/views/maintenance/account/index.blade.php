@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
 	<div class="container-fluid">
 		<div class=" panel panel-body table-responsive" style="padding: 20px;">
 			<legend><h3 class="text-muted">Accounts</h3></legend>

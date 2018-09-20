@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
 <div class="container-fluid col-md-offset-3 col-md-6 panel panel-body">
 
   <legend>

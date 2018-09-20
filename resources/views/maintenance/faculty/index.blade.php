@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
 <div class="container-fluid panel panel-body table-responsive">
 	<legend>Faculty</legend>
 	<table class="table table-striped table-hover table-bordered" id='faculty-table'>

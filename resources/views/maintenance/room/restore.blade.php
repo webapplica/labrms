@@ -1,23 +1,5 @@
-@extends('layouts.master-blue')
-@section('title')
-Room
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-	#page-body{
-		display: none;
-	}
+@extends('layouts.app')
 
-	th,tbody{
-		text-align: center;
-	}
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class="col-md-12" id="room-info">

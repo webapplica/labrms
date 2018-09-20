@@ -64,7 +64,7 @@
     @endif
     {{-- display the content page --}}
     <section id="content" class="page-content">
-      @yield('body-content')
+      @yield('content')
     </section>
     {{-- adding scripts after the page loads --}}
     @yield('scripts-append')

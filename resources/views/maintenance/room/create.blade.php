@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('body-content')
+@section('content')
   <div class="col-sm-offset-3 col-sm-6 panel panel-body " style="padding: 25px; padding-top: 10px;">
 
       <legend>

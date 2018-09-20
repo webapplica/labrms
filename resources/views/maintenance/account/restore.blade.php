@@ -1,6 +1,6 @@
 w@extends('layouts.app')
 
-@section('body-content')
+@section('content')
 <div class="container-fluid panel panel-body  table-responsive">
 	<legend>
 		<h3 class="text-muted">Restore Accounts</h3>
