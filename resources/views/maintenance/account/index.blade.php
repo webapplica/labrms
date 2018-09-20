@@ -10,6 +10,7 @@
 				</li>
 				<li class="active">Account</li>
 			</ul>
+			<input type="hidden" name="_url" id="_url" value="{{ url('account') }}" />
 			<table id='users-table' class="table table-hover table-striped" width="100%">
 				<thead>
 					<th>ID</th>
@@ -32,9 +33,10 @@
 @section('scripts-include')
 <script type="text/javascript">
 	$(document).ready(function() {
+		var baseUrl = $('#_url').val();
 	  	var table = $('#users-table').DataTable({
-			"pageLength": 100,
 			'serverSide': true,
+			"processing": true,
 	  		select: {
 	  			style: 'single'
 	  		},
@@ -47,8 +49,7 @@
 	    	"dom": "<'row'<'col-sm-2'l><'col-sm-7'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-			"processing": true,
-			ajax: "{{ url('account') }}",
+			ajax: baseUrl,
 			columns: [
 			  { data: "id" },
 			  { data: "username" },
@@ -62,19 +63,19 @@
 			  { data: "status_name" },
 			  { data: function(callback) {
 			  	return `
-		 			<a href="{{ url('account') }}/` + callback.id + `/edit" class="btn btn-default">
+		 			<a href="` + baseUrl + callback.id + `/edit" class="btn btn-default">
 		 				Update Info
 					</a>
-		 			<button id="access" class="btn btn-success">
+		 			<button type="button" id="access" class="btn btn-success">
 		 				Set Access
 					</button>
-		 			<button class="activation-btn btn btn-warning">
+		 			<button type="button" class="activation-btn btn btn-warning">
 		 				Activation
 					</button>
-		 			<button class="password-reset-btn btn btn-info">
+		 			<button type="button" class="password-reset-btn btn btn-info">
 		 				Reset Password
 					</button>
-		 			<button class="remove-btn btn btn-danger" data-id='` + callback.id + `'>
+		 			<button type="button" class="remove-btn btn btn-danger" data-id='` + callback.id + `'>
 		 				Remove
 					</button>
 				`;
@@ -83,12 +84,13 @@
     	});
 
 	 	$("div.toolbar").html(`
- 			<a href="{{ url('account/create') }}" id="new" class="btn btn-primary">
+ 			<a href="` + baseUrl + `/create" id="new" class="btn btn-primary">
  				Add New Account
 			</a>
 		`);
 
 	    $('#users-table').on('click', '.password-reset-btn', function () {
+	    	id = $(this).data('id');
 			swal({
 				title: "Are you sure?",
 				text: "This will reset this accounts password to the default '12345678'?",
@@ -106,9 +108,9 @@
 							'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 						},
 						type: 'post',
-						url: '{{ url("account/password/reset") }}',
+						url: baseUrl + '/password/reset',
 						data: {
-							'id': table.row('.selected').data().id
+							'id': id
 						},
 						dataType: 'json',
 						success: function(response){
@@ -116,6 +118,9 @@
 						},
 						error: function(response){
 							swal('Operation Unsuccessful', response.message ,'error')
+						},
+						complete: function () {
+							table.ajax.reload()
 						}
 					});
 				} else {
@@ -124,10 +129,11 @@
 			});
 	    });
 
-	    $('#users-table').on('click', 'remove-btn', function () {
+	    $('#users-table').on('click', '.remove-btn', function () {
+	    	id = $(this).data('id');
 	        swal({
 	          title: "Are you sure?",
-	          text: "Account will be removed from database?",
+	          text: "Account will be removed. Do you want to continue?",
 	          type: "warning",
 	          showCancelButton: true,
 	          confirmButtonText: "Yes, delete it!",
@@ -142,16 +148,19 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
 					type: 'delete',
-					url: '{{ url("account/") }}' + "/" + table.row('.selected').data().id,
+					url: baseUrl + '/' + id,
 					data: {
-						'id': table.row('.selected').data().id
+						'id': id
 					},
 					dataType: 'json',
 					success: function(response){
-						swal('Operation Successful', response.message ,'success')
+						swal('Success', response.message ,'success')
 					},
 					error: function(response){
-						swal('Operation Unsuccessful', response.message ,'error')
+						swal('Oopss!', response.message ,'error')
+					},
+					complete: function () {
+						table.ajax.reload()
 					}
 				});
 	          } else {

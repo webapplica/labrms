@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container-fluid col-md-offset-3 col-md-6 panel panel-body">
+
   <legend>
     <h3>Account: {{ $user->full_name }}</h3>
   </legend>

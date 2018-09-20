@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="col-md-offset-3 col-md-6" style="padding: 25px auto; margin-top: 50px; margin-bottom: 50px;">
-    <div class="col-sm-12 col-md-2 center-block" style="align-items: center; display: flex;">
-      <img class=" img img-responsive" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" style="width: auto; height: auto; max-height: 120px;"/>
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-1 col-sm-10 col-xs-offset-4 col-xs-4" style="padding: 25px auto; margin-top: 50px; margin-bottom: 50px;">
+    <div class="col-sm-2 col-md-2 center-block" style="align-items: center; display: flex;">
+      <img 
+        class=" img img-responsive" src="{{ asset('images/logo/ccis/ccis-logo-64.png') }}" 
+        style="width: auto; height: auto; max-height: 120px; min-height: 80px; min-width: 80px;" />
     </div>
-    <div class="col-sm-12 col-md-9 hidden-xs">
+    <div class="col-sm-9 col-md-p hidden-xs">
       <h4 class="text-muted" style="color: white;">{{ config('company.header') }}</h4>
       <h5 class="text-muted" style="color: white;">{{ config('company.department') }}</h5>
       <h6 class="text-muted" style="color: white;">{{ config('company.address') }}</h6>
@@ -14,7 +16,7 @@
 
   <div class="clearfix"></div>
 
-  <div class="col-md-offset-3 col-md-6 panel panel-body" style="padding: 30px;">
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-10 panel panel-body" style="padding: 30px;">
 
     <form class="form-horizontal" id="loginForm" method="post" action="{{ url('login') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
