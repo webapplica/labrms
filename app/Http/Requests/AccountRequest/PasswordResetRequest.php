@@ -14,7 +14,7 @@ class PasswordResetRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -31,7 +31,7 @@ class PasswordResetRequest extends FormRequest
                 'required',
                 'min:8',
                 'max:50',
-                Rule::notIn([ $request->current_password ]),
+                Rule::notIn([ $this->request->current_password ]),
             ]
         ];
     }
