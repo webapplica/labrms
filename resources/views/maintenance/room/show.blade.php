@@ -1,67 +1,60 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
 @section('content')
-<div class="container-fluid" id="page-body">
-	<div class="col-sm-12">
-		<div class="panel panel-default" style="padding:0px 20px">
-			<div class="panel-body">
-				<legend><h3 class="text-muted">Room {{ $room->name }}</h3></legend>
-				<ul class="breadcrumb">
-					<li><a href="{{ url('room') }}">Room</a></li>
-					<li class="active">{{ $room->name }}</li>
-				</ul>
-				<ul class="list-unstyled">
-					<div class="row">
-						<div class="col-sm-6">
-							<li><h5 class="text-muted"><label>Name:</label> {{ $room->name }} </h5></li>
-							<li><h5 class="text-muted"><label>Category:</label> {{ implode( ',', $room->categories->pluck('name')->toArray() ) }} </h5></li>
-							<li><h5 class="text-muted"><label>Description:</label> {{ $room->description }} </h5></li>
-						</div>
-						<div class="col-sm-6">
-							<li><h5 class="text-muted"><label>Inventory List</label></h5></li>
-							<ul>
+<div class="container-fluid panel panel-default panel-body">
+	<legend>
+		<h3 class="text-muted">Room: {{ $room->name }}</h3>
+	</legend>
 
-							</ul>
-						</div>
-					</div>
-				</ul>
-				<hr />
-		    	<div class="panel panel-body" style="padding: 10px;">
-					<table class="table table-bordered" id="historyTable">
-						<thead>
-							<tr>
-					            <th class="text-center" colspan=5>Tickets</th>
-							</tr>
-							<tr>
-					            <th>ID</th>
-					            <th>Name</th>
-					            <th>Details</th>
-					            <th>Author</th>
-					            <th>Status</th>
-							</tr>
-				        </thead>
-					</table>
-				</div>
+	<ul class="breadcrumb">
+		<li><a href="{{ url('room') }}">Room</a></li>
+		<li class="active">{{ $room->name }}</li>
+	</ul>
+
+	<ul class="list-unstyled">
+		<div class="row">
+			<div class="col-sm-6">
+				<li><h5 class="text-muted"><label>Name:</label> {{ $room->name }} </h5></li>
+				<li><h5 class="text-muted"><label>Category:</label> {{ implode( ',', $room->categories->pluck('name')->toArray() ) }} </h5></li>
+				<li><h5 class="text-muted"><label>Description:</label> {{ $room->description }} </h5></li>
+			</div>
+			<div class="col-sm-6">
+				<li><h5 class="text-muted"><label>Inventory List</label></h5></li>
+				<ul></ul>
 			</div>
 		</div>
-	</div>
+	</ul>
+
+	<table class="table table-bordered" id="room-history-table">
+		<thead>
+			<tr>
+	            <th class="text-center" colspan=5>Tickets</th>
+			</tr>
+			<tr>
+	            <th>ID</th>
+	            <th>Name</th>
+	            <th>Details</th>
+	            <th>Author</th>
+	            <th>Status</th>
+			</tr>
+        </thead>
+	</table>
 </div>
 @stop
-@section('script')
 
+@section('scripts-include')
 <script type="text/javascript">
-$(document).ready(function(){
-
-	var historyTable = $('#historyTable').DataTable( {
+$(document).ready(function () {
+	var historyTable = $('#room-history-table').DataTable( {
 	    language: {
 	        searchPlaceholder: "Search..."
 	    },
 	    order: [[ 0, "desc" ]],
 		"processing": true,
-        ajax: "{{ url("ticket/room/$room->id") }}",
+        ajax: "{{ url("room/$room->id/history") }}",
         columns: [
         	{ data: 'id' },
-        	{ data: 'ticketname' },
+        	{ data: 'name' },
         	{ data: 'details' },
         	{ data: 'author' },
         	{ data: 'status' }

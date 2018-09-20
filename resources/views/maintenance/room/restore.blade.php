@@ -1,47 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid" id="page-body">
-	<div class="col-md-12" id="room-info">
-		<div class="panel panel-body  table-responsive">
-			<ul class="breadcrumb">
-				<li>{{ HTML::link('room','Room') }}</li>
-				<li class="active">Restore</li>
-			</ul>
-			<table class="table table-condensed table-hover table-striped table-bordered" id="roomTable">
-				<thead>
-					<th>Name</th>
-					<th>Description</th>
-					<th>Action</th>
-				</thead>
-				<tbody>
-				@if(empty($rooms))
-				@else
-					@foreach($rooms as $room)
-					<tr>
-						<td class="col-md-5" >{{ $room->name }}</td>
-						<td class="col-md-5" >{{ $room->description }}</td>
-						<td class="col-md-2">
-							{{ Form::open(['method'=>'put','route' => array('room.restore',$room->id),'id'=>'restoreForm']) }}
-							<button class="btn btn-md btn-block btn-default delete" name="delete" type="button" value="Condemn"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"> <span class="hidden-xs"> Restore</span> </span></button>
-							{{ Form::close() }}
-						</td>
-					</tr>
-					@endforeach
-				@endif
-				</tbody>
-			</table>
-		</div>
-	</div>
+<div class="container-fluid panel panel-body table-responsive">
+	<legend>
+		<h3>Room: Restore</h3>
+	</legend>
+
+    <ul class="breadcrumb">
+		<li>{{ HTML::link('room','Room') }}</li>
+		<li class="active">Restore</li>
+	</ul>
+
+	<table class="table table-condensed table-hover table-striped table-bordered" id="roomTable">
+		<thead>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Action</th>
+		</thead>
+		<tbody>
+		@forelse($rooms as $room)
+		<tr>
+			<td class="col-md-5" >{{ $room->name }}</td>
+			<td class="col-md-5" >{{ $room->description }}</td>
+			<td class="col-md-2">
+				{{ Form::open(['method'=>'put', 'route' => array('room.restore', $room->id), 'id' => 'restore-table']) }}
+				<button 
+					class="btn btn-md btn-block btn-default delete" 
+					name="delete" 
+					type="button" 
+					value="Condemn">
+					Restore
+				</button>
+				{{ Form::close() }}
+			</td>
+		</tr>
+		@empty
+		@endforelse
+		</tbody>
+	</table>
 </div>
 @stop
 @section('script')
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('#page-body').show();
-		$('#roomTable').DataTable();
+	$(document).ready(function () {
+		$('#restore-table').DataTable();
 
-		$('.delete').click(function(){
+		$('.delete').click(function () {
 			swal({
 				title: "Are you sure?",
 				text: "Do you really want to restore this room?",
@@ -54,19 +58,12 @@
 			},
 			function(isConfirm){
 				if (isConfirm) {
-					$("#restoreForm").submit();
+					$("#restore-table").submit();
 				} else {
-					swal("Cancelled", "Deletion Cancelled", "error");
+					swal("Ooops!!", "Operation Cancelled", "error");
 				}
 			});
 		});
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
 	} );
 </script>
 @stop

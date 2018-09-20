@@ -1,46 +1,31 @@
 @extends('layouts.master-blue')
-@section('title')
-Room
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-	#page-body,#edit,#delete{
-		display: none;
-	}
 
-	.panel {
-		padding: 30px;
-	}
-</style>
+@section('styles-include')
+{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
 @stop
+
 @section('content')
-<div class="container-fluid" id="page-body">
-	<div class="col-md-12" id="room-info">
-		<div class="panel panel-body table-responsive">
-			<legend><h3 class="text-muted">Laboratory Rooms</h3></legend>
-			<table class="table table-hover table-condensed table-bordered table-striped" id="roomTable">
-				<thead>
-					<th>ID</th>
-					<th>Name</th>
-					<th>Category</th>
-					<th>Description</th>
-					<th class="no-sort col-sm-1"></th>
-				</thead>
-			</table>
-		</div>
-	</div>
+<div class="container-fluid panel panel-body table-responsive">
+	<legend>
+		<h3 class="text-muted">Laboratory Rooms</h3>
+	</legend>
+
+	<table class="table table-hover table-condensed table-bordered table-striped" id="roomTable">
+		<thead>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Category</th>
+			<th>Description</th>
+			<th class="no-sort col-sm-1"></th>
+		</thead>
+	</table>
 </div>
 @stop
-@section('script')
+
+@section('scripts-include')
 {{ HTML::script(asset('js/dataTables.select.min.js')) }}
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(document).ready(function () {
 		var table = $('#roomTable').DataTable( {
 	  		select: {
 	  			style: 'single'
@@ -68,15 +53,6 @@ Room
 	            } }
 	        ],
 	    } );
-
-		@if( Session::has("success-message") )
-			swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-			swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-		$('#page-body').show();
 	} );
 </script>
 @stop
