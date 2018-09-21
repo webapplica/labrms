@@ -24,6 +24,7 @@ class AuthenticationMiddleware
             } 
                 
             return redirect('login')->with('error-message', __('auth.insufficient_permission'));
+            
         }
 
         return $next($request);

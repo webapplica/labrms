@@ -5,17 +5,22 @@ namespace App\Http\Controllers\Maintenance;
 use Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Commands\User\RegisterUser;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AccountRequest\AccountEditRequest;
-use App\Http\Requests\AccountRequest\AccountShowRequest;
 use App\Http\Requests\AccountRequest\AccountStoreRequest;
 use App\Http\Requests\AccountRequest\AccountUpdateRequest;
-use App\Http\Requests\AccountRequest\AccountDestroyRequest;
+use App\Http\Requests\AccountRequest\PasswordResetRequest;
 
 class AccountController extends Controller
 {
 	private $viewBasePath = 'maintenance.account.';
 	private $baseUrl = 'account';
+	private $user;
+
+	public function __construct(User $user)
+	{
+		$this->user = $user;
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -25,10 +30,10 @@ class AccountController extends Controller
 	public function index(Request $request)
 	{
 		if($request->ajax()) {
-			return datatables(User::all())->toJson();
+			return datatables($this->user->get())->toJson();
 		}
 
-		return view( $this->viewBasePath . 'index');
+		return view($this->viewBasePath . 'index');
 	}
 
 
@@ -39,8 +44,9 @@ class AccountController extends Controller
 	 */
 	public function create(Request $request, User $user)
 	{
-		return view( $this->viewBasePath . 'create')
-					->with('roles', $user->camelCaseRoles());
+		return view($this->viewBasePath . 'create')
+					->with('roles', $user->camelCaseRoles())
+					->with('types', $user->types());
 	}
 
 
@@ -51,7 +57,7 @@ class AccountController extends Controller
 	 */
 	public function store(AccountStoreRequest $request)
 	{
-		User::create($request->toArray());
+		$this->dispatch(new RegisterUser($request));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -62,11 +68,10 @@ class AccountController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show(AccountShowRequest $request, $id)
+	public function show(Request $request, $id)
 	{
-		$user = User::findOrFail($id);
-		return view( $this->viewBasePath . 'show')
-				->with('person', $user);
+		return view($this->viewBasePath . 'show')
+				->with('person', $this->user->findOrFail($id));
 	}
 
 
@@ -78,10 +83,11 @@ class AccountController extends Controller
 	 */
 	public function edit(Request $request, $id)
 	{
-		$user = User::findOrFail($id);
-		return view( $this->viewBasePath . 'update')
+		$user = $this->user->findOrFail($id);
+		return view($this->viewBasePath . 'update')
 					->with('user', $user)
-					->with('roles', $user->camelCaseRoles());
+					->with('roles', $user->camelCaseRoles())
+					->with('types', $user->types());
 	}
 
 
@@ -93,7 +99,7 @@ class AccountController extends Controller
 	 */
 	public function update(AccountUpdateRequest $request, $id)
 	{
-		User::findOrFail($id)->update($request);
+		User::findOrFail($id)->update($request->toArray());
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -104,9 +110,16 @@ class AccountController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy(AccountDestroyRequest $request, $id)
+	public function destroy(Request $request, $id)
 	{
 		User::findOrFail($id)->delete();
+		
+		if($request->ajax()) {
+			return response()->json([
+				'message' => __('tasks.success')
+			], 200);
+		}
+
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -121,7 +134,7 @@ class AccountController extends Controller
 			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
-		return view( $this->viewBasePath . 'restore')
+		return view($this->viewBasePath . 'restore')
 			->with('user', $user);
 
 	}
@@ -132,9 +145,9 @@ class AccountController extends Controller
 	 *
 	 */
 
-	public function restore(AccountDestroyRequest $request, $id)
+	public function restore(Request $request, $id)
 	{
-		User::onlyTrashed()->find($id)->restore();
+		User::onlyTrashed()->findOrFail($id)->restore();
         return redirect('account/deleted')->with('success-message', __('tasks.success'));
 	}
 
@@ -145,9 +158,9 @@ class AccountController extends Controller
 	 *@param  int  $id
 	 * @return Response
 	 */
-	public function activate(AccountShowRequest $request, $id)
+	public function activate(Request $request, $id)
 	{
-		$user = User::find($id)->toggleStatusByAction($type)->save();
+		$user = User::findOrFail($id)->toggleStatusByAction($type)->save();
 		return redirect($this->baseUrl);
 	}
 	
@@ -159,14 +172,7 @@ class AccountController extends Controller
 	 */
 	public function resetPassword(PasswordResetRequest $request)
 	{
-	 	$user = User::find($request->id)->passwordReset()->save();
-
-		if($request->ajax()) {
-		 	return response([
-		 		'message' => __('account.task_performed_successfully')
-		 	], 200);
-		}
-
+	 	$user = User::findOrFail($request->id)->passwordReset()->save();
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
