@@ -30,7 +30,7 @@ Dillinger requires [Node.js](https://nodejs.org/) v4+ to run.
 Install the dependencies and devDependencies and start the server.
 
 ```sh
-prerequisite:
+Prerequisite:
 
 - composer
 - xampp, wamp, or any web server
@@ -44,9 +44,9 @@ e.g. C:/xampp/htdocs
 
 2. open command prompt under the project
 - shift  + right click then open command window here
-- e.g. cmd location C:/xampp/htdocs/labrms_v2 >
+- e.g. cmd location C:/xampp/htdocs/labrms
 
-3. run xampp or any web server you've chosen under the menu
+3. start xampp
 - start apache
 - start mysql
 
@@ -55,7 +55,7 @@ CREATING DATABASE
 1. open browser
 2. url: localhost/phpmyadmin
 3. click new
-4. enter 'labrms' as database name
+4. enter database name
 5. click create
 
 INSTALLING ADDITIONAL FILES
@@ -116,58 +116,6 @@ initial accounts:
 
 ```
 
-```sh
-For production environments...
-
-APP_NAME='Laboratory Resource Management System'
-APP_ENV=local
-APP_KEY=base64:DPajOJAcGHnWS12aGdyhMrR7yyHXHVktTLdHSNzABoU=
-APP_DEBUG=true
-APP_LOG=daily
-APP_LOG_LEVEL=debug
-APP_URL=http://localhost
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=labrms
-DB_USERNAME=root
-DB_PASSWORD=
-
-BROADCAST_DRIVER=pusher
-CACHE_DRIVER=file
-SESSION_DRIVER=file
-QUEUE_DRIVER=sync
-
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_DRIVER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=465
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_ENCRYPTION=ssl
-
-PUSHER_APP_ID=396662
-PUSHER_APP_KEY=9e33dd8721931c8255d4
-PUSHER_APP_SECRET=daa92c592ee1b929b6d2
-
-MAILGUN_DOMAIN=sandboxd170108d61244d799da25708c23da1e8.mailgun.org
-MAILGUN_SECRET=key-f23b71a997a3ae2d1e30ccf80a91a2ef
-
-COMPANY_HEADER='Polytechnic University Of the Philippines'
-COMPANY_SUBHEADER='Office of the Vice President for Academic Affairs'
-COMPANY_DEPARTMENT='College Of Computer and Information Sciences'
-COMPANY_SUBDEPARTMENT='Laboratory Operations Office'
-COMPANY_IMAGE='images/logo/pup/pup-logo.png'
-COMPANY_SUBIMAGE=''
-
-```
-
-
-
 ### Plugins
 
 LabRMS is currently extended with the following plugins. Instructions on how to use them in your own application are linked below.
@@ -180,5 +128,5 @@ LabRMS is currently extended with the following plugins. Instructions on how to 
 
 Want to contribute? Great!
 
-LabRMS uses Laravel for fast developing.
-Make a change in your file and instantanously see your updates! The system is available on github for forking and read-only purposes.
+Labrms uses Laravel for fast developing.
+The system is available on github for forking and read-only purposes.
