@@ -6,6 +6,7 @@ use Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Commands\User\UpdateUser;
+use App\Commands\User\DeleteUser;
 use App\Commands\User\RegisterUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountRequest\AccountStoreRequest;
