@@ -17,13 +17,15 @@ class UpdateUser
 
 	public function handle()
 	{
-		$this->user->firstname = $this->request->firstname;
-		$this->user->middlename = $this->request->middlename;
-		$this->user->lastname = $this->request->lastname;
-		$this->user->email = $this->request->email;
-		$this->user->contactnumber = $this->request->contactnumber;
-		$this->user->username = $this->request->username;
-		$this->user->type = $this->request->type;
-		$this->user->save();
+		$request = $this->request;
+		$this->user->update([
+			'firstname' => $request->firstname,
+			'middlename' => $request->middlename,
+			'lastname' => $request->lastname,
+			'email' => $request->email,
+			'contactnumber' => $request->contactnumber,
+			'username' => $request->username,
+			'type' => $request->type,
+		]);
 	}
 }

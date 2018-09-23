@@ -18,7 +18,6 @@ class RegisterUser
 	public function handle(User $user)
 	{
 		$request = $this->request;
-
 		User::create([
 			'firstname' => $request->firstname,
 			'middlename' => $request->middlename,
