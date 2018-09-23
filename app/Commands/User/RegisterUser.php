@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class RegisterUser
 {
 	protected $request;
+	const DEFAULT_STATUS = 1;
 
 	public function __construct(Request $request)
 	{
@@ -16,16 +17,19 @@ class RegisterUser
 
 	public function handle(User $user)
 	{
-		$user->firstname = $this->request->firstname;
-		$user->middlename = $this->request->middlename;
-		$user->lastname = $this->request->lastname;
-		$user->email = $this->request->email;
-		$user->contactnumber = $this->request->contactnumber;
-		$user->username = $this->request->username;
-		$user->password = $user->getDefaultPassword();
-		$user->accesslevel = $this->request->accesslevel;
-		$user->type = $this->request->type;
-		$user->status = 1;
-		$user->save();
+		$request = $this->request;
+
+		User::create([
+			'firstname' => $request->firstname,
+			'middlename' => $request->middlename,
+			'lastname' => $request->lastname,
+			'email' => $request->email,
+			'contactnumber' => $request->contactnumber,
+			'username' => $request->username,
+			'password' => $user->getDefaultPassword(),
+			'accesslevel' => $request->accesslevel,
+			'type' => $request->type,
+			'status' => DEFAULT_STATUS
+		]);
 	}
 }

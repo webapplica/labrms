@@ -164,9 +164,9 @@ class AccountController extends Controller
 	 * user id
 	 *@param  int  $id
 	 */
-	public function resetPassword(PasswordResetRequest $request)
+	public function resetPassword(PasswordResetRequest $request, $id)
 	{
-	 	$user = User::findOrFail($request->id)->passwordReset()->save();
+	 	$this->dispatch(new ResetPassword($id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
