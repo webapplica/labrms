@@ -61,7 +61,7 @@
 <div class="form-group">
     {{ Form::label('accesslevel','Role') }}
     <select class="form-control" name="accesslevel" id="access-level">
-      @foreach($roles as $key => $value)
+      @foreach($use->camelCaseRoles() as $key => $value)
           <option 
             value="{{ $key }}"
             {{ ((isset($user->accesslevel) && $user->accesslevel == $key ) || old('accesslevel') == $key ) ? 'selected' : '' }}>
@@ -74,7 +74,7 @@
 <div class="form-group">
     {{ Form::label('type','Type') }}
     <select class="form-control" name="type" id="type">
-        @foreach($types as $type)
+        @foreach($user->types() as $type)
             <option 
                 value="{{ $type }}"
                 {{ ((isset($user->type) && $user->type == $type ) || old('type') == $type ) ? 'selected' : '' }}>

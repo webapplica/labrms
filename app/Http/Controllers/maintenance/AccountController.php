@@ -46,9 +46,7 @@ class AccountController extends Controller
 	 */
 	public function create(Request $request, User $user)
 	{
-		return view($this->viewBasePath . 'create')
-					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->types());
+		return view($this->viewBasePath . 'create', compact('user'));
 	}
 
 
@@ -86,10 +84,7 @@ class AccountController extends Controller
 	public function edit(Request $request, $id)
 	{
 		$user = $this->user->findOrFail($id);
-		return view($this->viewBasePath . 'update')
-					->with('user', $user)
-					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->types());
+		return view($this->viewBasePath . 'update', compact('user'));
 	}
 
 
