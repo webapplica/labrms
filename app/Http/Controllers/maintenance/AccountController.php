@@ -113,14 +113,7 @@ class AccountController extends Controller
 	 */
 	public function destroy(Request $request, $id)
 	{
-		User::findOrFail($id)->delete();
-		
-		if($request->ajax()) {
-			return response()->json([
-				'message' => __('tasks.success')
-			], 200);
-		}
-
+		$this->dispatch(new DeleteUser($id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -135,8 +128,7 @@ class AccountController extends Controller
 			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
-		return view($this->viewBasePath . 'restore')
-			->with('user', $user);
+		return view($this->viewBasePath . 'restore');
 
 	}
 
