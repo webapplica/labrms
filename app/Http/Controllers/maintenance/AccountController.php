@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Maintenance;
 use Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Commands\User\UpdateUser;
 use App\Commands\User\RegisterUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountRequest\AccountStoreRequest;
@@ -99,7 +100,7 @@ class AccountController extends Controller
 	 */
 	public function update(AccountUpdateRequest $request, $id)
 	{
-		User::findOrFail($id)->update($request->toArray());
+		$this->dispatch(new UpdateUser($request, $id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
