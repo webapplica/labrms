@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Models\Room\Category as Category;
 use App\Http\Requests\RoomRequest\RoomStoreRequest;
+use App\Http\Requests\RoomRequest\RoomUpdateRequest;
 
 class RoomController extends Controller {
 
@@ -83,7 +84,7 @@ class RoomController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update(Request $request, $id)
+	public function update(RoomUpdateRequest $request, $id)
 	{
 		$room = Room::findOrFail($id)->update($request);
 		$room->categories()->sync($categories);

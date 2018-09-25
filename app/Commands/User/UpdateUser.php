@@ -5,30 +5,28 @@ namespace App\Commands\User;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class RegisterUser
+class UpdateUser
 {
+	protected $user;
 	protected $request;
-	const DEFAULT_STATUS = 1;
 
-	public function __construct(Request $request)
+	public function __construct(Request $request, $id)
 	{
 		$this->request = $request;
+		$this->user = User::find($id);
 	}
 
-	public function handle(User $user)
+	public function handle()
 	{
 		$request = $this->request;
-		User::create([
+		$this->user->update([
 			'firstname' => $request->firstname,
 			'middlename' => $request->middlename,
 			'lastname' => $request->lastname,
 			'email' => $request->email,
 			'contactnumber' => $request->contactnumber,
 			'username' => $request->username,
-			'password' => $user->getDefaultPassword(),
-			'accesslevel' => $request->accesslevel,
 			'type' => $request->type,
-			'status' => DEFAULT_STATUS
 		]);
 	}
 }

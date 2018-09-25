@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Maintenance;
 
-use App;
-use Session;
-use Validator;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UnitRequest\UnitStoreRequest;
+use App\Http\Requests\UnitRequest\UnitUpdateRequest;
 
-class UnitsController extends Controller
+class UnitController extends Controller
 {
+    protected $viewBasePath = 'maintenance.unit.';
+
     /**
      * Display a listing of the resource.
      *
@@ -17,16 +19,11 @@ class UnitsController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->ajax())
-        {
-            $units = App\Unit::all();
-            return json_encode([
-                'data' => $units
-            ]);
+        if($request->ajax()) {
+            return datatables(Unit::all())->toJson();
         }
 
-        return view('unit.index')
-                ->with('title','Unit');
+        return view($this->viewBasePath . 'index');
     }
 
     /**
@@ -36,8 +33,7 @@ class UnitsController extends Controller
      */
     public function create()
     {
-        return view('unit.create')
-                ->with('title','Unit');
+        return view($this->viewBasePath . 'create');
     }
 
     /**
@@ -46,33 +42,10 @@ class UnitsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UnitStoreRequest $request)
     {
-        $name = $this->sanitizeString($request->get('name'));
-        $description = $this->sanitizeString($request->get("description"));
-        $abbreviation = $this->sanitizeString($request->get("abbreviation"));
-
-        $validator = Validator::make([
-            'Name' => $name,
-            'Description' => $description,
-            'Abbreviation' => $abbreviation
-        ],App\Unit::$rules);
-
-        if($validator->fails())
-        {
-            return back()
-                    ->withInput()
-                    ->withErrors($validator);
-        }
-
-        $unit = new App\Unit;
-        $unit->name = $name;
-        $unit->description = $description;
-        $unit->abbreviation = $abbreviation;
-        $unit->save();
-
-        Session::flash('success-message','Unit Information Created');
-        return redirect('unit');
+        $this->dispatch(new NewUnit($request));
+        return redirect('unit')->with('success-message', __('tasks.success'));
     }
 
     /**
@@ -102,7 +75,7 @@ class UnitsController extends Controller
             return redirect('unit');
         }
 
-        return view('unit.edit')
+        return view( $this->viewBasePath . 'edit')
                 ->with('title','Unit')
                 ->with('unit',$unit);
     }
@@ -114,7 +87,7 @@ class UnitsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UnitUpdateRequest $request, $id)
     {
         $name = $this->sanitizeString($request->get('name'));
         $description = $this->sanitizeString($request->get("description"));

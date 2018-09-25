@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Maintenance;
 use Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Commands\User\UpdateUser;
+use App\Commands\User\DeleteUser;
 use App\Commands\User\RegisterUser;
+use App\Commands\Auth\ResetPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountRequest\AccountStoreRequest;
 use App\Http\Requests\AccountRequest\AccountUpdateRequest;
@@ -36,7 +39,6 @@ class AccountController extends Controller
 		return view($this->viewBasePath . 'index');
 	}
 
-
 	/**
 	 * Show the form for creating a new resource.
 	 *
@@ -44,9 +46,7 @@ class AccountController extends Controller
 	 */
 	public function create(Request $request, User $user)
 	{
-		return view($this->viewBasePath . 'create')
-					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->types());
+		return view($this->viewBasePath . 'create', compact('user'));
 	}
 
 
@@ -74,7 +74,6 @@ class AccountController extends Controller
 				->with('person', $this->user->findOrFail($id));
 	}
 
-
 	/**
 	 * Show the form for editing the specified resource.
 	 *
@@ -84,12 +83,8 @@ class AccountController extends Controller
 	public function edit(Request $request, $id)
 	{
 		$user = $this->user->findOrFail($id);
-		return view($this->viewBasePath . 'update')
-					->with('user', $user)
-					->with('roles', $user->camelCaseRoles())
-					->with('types', $user->types());
+		return view($this->viewBasePath . 'update', compact('user'));
 	}
-
 
 	/**
 	 * Update the specified resource in storage.
@@ -99,10 +94,9 @@ class AccountController extends Controller
 	 */
 	public function update(AccountUpdateRequest $request, $id)
 	{
-		User::findOrFail($id)->update($request->toArray());
+		$this->dispatch(new UpdateUser($request, $id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -112,14 +106,7 @@ class AccountController extends Controller
 	 */
 	public function destroy(Request $request, $id)
 	{
-		User::findOrFail($id)->delete();
-		
-		if($request->ajax()) {
-			return response()->json([
-				'message' => __('tasks.success')
-			], 200);
-		}
-
+		$this->dispatch(new DeleteUser($id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
@@ -134,8 +121,7 @@ class AccountController extends Controller
 			return datatables(User::onlyTrashed()->get())->toJson();
 		}
 
-		return view($this->viewBasePath . 'restore')
-			->with('user', $user);
+		return view($this->viewBasePath . 'restore');
 
 	}
 
@@ -170,9 +156,9 @@ class AccountController extends Controller
 	 * user id
 	 *@param  int  $id
 	 */
-	public function resetPassword(PasswordResetRequest $request)
+	public function resetPassword(PasswordResetRequest $request, $id)
 	{
-	 	$user = User::findOrFail($request->id)->passwordReset()->save();
+	 	$this->dispatch(new ResetPassword($id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
 
