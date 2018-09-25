@@ -20,7 +20,7 @@
       'id' => 'item-type-form'
     ]) }}
 
-    @include('maintenance.item.type.form')
+    @include('maintenance.item.type.partials.form')
 
     <div class="form-group">
         <button class="btn btn-primary btn-flat btn-block btn-lg" type="submit" style="padding:10px;">
