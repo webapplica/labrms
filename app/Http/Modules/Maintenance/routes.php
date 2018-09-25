@@ -34,7 +34,7 @@ class Routes
             Route::resource('room/log','RoomLogController');
             Route::resource('room/scheduling','RoomSchedulingController');
             Route::resource('lend','LentItemsController');
-            Route::resource('unit','UnitsController');
+            Route::resource('unit','UnitController');
         });
     }
 }

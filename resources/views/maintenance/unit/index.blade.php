@@ -1,42 +1,25 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
-@section('style')
-{{ HTML::style(asset('css/select.bootstrap.min.css')) }}
-<link rel="stylesheet" href="{{ asset('css/style.css') }}" />
-<style>
-	#page-body,#edit,#delete{
-		display: none;
-	}
-
-	.panel {
-		padding: 30px;
-	}
-</style>
-@stop
 @section('content')
-<div class="container-fluid" id="page-body">
-	<div class="col-md-12" id="unit-info">
-		<div class="panel panel-body table-responsive">
-			<legend>Unit</legend>
-			<table class="table table-striped table-hover table-bordered" id='unitTable'>
-				<thead>
-					<th class="col-sm-1">ID</th>
-					<th class="col-sm-1">Name</th>
-					<th class="col-sm-1">Abbreviation</th>
-					<th class="col-sm-1">Description</th>
-					<th class="no-sort col-sm-1"></th>
-				</thead>
-			</table>
-		</div>
-	</div>
+<div class="container-fluid panel panel-body table-responsive">
+	<legend>Unit</legend>
+
+	<table class="table table-striped table-hover table-bordered" id='unit-table'>
+		<thead>
+			<th class="col-sm-1">ID</th>
+			<th class="col-sm-1">Name</th>
+			<th class="col-sm-1">Abbreviation</th>
+			<th class="col-sm-1">Description</th>
+			<th class="no-sort col-sm-1"></th>
+		</thead>
+	</table>
 </div>
 @stop
-@section('script')
-
-<script>
+@section('scripts-include')
+<script type="text/javascript">
 	$(document).ready(function(){
 
-	    var table = $('#unitTable').DataTable( {
+	    var table = $('#unit-table').DataTable( {
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
