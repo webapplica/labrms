@@ -39,7 +39,6 @@ class AccountController extends Controller
 		return view($this->viewBasePath . 'index');
 	}
 
-
 	/**
 	 * Show the form for creating a new resource.
 	 *
@@ -75,7 +74,6 @@ class AccountController extends Controller
 				->with('person', $this->user->findOrFail($id));
 	}
 
-
 	/**
 	 * Show the form for editing the specified resource.
 	 *
@@ -88,7 +86,6 @@ class AccountController extends Controller
 		return view($this->viewBasePath . 'update', compact('user'));
 	}
 
-
 	/**
 	 * Update the specified resource in storage.
 	 *
@@ -100,7 +97,6 @@ class AccountController extends Controller
 		$this->dispatch(new UpdateUser($request, $id));
 		return redirect('account')->with('success-message', __('tasks.success'));
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
