@@ -9,13 +9,17 @@ class Routes
     public static function all()
     {
 
-        Route::namespace('maintenance')->middleware(['auth', 'laboratorystaff'])->group(function(){
+        Route::namespace('maintenance')->middleware(['auth', 'lab.staff'])->group(function () {
 
             Route::resource('academicyear','AcademicYearController');
             Route::resource('event','SpecialEventController');
             Route::resource('faculty','FacultiesController');
             Route::resource('inventory/software','SoftwareInventoryController');
-            Route::resource('item/type','ItemTypesController');
+
+            Route::namespace('item')->group(function() {
+                Route::resource('item/type','TypeController');
+            });
+
             Route::resource('lostandfound','LostAndFoundController');
             Route::resource('maintenance/activity','MaintenanceActivityController');
             Route::resource('purpose','PurposeController');
