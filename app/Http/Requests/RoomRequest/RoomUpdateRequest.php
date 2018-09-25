@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\RoomRequest;
 
+use App\Models\Room;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RoomUpdateRequest extends FormRequest
