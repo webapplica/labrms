@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class UpdateUser
 {
+	protected $user;
 	protected $request;
 
 	public function __construct(Request $request, $id)
