@@ -16,7 +16,7 @@ class Faculty extends Model
 	];
 
 	protected $hidden = ['password','remember_token'];
-	protected $appends = [ 'full_name', ];
+	protected $appends = ['full_name'];
 
 	public function getFullNameAttribute()
 	{
