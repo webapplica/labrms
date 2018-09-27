@@ -3,20 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Carbon;
-use Session;
-use Validator;
-use Auth;
-use App;
-use DB;
 use Illuminate\Http\Request;
 
-class TicketController extends Controller {
-
-	private $ticket_status = [
-		'Open',
-		'Closed'
-	];
+class TicketController extends Controller 
+{
 
 	/**
 	 * Display a listing of the resource.
@@ -25,13 +15,8 @@ class TicketController extends Controller {
 	 */
 	public function index(Request $request)
 	{
-		$type = $request->get('type');
-		$status = $request->get('status');
+		if($request->ajax()) {
 
-		if($request->ajax())
-		{
-
-			$query = App\Ticket::orderBy('date','desc');
 
 			if( Auth::user()->accesslevel == 2 )
 			{
@@ -59,8 +44,11 @@ class TicketController extends Controller {
 			{
 				$query = $query->selfAuthored()->findByType('Complaint');
 			}
+			$query = App\Ticket::orderBy('date','desc')
+						->filterByRequest($request)
+						-get();
 
-			return datatables($query->get())->toJson();
+			return datatables($query)->toJson();
 		}
 
 		// total tickets
