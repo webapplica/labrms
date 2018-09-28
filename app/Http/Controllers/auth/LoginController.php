@@ -41,7 +41,6 @@ class LoginController extends Controller
  		];
 
 		if(Auth::attempt($user)) {
-			session()->flash('success-message','Invalid login credentials');
 			return redirect('/')->with('success-message', __('auth.success'));
  		}
 
