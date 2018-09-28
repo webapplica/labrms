@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Maintenance;
 
 use Illuminate\Http\Request;
+use App\Models\Item\Lost as Item;
 use App\Http\Controllers\Controller;
-use App\Models\Item\Lost as LostItem;
 use App\Commands\Item\LostItem\AddItem;
 use App\Commands\Item\LostItem\UpdateItem;
 
@@ -18,7 +18,7 @@ class LostAndFoundController extends Controller
     public function index(Request $request)
     {
         if( $request->ajax()) {
-            $items = LostItem::all();
+            $items = Item::all();
             return datatables($items)->toJson();
         }
 
@@ -82,7 +82,7 @@ class LostAndFoundController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        LostItem::findOrFail($id)->delete();
+        Item::findOrFail($id)->delete();
         return redirect('lostandfound')->with('success-message', __('tasks.success'));
     }
 }
