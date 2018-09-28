@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Ticket;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Commands\Ticket\ComplaintTicket;
 
 class TicketController extends Controller 
 {
@@ -13,61 +15,15 @@ class TicketController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function index(Request $request)
+	public function index(Request $request, Ticket $ticket)
 	{
 		if($request->ajax()) {
-
-
-			if( Auth::user()->accesslevel == 2 )
-			{
-				$query = $query->staff(Auth::user()->id);
-			}
-
-			if($request->has('type'))
-			{
-				if( $type != 'all') $query = $query->findByType($this->sanitizeString( $type ));
-			}
-
-			if($request->has('assigned'))
-			{
-				$assigned = $this->sanitizeString($request->get('assigned'));
-			}
-
-			if($request->has('status'))
-			{
-				$query = $query->findByStatus($request->get('status'));
-			} else {
-				$query = $query->findByStatus( 'Open' );
-			}
-			
-			if( Auth::user()->accesslevel == 3 || Auth::user()->accesslevel == 4  )
-			{
-				$query = $query->selfAuthored()->findByType('Complaint');
-			}
-			$query = App\Ticket::orderBy('date','desc')
-						->filterByRequest($request)
-						-get();
-
-			return datatables($query)->toJson();
+			$ticket = Ticket::oldest('date')->involved()->get();
+			return datatables($ticket)->toJson();
 		}
 
-		// total tickets
-		$total_tickets = App\Ticket::count();
-		$complaints = App\Ticket::selfAuthored()->findByType('complaint')->open()->count();
-		$authored_tickets = App\Ticket::selfAuthored()->count();
-		$open_tickets = App\Ticket::selfAuthored()->open()->count();
-		$ticket_types = App\TicketType::all();
-
 		return view('ticket.index')
-				->with('ticket_types', $ticket_types)
-				->with('ticket_statuses',$this->ticket_status)
-				->with('lastticket',$total_tickets + 1)
-				->with('total_tickets', $total_tickets)
-				->with('complaints',$complaints)
-				->with('authored_tickets',$authored_tickets)
-				->with('open_tickets',$open_tickets)
-				->with('type', $type)
-				->with('status', $status);
+				->with('ticket', $ticket);
 	}
 
 
@@ -78,21 +34,10 @@ class TicketController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		$last_generated_ticket = App\Ticket::count() + 1;
+		$users = User::staffExcept(User::admin()->pluck('id'))->get();
+		$types = Type::pluck('name', 'id');
 
-		$staff = App\User::staff()
-					->whereNotIn('id', [ Auth::user()->id, App\User::admin()->first()->id ])
-					->select(
-						'id as id',
-						DB::raw('CONCAT( firstname , " " , middlename , " " , lastname ) as name')
-					)
-					->pluck('name','id');
-		$ticket_types = App\TicketType::pluck('name', 'id');
-
-		return view('ticket.create')
-				->with('lastticket',$last_generated_ticket)
-				->with('staff',$staff)
-				->with('ticket_types', $ticket_types);
+		return view('ticket.create', compact('users', 'types'));
 	}
 
 
@@ -103,51 +48,8 @@ class TicketController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$tag = $this->sanitizeString($request->get('tag'));
-		$ticket_type = $this->sanitizeString($request->get('ticket_type'));
-		$title = $this->sanitizeString($request->get('subject'));
-		$author = null;
-		$staff = null;
-
-		if($request->has('author')) {
-			$author = $this->sanitizeString($request->get('author'));
-		}
-
-		$details = $this->sanitizeString($request->get('description'));
-
-		if(Auth::user()->accesslevel <= 2) {
-			if($request->has('assign-to-staff')) {
-				$staff = $this->sanitizeString($request->get('staffassigned'));
-			}
-		}
-
-		$validator = Validator::make([
-				'Subject' => $title,
-				'Details' => $details,
-				'Staff' => $staff,
-				'Type' => $ticket_type
-			],App\Ticket::$rules);
-
-		if($validator->fails()) {
-			return redirect('ticket/create')
-				->withInput()
-				->withErrors($validator);
-		}
-
-		DB::beginTransaction();
-
-		$ticket = new App\Ticket;
-		$ticket->title = $title;
-		$ticket->details = $details;
-		$ticket->type_id = $ticket_type;
-		$ticket->staff_id = $staff;
-		$ticket->status = 'Open';
-		$ticket->generate($tag);
-
-		DB::commit();
-
-		Session::flash('success-message','Ticket Generated');
-		return redirect('ticket');
+		$this->dispatch(new ComplaintTicket($request));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 
 	}
 
@@ -160,160 +62,12 @@ class TicketController extends Controller
 	 */
 	public function show(Request $request, $id)
 	{
-		if($request->ajax())
-		{
-			$arraylist = array();
-			$cond = true;
-			$start = 0;
-			$ticket;
-			do
-			{
-
-				/*
-				|--------------------------------------------------------------------------
-				|
-				| 	$start = 0	->	original
-				|	$start = 1	->	next ticket
-				|	$start = 2	->	last
-				|
-				|--------------------------------------------------------------------------
-				|
-				*/
-				if($start == 0)
-				{
-
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Get all the previous ticket
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					$ticket =  App\Ticket::where('parent_id','=',$id)
-								->orderBy('id','desc')
-								->with('user')
-								->whereNotIn('id',array_pluck($arraylist,'id'))
-								->first();
-				}
-				else
-				{
-
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Get all the ticket connected to the original
- 					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					$ticket =  App\Ticket::where('id','=',$id)
-								->orderBy('id','desc')
-								->whereNotIn('id',array_pluck($arraylist,'id'))
-								->with('user')
-								->first();
-				}
-
-				try
-				{
-
-					/*
-					|--------------------------------------------------------------------------
-					|
-					| 	Ticket exists
-					|
-					|--------------------------------------------------------------------------
-					|
-					*/
-					if(isset($ticket))
-					{
-
-						/*
-						|--------------------------------------------------------------------------
-						|
-						| 	If original
-						|
-						|--------------------------------------------------------------------------
-						|
-						*/
-						if($start == 1)
-						{
-							$id = $ticket->parent_id;
-						}
-
-						array_push($arraylist,$ticket);
-					}
-					else
-					{
-						if($start == 2)
-						{
-
-							/*
-							|--------------------------------------------------------------------------
-							|
-							| 	all connected ticket are used
-							|
-							|--------------------------------------------------------------------------
-							|
-							*/
-							$cond  = false;
-						}
-						else if($start == 1)
-						{
-
-							/*
-							|--------------------------------------------------------------------------
-							|
-							| 	no more previous ticket
-							|
-							|--------------------------------------------------------------------------
-							|
-							*/
-							$start = 2;
-						}
-						else
-						{
-							$start = 1;
-						}
-					}
-				}
-				catch( Exception $e )
-				{
-					$cond = false;
-				}
-
-
-			} while ( $cond == true);
-
-			return json_encode([ 'data'=> $arraylist ]);
+		if($request->ajax()) {
+			return datatables(Ticket::relatedTo($id)->get())->toJson();
 		}
 
-		$ticket = App\Ticket::where('id','=',$id)->first();
-		$last_ticket = App\Ticket::orderBy('created_at', 'desc')->first();
-
-		if($ticket && $ticket->user_id != Auth::user()->id && ( in_array(Auth::user()->accesslevel, [ 3, 4] )) )
-		{
-			return redirect('ticket')->withErrors(['Invalid Ticket']);
-		}
-
-		if ( $last_ticket && $last_ticket->count() == 0 )
-		{
-			$last_ticket = 1;
-		}
-		elseif( $last_ticket && $last_ticket->count() > 0 )
-		{
-			$last_ticket = $last_ticket->id + 1;
-		}
-
-		if( !$ticket || $ticket->count() <= 0)
-		{
-			return redirect('ticket')->withErrors(['Invalid Ticket']);
-		}
-
-		return view('ticket.show')
-			->with('ticket',$ticket)
-			->with('id',$id)
-			->with('lastticket',$last_ticket);
+		$ticket = Ticket::findOrFail($id);
+		return view('ticket.show', compact('ticket'));
 
 	}
 
@@ -326,9 +80,8 @@ class TicketController extends Controller
 	 */
 	public function edit(Request $request, $id)
 	{
-		$ticket = App\Ticket::find($id);
-		return view('ticket.edit')
-				->with('ticket',$ticket);
+		$ticket = Ticket::findOrFail($id);
+		return view('ticket.edit', compact('ticket'));
 	}
 
 
@@ -340,25 +93,8 @@ class TicketController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		$propertynumber = $this->sanitizeString($request->get('propertynumber'));
-		$type = $this->sanitizeString($request->get('type'));
-		$maintenancetype = $this->sanitizeString($request->get('maintenancetype'));
-		$category = $this->sanitizeString($request->get('category'));
-		$author = $this->sanitizeString($request->get('author'));
-		$details = $this->sanitizeString($request->get('description'));
-		$staffassigned = Auth::user()->id;
-		$propertynumber;
-
-		$ticket = App\Ticket::find($id);
-		$ticket->item_id = $propertynumber;
-		$ticket->ticketname = $category;
-		$ticket->tickettype = $type;
-		$ticket->details = $maintenancetype . $details;
-		$ticket->author = $author;
-		$ticket->save();
-
-		Session::flash('success-message','Ticket Generated');
-		return redirect('ticket');
+		$this->dispatch(new UpdateTicket($request, $id));
+		return redirect('/')->with('success-message', __('tasks.success'));
 
 	}
 
@@ -368,32 +104,10 @@ class TicketController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function transfer(Request $request, $id = null)
+	public function transfer(Request $request, $id)
 	{
-
-		$id = $this->sanitizeString($request->get('id'));
-		$staff_id = $this->sanitizeString($request->get('transferto'));
-		$comments = $this->sanitizeString($request->get('comment'));
-	
-		$validator = Validator::make([
-				'Ticket ID' => $id,
-				'Staff Assigned' => $staff_id
-			], App\Ticket::$transferRules );
-
-		if($validator->fails())
-		{
-			Session::flash('error-message','Problem encountered while processing your request');
-			return redirect()->back();
-		}
-
-		$ticket = App\Ticket::find($id);
-		$ticket->status = 'Open';
-		$ticket->comments = $comments;
-		$ticket->staff_id = $staff_id;
-		$ticket->transfer();
-
-		Session::flash('success-message','Ticket Transferred');
-		return redirect()->back();
+		$this->dispatch(new TransferTicket($request, $id));
+		return redirect('/')->with('success-message', __('tasks.success'));
 	}
 
 	/**
@@ -404,14 +118,9 @@ class TicketController extends Controller
 	 */
 	public function destroy(Request $request, $id)
 	{
-		if($request->ajax())
-		{
-			$ticket = App\Ticket::find($id);
 
-			if( $ticket && $ticket->count() <= 0) return json_encode('error');
-			$ticket->close($id);
-			return json_encode('success');
-		}
+		$this->dispatch(new CloseTicket($request, $id));
+		return redirect('/')->with('success-message', __('tasks.success'));
 	}
 
 	/**
@@ -420,20 +129,10 @@ class TicketController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function reOpenTicket(Request $request, $id)
+	public function reopen(Request $request, $id)
 	{
-		if($request->ajax())
-		{
-			$ticket = App\Ticket::find($id);
-
-			if($ticket && $ticket->count() > 0)
-			{
-				$ticket->reopen();
-				return json_encode('success');
-			}
-			
-			return json_encode('error');
-		}
+		$this->dispatch(new ReopenTicket($request, $id));
+		return redirect('/')->with('success-message', __('tasks.success'));
 	}
 	
 	/**
@@ -445,169 +144,8 @@ class TicketController extends Controller
 	*/
 	public function resolve(Request $request)
 	{
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Intantiate Values
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$id = $this->sanitizeString($request->get('id'));
-		$activity = $this->sanitizeString($request->get('activity'));
-		$status = 'Open';
-		$underrepair = false;
-		$details = "";
-
-		if($request->has('contains'))
-		{
-			$details = $this->sanitizeString($request->get('details'));
-		}
-		else
-		{
-			
-			$validator = Validator::make([
-				'activity' => $activity
-			], App\Activity::$isExistingActivity);
-
-			if( $validator->fails() )
-			{
-				// Session::flash('error-message', $validator->errors()->first('activity')) ;
-				return redirect()->back()->withErrors($validator);
-			}
-
-			$suggestions = App\Activity::find($activity);
-			$details = isset($suggestions->activity) ? $suggestions->activity : $activity;
-
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if the status will be changed
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->has('underrepair'))
-		{
-			$underrepair = 'underrepair';
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if the status will be changed
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->has('working'))
-		{
-			$underrepair = 'working';
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	check if the the ticket will be closed
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		if($request->has('close'))
-		{
-			$status = "Closed";
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	validates
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$validator = Validator::make([
-				'Details' => $details
-		],App\Ticket::$maintenanceRules);
-
-		if($validator->fails())
-		{
-			// Session::flash('error-message', $validator->errors()->first('Details') );
-			return redirect()->back()->withErrors($validator);
-		}
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	call function resolve ticket
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		$ticket = App\Ticket::find($id);
-		$ticket->details = $details;
-		$ticket->status = $status;
-		$ticket->underrepair = $underrepair;
-		$ticket->resolve();
-
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	return successful
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
-		Session::flash('success-message','Action Created');
-		return redirect()->back();
-	}
-
-	/**
-	*
-	*	complain process
-	*
-	*/
-	public function complaint(Request $request)
-	{
-		return redirect('ticket/complaint');
-	}
-
-	/**
-	*
-	*	@return complaint view
-	*	@return opened ticket
-	*
-	*/
-	public function complaintViewForStudentAndFaculty(Request $request)
-	{
-		if($request->ajax())
-		{
-			return json_encode([
-					'data' => App\Ticket::with('itemprofile')
-										->with('user')
-										->open()
-										->get()
-				]);
-		}
-		return view('ticket.complaint');
-	}
-
-	/**
-	*
-	*	@param $tag
-	*	@return item information
-	*	@return is existing room
-	*	@return pc information
-	*
-	*/
-	public function getTagInformation(Request $request, App\Ticket $ticket)
-	{
-
-		$tag = $this->sanitizeString($request->get('id'));
-
-		return response()->json( $ticket->getTagDetails($tag) , 200);
+		$this->dispatch(new ResolveTicket($request, $id));
+		return redirect('/')->with('success-message', __('tasks.success'));
 	}
 
 }
