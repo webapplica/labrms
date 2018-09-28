@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Htpt\Modules\Ticket;
+namespace App\Http\Modules\Ticket;
 
 trait Filterable
 {

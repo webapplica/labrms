@@ -204,14 +204,8 @@ class Ticket extends Model
 
 		$this->save();
 		
-		/*
-		|--------------------------------------------------------------------------
-		|
-		| 	Check if the equipment is connected to pc
-		|
-		|--------------------------------------------------------------------------
-		|
-		*/
+		
+		// check if the tag is connected to a workstation
 		if( $pc = Workstation::isWorkstation($tag) )
 		{
 
