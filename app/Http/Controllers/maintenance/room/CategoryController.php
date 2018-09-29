@@ -7,6 +7,8 @@ use App\Models\Room\Category;
 use App\Http\Controllers\Controller;
 use App\Commands\Room\Category\AddCategory;
 use App\Commands\Room\Category\UpdateCategory;
+use App\Http\Requests\RoomCategoryRequest\CategoryStoreRequest;
+use App\Http\Requests\RoomCategoryRequest\CategoryUpdateRequest;
 
 class CategoryController extends Controller
 {
@@ -40,7 +42,7 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryStoreRequest $request)
     {
         $this->dispatch(new AddCategory($request));
         return redirect('room/category')->with('success-message', __('tasks.success'));
@@ -65,7 +67,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryUpdateRequest $request, $id)
     {
         $this->dispatch(new UpdateCategory($request, $id));
         return redirect('room/category')->with('success-message', __('tasks.success'));
