@@ -1,34 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Inventory\Workstation\Software;
 
-use App\Http\Controllers\Controller;
-use Validator;
-use Session;
-use App;
-use DB;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class WorkstationSoftwareController extends Controller {
-
-	public function getAllWorkstationSoftware($id)
-	{
-		$softwares = DB::table('softwares')
-							->leftJoin('workstation_software', 'software_id', '=', 'softwares.id')
-							->leftJoin('software_licenses', 'workstation_software.license_id', '=', 'software_licenses.id')
-							->Join('room_software', 'room_software.software_id', '=', 'softwares.id')
-							->leftJoin('rooms', 'room_software.room_id', '=', 'rooms.id')
-							->select(
-									'softwares.id as id', 'softwares.name as name', 
-									'software_licenses.key  as license_key',
-									'workstation_id as workstation'
-								)
-							->distinct()
-							->get();
-
-		return datatables($softwares)->toJson();
-	}
-
+class SoftwareController extends Controller 
+{
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -37,10 +15,12 @@ class WorkstationSoftwareController extends Controller {
 	public function index()
 	{
 		$workstations = App\Workstation::all();
+		
+		if($request->ajax()) {
+			return datatables($workstations)->toJson();
+		}
 
-		return view('workstation.software.index')
-			->with('workstation', $workstations )
-			->with('active_tab','software');
+		return view('workstation.software.index');
 	}
 
 
@@ -55,8 +35,7 @@ class WorkstationSoftwareController extends Controller {
 
 		if(count($workstation) <= 0) return view('errors.404');
 
-		return view('workstation.software.create')
-			->with('workstation',$workstation);
+		return view('workstation.software.create');
 	}
 
 

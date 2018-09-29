@@ -39,13 +39,12 @@ class ReservationController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		$date = Reservation::thirdWorkingDay(Carbon::now());
 		$items = Item::enabledOnReservation()->pluck('property_number', 'id');
 		$rooms = Room::pluck('name', 'id');
 		$purposes = Purpose::pluck('title', 'id');
 		$faculties =  Faculty::all();
 
-		return view('reservation.create', compact('date', 'items', 'rooms', 'purposes', 'faculties'));
+		return view('reservation.create', compact('items', 'rooms', 'purposes', 'faculties'));
 	}
 
 
