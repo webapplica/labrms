@@ -2,14 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use DB;
-use App;
-use Carbon;
-use Session;
-use Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Input;
 
 class ItemsController extends Controller {
 
