@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>{{ config('backpack.base.project_name') }} Error 408</title>
+    <title>{{ config('app.name') }} Error 429</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
 
@@ -43,8 +43,8 @@
   <body>
     <div class="container">
       <div class="content">
-        <div class="title">408</div>
-        <div class="quote">Request timeout.</div>
+        <div class="title">429</div>
+        <div class="quote">Too many requests.</div>
         <div class="explanation">
           <br>
           <small>

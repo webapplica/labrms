@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>{{ config('backpack.base.project_name') }} Error 403</title>
+    <title>{{ config('app.name') }} Error 500</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
 
@@ -43,13 +43,13 @@
   <body>
     <div class="container">
       <div class="content">
-        <div class="title">403</div>
-        <div class="quote">Forbidden.</div>
+        <div class="title">500</div>
+        <div class="quote">It's not you, it's me.</div>
         <div class="explanation">
           <br>
           <small>
             <?php
-              $default_error_message = "Please return to <a href='".url('')."'>our homepage</a>.";
+              $default_error_message = "An internal server error has occurred. If the error persists please contact the development team.";
             ?>
             {!! isset($exception)? ($exception->getMessage()?$exception->getMessage():$default_error_message): $default_error_message !!}
          </small>

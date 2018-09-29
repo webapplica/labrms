@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>{{ config('backpack.base.project_name') }} Error 401</title>
+    <title>{{ config('app.name') }} Error 400</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
 
@@ -43,8 +43,8 @@
   <body>
     <div class="container">
       <div class="content">
-        <div class="title">401</div>
-        <div class="quote">Unauthorized action.</div>
+        <div class="title">400</div>
+        <div class="quote">Bad request.</div>
         <div class="explanation">
           <br>
           <small>
