@@ -55,5 +55,12 @@ class Receipt extends \Eloquent{
 	            ->withTimestamps();
 	}
 
+	public function scopeFindThroughInventory($query, $id)
+	{
+		$query->whereHas('inventory', function ($innerQuery) use($id) {
+			$innerQuery->where('id', '=', $id);	
+		});
+	}
+
 
 }

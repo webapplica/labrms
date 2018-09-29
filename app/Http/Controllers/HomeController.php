@@ -20,9 +20,5 @@ class HomeController extends Controller
         }
 
         return redirect('login');
-
-        return view('welcome')
-                ->with('isPlainBackground', true)
-                ->with('bodyBackgroundColor', 'whtie');
     }
 }

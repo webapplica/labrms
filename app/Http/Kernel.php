@@ -50,19 +50,19 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'session_start' => \App\Http\Middleware\BeforeSessionStartMiddleware::class,
-        'lab.head' => \App\Http\Middleware\LaboratoryHeadMiddleware::class,
-        'lab.assistant' => \App\Http\Middleware\LaboratoryAssistantMiddleware::class,
-        'lab.staff' => \App\Http\Middleware\LaboratoryStaffMiddleware::class,
-        'faculty' => \App\Http\Middleware\FacultyMiddleware::class,
-        'student' => \App\Http\Middleware\StudentMiddleware::class,
-        'lab.user' => \App\Http\Middleware\LaboratoryUsersMiddleware::class,
+        // 'session_start' => \App\Http\Middleware\BeforeSessionStartMiddleware::class,
+        // 'lab.head' => \App\Http\Middleware\LaboratoryHeadMiddleware::class,
+        // 'lab.assistant' => \App\Http\Middleware\LaboratoryAssistantMiddleware::class,
+        // 'lab.staff' => \App\Http\Middleware\LaboratoryStaffMiddleware::class,
+        // 'faculty' => \App\Http\Middleware\FacultyMiddleware::class,
+        // 'student' => \App\Http\Middleware\StudentMiddleware::class,
+        // 'lab.user' => \App\Http\Middleware\LaboratoryUsersMiddleware::class,
         // 'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth' => \App\Http\Middleware\AuthenticationMiddleware::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'auth.before' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
 }

@@ -30,7 +30,7 @@ trait SessionsManager
 	 * 
 	 * @return
 	 */
-	public function verifyIfActivated()
+	public function isActivated()
 	{
         if($this->status == 0) {
             return redirect('logout', __('account.activation_required'));
