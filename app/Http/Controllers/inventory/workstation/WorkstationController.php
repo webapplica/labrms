@@ -140,7 +140,6 @@ class WorkstationController extends Controller
 	*/
 	public function deploy(Request $request, $id)
 	{
-		
 		$this->dispatch(new DeployWorkstation($request, $id));
 		return redirect('workstation')->with('success-message', __('tasks.success'));
 	}

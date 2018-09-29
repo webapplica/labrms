@@ -31,10 +31,7 @@ class SoftwareController extends Controller
 	 */
 	public function create($id)
 	{
-		$workstation = Workstation::find($id);
-
-		if(count($workstation) <= 0) return view('errors.404');
-
+		$workstation = Workstation::findOrFail($id);
 		return view('workstation.software.create');
 	}
 
@@ -46,51 +43,8 @@ class SoftwareController extends Controller
 	 */
 	public function store(Request $request, $id)
 	{
-
-		$id = $this->sanitizeString($id);
-		$software = $this->sanitizeString($request->get('software'));
-		$license = $this->sanitizeString($request->get('softwarelicense'));
-
-		$validator = Validator::make([
-			'Workstation' => $id,
-			'Software' => $software,
-			'License Key' => $license
-		], App\Software::$installationRules);
-
-
-		if($validator->fails())
-		{
-			if($request->ajax())
-			{
-				return response()->json([
-					'error-messages' => $validator->messages()->toJson()
-					
-				], 401);
-			}
-			else
-			{
-
-				return redirect()->back()
-					->withInput()
-					->withErrors($validator);
-			}
-		}
-		DB::beginTransaction();
-
-		App\Software::find($software)->install($id, $license);
-
-		DB::commit();
-
-		if($request->ajax())
-		{
-			return response()->json([
-				'message' => 'success',
-			], 200);
-		} 
-
-
-		Session::flash('success-message','Software added to workstation');
-		return redirect('workstation/view/software');
+		$this->dispatch(new AssignSoftware($request, $id));
+		return redirect("workstation/$id/software")->with('success-message', __('tasks.success'));
 	}
 
 
@@ -114,7 +68,7 @@ class SoftwareController extends Controller
 	 */
 	public function edit($id)
 	{
-		Workstationsoftware::find($id);
+		Workstation::findOrFail($id);
 		return view('workstation.software.edit');
 	}
 
@@ -127,48 +81,8 @@ class SoftwareController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		$id = $this->sanitizeString($id);
-		$software = $this->sanitizeString($request->get('software'));
-		$license = $this->sanitizeString($request->get('softwarelicense'));
-
-		$validator = Validator::make([
-			'Workstation' => $id,
-			'Software' => $software,
-			'License Key' => $license
-		], App\Software::$installationRules);
-
-		if($validator->fails())
-		{
-
-			if($request->ajax())
-			{
-				return response()->json([
-					'error-messages' => $validator->messages()->toJson(),
-					'message' => '' 
-				], 401);
-			}
-			else
-			{
-				return redirect()->back()
-					->withInput()
-					->withErrors($validator);
-			}
-
-		}
-
-		DB::beginTransaction();
-
-		App\Software::find($software)->updateSoftwareLicense($id,$license);
-
-		DB::commit();
-
-		return response()->json([
-			'error-messages' => [],
-			'message' => 'success' 
-		], 200);
-
-		Session::flash('success-message','Software updated');
-		return redirect('workstation/software');
+		$this->dispatch(new UpdateLicense($request, $id));
+		return redirect("workstation/$id/software")->with('success-message', __('tasks.success'));
 	}
 
 
@@ -180,49 +94,8 @@ class SoftwareController extends Controller
 	 */
 	public function destroy(Request $request, $id)
 	{
-		$id = $this->sanitizeString($id);
-		$software = $this->sanitizeString($request->get('software'));
-
-		$validator = Validator::make([
-			'Workstation' => $id,
-			'Software' => $software
-		], App\Software::$installationRules);
-
-		if($request->ajax())
-		{
-
-			if($validator->fails())
-			{
-				return response()->json([
-					'error-messages' => $validator->messages()->toJson()
-					
-				],401);
-			}
-		}
-
-		if($validator->fails())
-		{
-			return redirect()->back()
-				->withInput()
-				->withErrors($validator);
-		}
-
-		DB::beginTransaction();
-
-		App\Software::find($software)->uninstall($id);
-
-		DB::commit();
-
-
-		if($request->ajax())
-		{
-			return response()->json([
-				'message' => 'success',
-			], 200);
-		} 
-
-		Session::flash('success-message','Software successfully removed from workstation');
-		return redirect('workstation/view/software');
+		$this->dispatch(new UnassignSoftware($request, $id));
+		return redirect("workstation/$id/software")->with('success-message', __('tasks.success'));
 	}
 
 
