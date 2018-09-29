@@ -44,12 +44,8 @@ class SessionsController extends Controller
 	 */
 	public function update(Request $request)
 	{
-		$currentPassword = filter_var($request->get('password'), FILTER_SANITIZE_STRING);
-		$newPassword = filter_var($request->get('newpassword'), FILTER_SANITIZE_STRING);
-		User::changePassword($currentPassword, $newPassword);
-		
-		session()->flash('success-message', __('account.successful_password_update'));
-		return back();
+		$this->dispatch(new ChangePassword($request));
+		return back()->with('success-message', __('account.successful_password_update'));
 	}
 
 	/**
