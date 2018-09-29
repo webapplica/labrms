@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance;
+namespace App\Http\Controllers\Maintenance\Room;
 
 use App\Models\Room\Room;
 use Illuminate\Http\Request;
+use App\Models\Room\Category;
+use App\Commands\Room\AddRoom;
+use App\Commands\Room\UpdateRoom;
 use App\Http\Controllers\Controller;
-use App\Http\Models\Room\Category as Category;
 use App\Http\Requests\RoomRequest\RoomStoreRequest;
 use App\Http\Requests\RoomRequest\RoomUpdateRequest;
 
@@ -24,7 +26,7 @@ class RoomController extends Controller {
 		}
 
 		$categories = Category::pluck('name', 'id');	
-		return view('room.index', compact('categories'));
+		return view('maintenance.room.index', compact('categories'));
 	}
 
 
@@ -36,7 +38,7 @@ class RoomController extends Controller {
 	public function create()
 	{
 		$categories = Category::pluck('name', 'id');	
-		return view('room.create', compact('categories'));
+		return view('maintenance.room.create', compact('categories'));
 	}
 
 	/**
@@ -46,8 +48,7 @@ class RoomController extends Controller {
 	 */
 	public function store(RoomStoreRequest $request)
 	{
-		$room = Room::create($request);
-		$room->categories()->sync($categories);
+		$this->dispatch(new AddRoom($request));
 		return redirect('room')->with('success-message', __('tasks.success'));
 	}
 
@@ -61,7 +62,7 @@ class RoomController extends Controller {
 	public function show($id)
 	{
 		$room = Room::findOrFail($id);
-		return view('room.show', compact('room'));
+		return view('maintenance.room.show', compact('room'));
 	}
 
 
@@ -74,7 +75,8 @@ class RoomController extends Controller {
 	public function edit($id)
 	{
 		$room = Room::with('categories')->findOrFail($id);
-		return view('room.edit', compact('room'));
+		$categories = Category::pluck('name', 'id');	
+		return view('maintenance.room.edit', compact('room', 'categories'));
 	}
 
 
@@ -86,8 +88,7 @@ class RoomController extends Controller {
 	 */
 	public function update(RoomUpdateRequest $request, $id)
 	{
-		$room = Room::findOrFail($id)->update($request);
-		$room->categories()->sync($categories);
+		$this->dispatch(new UpdateRoom($request, $id));
 		return redirect('room')->with('success-message', __('tasks.success'));
 	}
 
