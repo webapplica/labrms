@@ -46,12 +46,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof NotFoundHttpException) {
-            // return view('errors.404');\
             $e = new NotFoundHttpException($exception->getMessage(), $exception);
-        }
-
-        if ($e instanceof \Illuminate\Session\TokenMismatchException) {            
-            return redirect('/')->with('error-message', 'Your session has already expired. Please try again.');
         }
 
         return parent::render($request, $exception);

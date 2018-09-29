@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class AuthenticationMiddleware
+class CheckAuthenticatedIfStaff
 {
     /**
      * Handle an incoming request.
@@ -16,8 +16,10 @@ class AuthenticationMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (! Auth::check() || ! Auth::user()->isActivated()) {           
-            return redirect('logout')->with('error-message', __('auth.insufficient_permission'));
+        // check if the current authenticated user is not
+        // a staff, redirect to dashboard
+        if(! Auth::user()->isStaff()) {
+            redirect('/')->with('error-message', __('auth.insufficient_permission'));
         }
 
         return $next($request);

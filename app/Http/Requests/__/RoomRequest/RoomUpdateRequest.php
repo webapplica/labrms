@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\RoomRequest;
 
-use App\Models\Room;
+use App\Models\Room\Room;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RoomUpdateRequest extends FormRequest
@@ -26,7 +26,7 @@ class RoomUpdateRequest extends FormRequest
     {
         $room = Room::findOrFail($this->room);
         return [
-            'name' => 'required|exists:rooms,name,' . $room->name . ',name',
+            'name' => 'required|unique:rooms,name,' . $room->name . ',name',
             'description' => 'nullable|max:256',  
         ];
     }

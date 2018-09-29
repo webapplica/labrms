@@ -4,7 +4,7 @@ namespace App\Models\Room;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Catagory extends Model
+class Category extends Model
 {
     protected $table = 'room_categories';
 	protected $primaryKey = 'id';
