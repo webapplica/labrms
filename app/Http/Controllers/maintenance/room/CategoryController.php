@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance\Rooms;
+namespace App\Http\Controllers\Maintenance\Room;
 
 use Illuminate\Http\Request;
 use App\Models\Room\Category;
 use App\Http\Controllers\Controller;
+use App\Commands\Room\Category\AddCategory;
+use App\Commands\Room\Category\UpdateCategory;
+use App\Http\Requests\RoomCategoryRequest\CategoryStoreRequest;
+use App\Http\Requests\RoomCategoryRequest\CategoryUpdateRequest;
 
-class RoomCategoryController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +23,7 @@ class RoomCategoryController extends Controller
             return datatables(Category::all())->toJson();
         }
 
-        return view('room.category.index');
+        return view('maintenance.room.category.index');
     }
 
     /**
@@ -29,7 +33,7 @@ class RoomCategoryController extends Controller
      */
     public function create(Request $request)
     {
-        return view('room.category.create');
+        return view('maintenance.room.category.create');
     }
 
     /**
@@ -38,21 +42,10 @@ class RoomCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryStoreRequest $request)
     {
-        Category::create($request);
+        $this->dispatch(new AddCategory($request));
         return redirect('room/category')->with('success-message', __('tasks.success'));
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request, $id)
-    {
-        return view('room.category.show');
     }
 
     /**
@@ -63,7 +56,8 @@ class RoomCategoryController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        return view('room.category.edit');
+        $category = Category::findOrFail($id);
+        return view('maintenance.room.category.edit', compact('category'));
     }
 
     /**
@@ -73,9 +67,9 @@ class RoomCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryUpdateRequest $request, $id)
     {
-        Category::findOrFail($id)->update($request);
+        $this->dispatch(new UpdateCategory($request, $id));
         return redirect('room/category')->with('success-message', __('tasks.success'));
     }
 

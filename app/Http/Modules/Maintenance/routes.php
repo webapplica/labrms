@@ -21,6 +21,7 @@ class Routes
             // });
 
             Route::namespace('room')->group(function() {
+                Route::resource('room/category','CategoryController');
                 Route::resource('room','RoomController');
             });
 
@@ -34,7 +35,6 @@ class Routes
             // Route::resource('semester','SemesterController');
             // Route::resource('receipt', 'ReceiptsController');
             
-            // Route::resource('room/category','RoomCategoryController');
             // Route::resource('room/log','RoomLogController');
             // Route::resource('room/scheduling','RoomSchedulingController');
             // Route::resource('lend','LentItemsController');
