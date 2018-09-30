@@ -1,51 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid col-md-12 panel panel-body table-responsive">
+<div class="container-fluid panel panel-body table-responsive">
 	<legend>
-		<h3 class="text-muted">Laboratory Room Categories</h3>
+		<h3 class="text-muted">Unit</h3>
 	</legend>
 
 	<table 
-		class="table table-hover table-striped table-bordered" 
-		id="room-table"
-		data-csrf-token="{{ csrf_token() }}"
-		data-base-url="{{ url('room/category') }}">
+		class="table table-striped table-hover table-bordered" 
+		id='unit-table'
+		data-base-url="{{ url('unit') }}"
+		data-create-url="{{ url('unit/create') }}">
 		<thead>
-			<th class=>ID</th>
-			<th class=>Name</th>
-			<th class="no-sort"></th>
+			<th class="col-sm-1">ID</th>
+			<th class="col-sm-1">Name</th>
+			<th class="col-sm-1">Abbreviation</th>
+			<th class="col-sm-1">Description</th>
+			<th class="no-sort col-sm-1"></th>
 		</thead>
 	</table>
 </div>
-@endsection
+@stop
 
 @section('scripts-include')
 <script type="text/javascript">
 	$(document).ready(function () {
-		var table = $('#room-table');
-		var csrf_token = table.data('csrf-token');
+		var table = $('#unit-table');
+		var csrf_token = $('meta[name="csrf-token"]').attr('content');
 		var base_url = table.data('base-url');
-
-
-		var table = $('#room-table').DataTable({
-			serverSide: true,
-			processing: true,
-		    language: {
-		        searchPlaceholder: "Search..."
-		    },
+		var create_url = table.data('create-url');
+		
+	    var dataTable = table.DataTable( {
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
+		    language: {
+		        searchPlaceholder: "Search..."
+		    },
 	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
-	        ajax: "{{ url('room/category') }}",
+	        ajax: "{{ url('unit') }}",
 	        columns: [
 	            { data: "id" },
 	            { data: "name" },
-	            { data: function (callback) {
+	            { data: "abbreviation" },
+	            { data: "description" },
+	            { data: function(callback){
 	            	return `
 						<form method="post" action="` + base_url + '/' + callback.id + `">
 
@@ -66,9 +68,11 @@
 	        ],
 	    } );
 
-	    $('div.toolbar').html(`
-			<a href="{{ url('room/category/create') }}" class="btn btn-primary">Create</a>
-    	`)
-	} );
-</script>
+	 	$("div.toolbar").html(`
+ 			<a href="` + create_url + `" id="new" class="btn btn-primary">
+ 				Add
+ 			</a>
+		`);
+	})
+</script>	
 @stop

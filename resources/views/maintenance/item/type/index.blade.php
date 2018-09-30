@@ -1,52 +1,58 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid col-md-12 panel panel-body table-responsive">
-	<legend>
-		<h3 class="text-muted">Laboratory Room Categories</h3>
-	</legend>
+<div class="container-fluid panel panel-body  table-responsive">
+
+	<legend><h3 class="text-muted">Item Types</h3></legend>
 
 	<table 
-		class="table table-hover table-striped table-bordered" 
-		id="room-table"
+		class="table table-striped table-bordered" 
+		id='item-type-table'
 		data-csrf-token="{{ csrf_token() }}"
-		data-base-url="{{ url('room/category') }}">
+		data-base-url="{{ url('item/type') }}"
+		data-create-url="{{ url('item/type/create') }}">
+
 		<thead>
-			<th class=>ID</th>
-			<th class=>Name</th>
-			<th class="no-sort"></th>
+			<th>ID</th>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Category</th>
+			<th></th>
 		</thead>
 	</table>
+
 </div>
-@endsection
+@stop
 
 @section('scripts-include')
 <script type="text/javascript">
 	$(document).ready(function () {
-		var table = $('#room-table');
-		var csrf_token = table.data('csrf-token');
+
+		var table = $('#item-type-table');
+		var csrf_token = $('meta[name="csrf-token"]').attr('content');
 		var base_url = table.data('base-url');
+		var create_url = table.data('create-url');
 
-
-		var table = $('#room-table').DataTable({
-			serverSide: true,
-			processing: true,
+    	var dataTable = table.DataTable( {
+			"pageLength": 100,
+	  		select: {
+	  			style: 'single'
+	  		},
 		    language: {
 		        searchPlaceholder: "Search..."
 		    },
-	    	columnDefs:[
-				{ targets: 'no-sort', orderable: false },
-	    	],
 	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
-	        ajax: "{{ url('room/category') }}",
+	        ajax: base_url,
 	        columns: [
 	            { data: "id" },
 	            { data: "name" },
-	            { data: function (callback) {
-	            	return `
+	            { data: "description" },
+	            { data: "category" },
+	            { data: function(callback){
+					return `
 						<form method="post" action="` + base_url + '/' + callback.id + `">
 
 							<input type="hidden" name="_token" value="` + csrf_token + `" />
@@ -61,14 +67,17 @@
 							</button>
 
 						</form>
-	            	`;
-	            } }
+					`;
+				} }
 	        ],
-	    } );
+    	} );
 
-	    $('div.toolbar').html(`
-			<a href="{{ url('room/category/create') }}" class="btn btn-primary">Create</a>
-    	`)
-	} );
+	 	$("div.toolbar").html(`
+ 			<a href="` + create_url + `" id="new" class="btn btn-primary">
+ 				Add New Type
+			</a>
+		`);
+
+	});
 </script>
 @stop

@@ -4,7 +4,7 @@
         <a href="#" class="dropdown-toggle text-capitalize" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <img 
                 class="img"
-                src="{{ Auth::user()->imageUrl }}"
+                src="{{ url(Auth::user()->imageUrl) }}"
                 style="width: 25px; height: 25px; margin-right: 5px;">
 
             {{ Auth::user()->full_name }} <span class="caret"></span>
