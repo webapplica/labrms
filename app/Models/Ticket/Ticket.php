@@ -5,8 +5,8 @@ namespace App\Models\Ticket;
 // use DB;
 // use Auth;
 // use Carbon;
+use App\Models\User;
 use App\Models\Ticket\Tag;
-// use App\Models\User;
 // use App\Models\Room\Room;
 // use App\Models\Item\Item;
 use App\Models\Ticket\Type;
@@ -122,10 +122,15 @@ class Ticket extends Model
 	// 	return $this->belongsTo(User::class, 'user_id', 'id');
 	// }
 
-	// public function staff()
-	// {
-	// 	return $this->belongsTo(User::class, 'staff_id', 'id');
-	// }
+	/**
+	 * Returns the user where the staff_id exists
+	 *
+	 * @return void
+	 */
+	public function staff()
+	{
+		return $this->belongsTo(User::class, 'staff_id', 'id');
+	}
 
 	/**
 	 * Returns relationship with tags table
