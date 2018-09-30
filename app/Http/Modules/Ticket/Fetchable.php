@@ -42,7 +42,7 @@ trait Fetchable
      *
      * @return string
      */
-	protected function getOpenStatus()
+	public function getOpenStatus()
 	{
 		return self::OPEN_STATUS;
 	}
@@ -52,7 +52,7 @@ trait Fetchable
      *
      * @return string
      */
-	protected function getClosedStatus()
+	public function getClosedStatus()
 	{
 		return self::CLOSED_STATUS;
 	}
@@ -62,7 +62,7 @@ trait Fetchable
      *
      * @return string
      */
-	protected function getTransferredStatus()
+	public function getTransferredStatus()
 	{
 		return self::TRANSFERRED_STATUS;
 	}

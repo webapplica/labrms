@@ -5,15 +5,15 @@ namespace App\Models\Ticket;
 // use DB;
 // use Auth;
 // use Carbon;
-// use App\Models\Tag;
+use App\Models\Ticket\Tag;
 // use App\Models\User;
 // use App\Models\Room\Room;
 // use App\Models\Item\Item;
-// use App\Models\Ticket\Type;
+use App\Models\Ticket\Type;
 // use App\Models\Workstation;
-// use App\Http\Modules\Ticket\Mutable;
-// use App\Http\Modules\Ticket\Fetchable;
-// use App\Http\Modules\Ticket\Filterable;
+use App\Http\Modules\Ticket\Mutable;
+use App\Http\Modules\Ticket\Fetchable;
+use App\Http\Modules\Ticket\Filterable;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ticket extends Model
 {
 
-	// use Filterable, Fetchable, Mutable;
+	use Filterable, Fetchable, Mutable;
 
 	const OPEN_STATUS = 'Open';
 	const CLOSED_STATUS = 'Closed';
@@ -36,7 +36,8 @@ class Ticket extends Model
 	// public $undermaintenance = false;
 
 	public $fillable = [
-		'item_id', 'type_id', 'title', 'details', 'author', 'staff_id', 'ticket_id', 'status'
+		'item_id', 'type_id', 'title', 'details', 'author', 'staff_id', 'ticket_id', 'status',
+		'user_id',
 	];
 
 	// public static $rules = array(
@@ -66,8 +67,33 @@ class Ticket extends Model
 	// );
 
 	protected $appends = [
-		'ticket_type_name', 'ticket_code', 'tag_list', 'staff_name', 'human_readable_date'
+		'type_name', 'staff_name', 'human_readable_date'
 	];
+
+	/**
+	 * Returns the type the ticket currently have
+	 *
+	 * @return string
+	 */
+	public function getTypeNameAttribute()
+	{
+		return $this->type->name ?? 'Not Set';
+	}
+
+	/**
+	 * Get the fullname of staff who is currently assigned to the ticket
+	 * Returns none if there are no staff currently assigned
+	 *
+	 * @return string
+	 */
+	public function getStaffNameAttribute()
+	{
+		if( isset($this->staff) && $this->staff->count() > 0) {
+			return $this->staff->firstname . " " . $this->staff->middlename . " " . $this->staff->lastname;
+		}
+
+		return 'None';
+	}
 
 	/**
 	 * Returns the parsed for human date format
@@ -78,41 +104,6 @@ class Ticket extends Model
 	{
 		return Carbon::parse($this->date)->diffForHumans();
 	}
-
-	/**
-	 * Get the fullname of staff who is currently assigned to the ticket
-	 * Returns none if there are no staff currently assigned
-	 *
-	 * @return string
-	 */
-	// public function getStaffNameAttribute()
-	// {
-	// 	if( isset($this->staff) && $this->staff->count() > 0) {
-	// 		return $this->staff->firstname . " " . $this->staff->middlename . " " . $this->staff->lastname;
-	// 	}
-
-	// 	return 'None';
-	// }
-
-	/**
-	 * List all the tags the ticket currently have
-	 *
-	 * @return string
-	 */
-	// public function getTagNamesAttribute()
-	// {
-	// 	return $this->tags->pluck('name');
-	// }
-
-	/**
-	 * Returns the type the ticket currently have
-	 *
-	 * @return string
-	 */
-	// public function getTicketTypeNameAttribute()
-	// {
-	// 	return $this->type->name ?? 'Not Set';
-	// }
 
 	/**
 	 * Generate a ticket code based on the current year and month
@@ -135,20 +126,30 @@ class Ticket extends Model
 	// 	return $this->belongsTo(User::class, 'staff_id', 'id');
 	// }
 
-	// public function type()
-	// {
-	// 	return $this->belongsTo(Type::class, 'type_id', 'id');
-	// }
+	/**
+	 * Returns relationship with tags table
+	 *
+	 * @return void
+	 */
+	public function type()
+	{
+		return $this->belongsTo(Type::class, 'type_id', 'id');
+	}
 
 	// public function item()
 	// {
 	// 	return $this->belongsToMany(Item::class, 'item_ticket', 'item_id', 'ticket_id');
 	// }
 
-	// public function tags()
-	// {
-	// 	return $this->belongsToMany(Tag::class, 'tag_ticket', 'tag_id',' ticket_id');
-	// }
+	/**
+	 * Returns relationship with tags table
+	 *
+	 * @return void
+	 */
+	public function tags()
+	{
+		return $this->belongsToMany(Tag::class, 'tag_ticket',' ticket_id', 'tag_id');
+	}
 
 	// public function room()
 	// {

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Ticketing;
 
 use App\Models\User;
 use App\Models\Ticket\Type;
-use App\Models\Ticket\Ticket;
 use Illuminate\Http\Request;
+use App\Models\Ticket\Ticket;
 use App\Http\Controllers\Controller;
+use App\Commands\Ticket\CreateTicket;
+use App\Http\Requests\TicketRequest\TicketStoreRequest;
 
 class TicketController extends Controller 
 {
@@ -34,10 +36,8 @@ class TicketController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		$users = User::staffExcept(User::admin()->pluck('id'))->get();
-		$types = Type::pluck('name', 'id');
-
-		return view('ticket.create', compact('users', 'types'));
+		$types = Type::fetchOnly(['Complaint', 'Maintenance', 'Incident'])->pluck('id', 'name');
+		return view('ticket.create', compact('types'));
 	}
 
 
@@ -46,7 +46,7 @@ class TicketController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function store(Request $request)
+	public function store(TicketStoreRequest $request)
 	{
 		$this->dispatch(new CreateTicket($request));
 		return redirect('ticket')->with('success-message', __('tasks.success'));

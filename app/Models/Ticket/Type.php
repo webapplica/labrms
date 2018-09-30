@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models\Ticket;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,8 +14,8 @@ class Type extends Model{
    /**
     * Filters the query by name
     *
-    * @param [type] $query
-    * @param [type] $value
+    * @param Builder $query
+    * @param string $value
     * @return void
     */
    public function scopeName($query, $value)
@@ -39,6 +39,18 @@ class Type extends Model{
         return [
             $upperCaseAll, $upperCaseFirst, $default
         ];
+   }
+
+   /**
+    * Filter query by provided names
+    *
+    * @param Builder $query
+    * @param array $arrayList
+    * @return void
+    */
+   public function scopeFetchOnly($query, $arrayList)
+   {
+       return $query->whereIn('name', $arrayList);
    }
 
 }

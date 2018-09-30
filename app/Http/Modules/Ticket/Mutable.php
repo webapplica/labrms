@@ -21,7 +21,7 @@ trait Mutable
 	 * 
 	 * @return object
 	 */
-	protected function parentIsNull()
+	public function parentIsNull()
 	{
 		$this->parent_id = null;
 
@@ -35,7 +35,7 @@ trait Mutable
 	 * @param string $type
 	 * @return object
 	 */
-	protected function setTypeTo($type)
+	public function setTypeTo($type)
 	{
 		$this->type_id = Type::firstOrCreate([
 			'name' => 'Maintenance'
@@ -49,7 +49,7 @@ trait Mutable
 	 * 
 	 * @return object
 	 */
-	protected function setStatusToOpen()
+	public function setStatusToOpen()
 	{
 		$this->status = self::OPEN_STATUS;
 
@@ -61,7 +61,7 @@ trait Mutable
 	 * 
 	 * @return object
 	 */
-	protected function setStatusToClosed()
+	public function setStatusToClosed()
 	{
 		$this->status = self::CLOSED_STATUS;
 
@@ -73,7 +73,7 @@ trait Mutable
 	 * 
 	 * @return object
 	 */
-	protected function setStatusToTransferred()
+	public function setStatusToTransferred()
 	{
 		$this->status = self::TRANSFERRED_STATUS;
 
@@ -85,7 +85,7 @@ trait Mutable
 	 * 
 	 * @return object
 	 */
-	protected function assignToCurrentUser()
+	public function assignToCurrentUser()
 	{
 		$this->staff_id = Auth::user()->id;
 
@@ -98,7 +98,7 @@ trait Mutable
 	 * @param string $details
 	 * @return object
 	 */
-	protected function withDetails($details)
+	public function withDetails($details)
 	{
 		$this->details = $details;
 
@@ -111,7 +111,7 @@ trait Mutable
 	 * @param string $title
 	 * @return object
 	 */
-	protected function withTitle($title)
+	public function withTitle($title)
 	{
 		$this->title = $title;
 
