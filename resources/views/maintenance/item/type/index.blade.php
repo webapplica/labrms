@@ -5,7 +5,12 @@
 
 	<legend><h3 class="text-muted">Item Types</h3></legend>
 
-	<table class="table table-striped table-bordered" id='item-type-table'>
+	<table 
+		class="table table-striped table-bordered" 
+		id='item-type-table'
+		data-csrf-token="{{ csrf_token() }}"
+		data-base-url="{{ url('item/type') }}"
+		data-create-url="{{ url('item/type/create') }}">
 
 		<thead>
 			<th>ID</th>
@@ -23,7 +28,12 @@
 <script type="text/javascript">
 	$(document).ready(function () {
 
-    	var table = $('#item-type-table').DataTable( {
+		var table = $('#item-type-table');
+		var csrf_token = $('meta[name="csrf-token"]').attr('content');
+		var base_url = table.data('base-url');
+		var create_url = table.data('create-url');
+
+    	var dataTable = table.DataTable( {
 			"pageLength": 100,
 	  		select: {
 	  			style: 'single'
@@ -35,7 +45,7 @@
 						    "<'row'<'col-sm-12'tr>>" +
 						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
 			"processing": true,
-	        ajax: "{{ url('item/type') }}",
+	        ajax: base_url,
 	        columns: [
 	            { data: "id" },
 	            { data: "name" },
@@ -43,23 +53,27 @@
 	            { data: "category" },
 	            { data: function(callback){
 					return `
-						<form method="post" action="{{ url('item/type') }}/` + callback.id + `">
-							<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-							<input type="hidden" name="_method" value="DELETE" />
-							<a href="{{ url('item/type') }}/`+ callback.id +`/edit" class="edit btn btn-sm btn-default">
+						<form method="post" action="` + base_url + '/' + callback.id + `">
+
+							<input type="hidden" name="_token" value="` + csrf_token + `" />
+							<input type="hidden" name="_method" value="delete" />
+
+							<a href="` + base_url + '/' + callback.id + `/edit" class="btn btn-default">
 								Update
 							</a>
-							<button data-id="`+ callback.id +`" class="btn-delete btn btn-sm btn-danger">
+
+							<button type="submit" data-id="` + callback.id + `" class="remove-btn btn btn-danger">
 								Remove
 							</button>
-						</form
+
+						</form>
 					`;
 				} }
 	        ],
     	} );
 
 	 	$("div.toolbar").html(`
- 			<a href="{{ url('item/type/create') }}" id="new" class="btn btn-primary">
+ 			<a href="` + create_url + `" id="new" class="btn btn-primary">
  				Add New Type
 			</a>
 		`);

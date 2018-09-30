@@ -16,9 +16,9 @@ class Routes
             Route::resource('faculty','FacultyController', ['except' => array('show')]);
             // Route::resource('inventory/software','SoftwareInventoryController');
 
-            // Route::namespace('item')->group(function() {
-            //     Route::resource('item/type','TypeController');
-            // });
+            Route::namespace('item')->prefix('item')->group(function() {
+                Route::resource('type','TypeController');
+            });
 
             Route::resource('unit','UnitController', ['except' => array('show')] );
 

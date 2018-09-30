@@ -5,27 +5,23 @@ namespace App\Commands\Item\Type;
 use App\Models\Item\Type;
 use Illuminate\Http\Request;
 
-class UpdateType
+class AddType
 {
-	protected $type;
 	protected $request;
 
-	public function __construct(Request $request, $id)
+	public function __construct(Request $request)
 	{
 		$this->request = $request;
-		$this->type = Type::findOrFail($id);
 	}
 
-	public function handle()
+	public function handle(Type $type)
 	{
 		$request = $this->request;
-		$this->type->update([
+		$type->create([
 			'name' => $request->name,
 			'description' => $request->description,
 			'category' => $request->category,
 
 		]);
 	}
-
-
 }

@@ -2,7 +2,9 @@
 
 @section('content')
 <div class="container-fluid col-md-offset-3 col-md-6 panel panel-body ">
-    <legend><h3 class="text-muted">Item Types</h3></legend>
+    <legend>
+        <h3 class="text-muted">Item Type: {{ $type->name }}</h3>
+    </legend>
     
     @include('errors.alert')
 
@@ -20,13 +22,13 @@
       'id' => 'item-type-form'
     ]) }}
 
-    @include('maintenance.item.type.partials.form')
+        @include('maintenance.item.type.partials.form')
 
-    <div class="form-group">
-        <button class="btn btn-primary btn-flat btn-block btn-lg" type="submit" style="padding:10px;">
-            Update
-        </button>
-    </div>
+        <div class="form-group">
+            <button class="btn btn-primary btn-flat btn-block btn-lg" type="submit" style="padding:10px;">
+                Update
+            </button>
+        </div>
 
     {{ Form::close() }}
 </div>

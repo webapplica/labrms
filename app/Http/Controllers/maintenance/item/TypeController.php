@@ -4,16 +4,15 @@ namespace App\Http\Controllers\Maintenance\Item;
 
 use App\Models\Item\Type;
 use Illuminate\Http\Request;
-use App\Commands\Item\Type\NewType;
-use App\Commands\Item\Type\UpdateType;
+use App\Commands\Item\Type\AddType;
 use App\Http\Controllers\Controller;
+use App\Commands\Item\Type\UpdateType;
 use App\Http\Requests\ItemTypeRequest\TypeStoreRequest;
 use App\Http\Requests\ItemTypeRequest\TypeUpdateRequest;
 
 class TypeController extends Controller 
 {
-	private $viewBasePath = 'maintenance.item.type.';
-
+	
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -25,7 +24,7 @@ class TypeController extends Controller
 			return datatables(Type::all())->toJson();
 		}
 
-		return view( $this->viewBasePath . 'index');
+		return view('maintenance.item.type.index');
 	}
 
 	/**
@@ -35,7 +34,7 @@ class TypeController extends Controller
 	 */
 	public function create(Type $type)
 	{
-		return view( $this->viewBasePath . 'create', compact('type'));
+		return view('maintenance.item.type.create', compact('type'));
 	}
 
 	/**
@@ -45,7 +44,7 @@ class TypeController extends Controller
 	 */
 	public function store(TypeStoreRequest $request)
 	{
-		$this->dispatch(new NewType($request));
+		$this->dispatch(new AddType($request));
 		return redirect('item/type')->with('success-message', __('tasks.success'));
 	}
 
@@ -58,7 +57,7 @@ class TypeController extends Controller
 	public function edit($id)
 	{
 		$type = Type::findOrFail($id);
-		return view( $this->viewBasePath . 'edit', compact('type'));
+		return view('maintenance.item.type.edit', compact('type'));
 	}
 
 	/**

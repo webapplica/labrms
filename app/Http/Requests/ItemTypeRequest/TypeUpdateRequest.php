@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ItemTypeRequest;
 
+use App\Models\Item\Type;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TypeUpdateRequest extends FormRequest
@@ -24,21 +25,11 @@ class TypeUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $args = $this->route()->parameters('id');
+        $type = Type::findOrFail( $args['type'] ?? null );
         return [
-            'name' => 'required|min:2|max:50|unique:item_types,name,'. $this->type .',name',
+            'name' => 'required|min:2|max:50|unique:item_types,name,'. $type->name .',name',
             'description' => 'min:5|max:450'
         ];
-    }
-
-    public function validationData()
-    {
-        if (method_exists($this->route(), 'parameters')) {
-            $this->request->add($this->route()->parameters('id'));
-            $this->query->add($this->route()->parameters('id'));
-
-            return array_merge($this->route()->parameters(), $this->all());
-        }
-
-        return $this->all();
     }
 }
