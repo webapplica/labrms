@@ -4,7 +4,7 @@ namespace App\Http\Requests\FacultyRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FacultyUpdateRequest extends FormRequest
+class FacultyStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,13 @@ class FacultyUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|integer|exists:faculties,id',
             'firstname' => 'required|between:2,100|string',
             'middlename' => 'min:2|max:50|string',
             'lastname' => 'required|min:2|max:50|string',
             'contact_number' => 'size:11|string',
             'email' => 'email',
             'suffix' => 'max:3',
+            'title' => 'nullable|max:30',
         ];
     }
 }

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid col-md-12 panel panel-body table-responsive">
 	<legend>
-		<h3 class="text-muted">Laboratory Room</h3>
+		<h3 class="text-muted">Laboratory Room Categories</h3>
 	</legend>
 
 	<table 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +18,11 @@ class Faculty extends Model
 	protected $hidden = ['password','remember_token'];
 	protected $appends = ['full_name'];
 
+	/**
+	 * Return formatted fullname attribute
+	 *
+	 * @return void
+	 */
 	public function getFullNameAttribute()
 	{
 		return $this->lastname . ', ' . $this->firstname . trim($this->middlename);

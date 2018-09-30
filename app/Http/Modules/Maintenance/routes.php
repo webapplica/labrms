@@ -13,7 +13,7 @@ class Routes
 
             // Route::resource('academicyear','AcademicYearController');
             // Route::resource('event','SpecialEventController');
-            // Route::resource('faculty','FacultiesController');
+            Route::resource('faculty','FacultyController', ['except' => array('show')]);
             // Route::resource('inventory/software','SoftwareInventoryController');
 
             // Route::namespace('item')->group(function() {

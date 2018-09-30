@@ -4,7 +4,7 @@ namespace App\Http\Requests\FacultyRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FacultyStoreRequest extends FormRequest
+class FacultyUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,6 +30,7 @@ class FacultyStoreRequest extends FormRequest
             'contact_number' => 'size:11|string',
             'email' => 'email',
             'suffix' => 'max:3',
+            'title' => 'nullable|max:30',
         ];
     }
 }

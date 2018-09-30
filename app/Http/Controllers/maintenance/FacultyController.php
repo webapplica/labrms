@@ -5,12 +5,18 @@ namespace App\Http\Controllers\Maintenance;
 use App\Models\Faculty;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\View;
+use App\Commands\Faculty\UpdateFaculty;
+use App\Commands\Faculty\RegisterFaculty;
 use App\Http\Requests\FacultyRequest\FacultyStoreRequest;
-use App\Http\Requests\FacultyRequest\FacultyUpdateRequest;
+use App\Http\Requests\FacultyRequest\FacultyUpdateRequest; 
 
 class FacultyController extends Controller
 {
-
+    
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         View::share('title', 'Faculty');
@@ -24,10 +30,10 @@ class FacultyController extends Controller
     public function index(Request $request)
     {
         if($request->ajax()) {
-            return datatables( Faculty::all() )->toJson();
+            return datatables(Faculty::all())->toJson();
         }
 
-        return view('faculty.index');
+        return view('maintenance.faculty.index');
     }
 
     /**
@@ -37,7 +43,7 @@ class FacultyController extends Controller
      */
     public function create()
     {
-        return view('faculty.create');
+        return view('maintenance.faculty.create');
     }
 
     /**
@@ -48,7 +54,7 @@ class FacultyController extends Controller
      */
     public function store(FacultyStoreRequest $request)
     {
-        Faculty::create($request);
+        $this->dispatch(new RegisterFaculty($request));
         return redirect('faculty')->with('success-message', __('tasks.success'));
     }
 
@@ -60,8 +66,8 @@ class FacultyController extends Controller
      */
     public function edit($id)
     {
-        return view('faculty.edit')
-                ->with('faculty', Faculty::findOrFail($id));
+        $faculty = Faculty::findOrFail($id);
+        return view('maintenance.faculty.edit', compact('faculty'));
     }
 
     /**
@@ -73,7 +79,7 @@ class FacultyController extends Controller
      */
     public function update(FacultyUpdateRequest $request, $id)
     {
-        $faculty = Faculty::findOrFail($id)->update($request);
+        $this->dispatch(new UpdateFaculty($request, $id));
         return redirect('faculty')->with('success-message', __('tasks.success'));
     }
 
