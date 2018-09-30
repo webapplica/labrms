@@ -16,10 +16,15 @@ class Ticket
     {
         Route::middleware(['auth'])->namespace('ticketing')->group(function () {
             Route::resource('ticket','TicketController');
-            // Route::get('ticket/workstation/{id}','Workstation');
-            // Route::get('ticket/room/{id}','RoomsController@getRoomTickets');
-            Route::post('ticket/{id}/transfer','TicketController@transfer');
-            Route::post('ticket/{id}/reopen','TicketController@reopen');
+            
+            Route::get('ticket/{id}/action', 'ActionController@create');
+            Route::post('ticket/{id}/action', 'ActionController@store');
+
+            // Route::get('ticket/{id}/transfer', 'TransferController');
+            // Route::post('ticket/{id}/transfer', 'TransferController');
+
+            // Route::get('ticket/{id}/action', 'ActionController');
+            // Route::post('ticket/{id}/action', 'ActionController');
         });
     }
 }

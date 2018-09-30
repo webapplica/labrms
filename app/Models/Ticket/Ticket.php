@@ -37,7 +37,7 @@ class Ticket extends Model
 
 	public $fillable = [
 		'item_id', 'type_id', 'title', 'details', 'author', 'staff_id', 'ticket_id', 'status',
-		'user_id',
+		'user_id', 'main_id', 'parent_id'
 	];
 
 	// public static $rules = array(

@@ -31,31 +31,33 @@
         data-reopen-url="{{ url('ticket/' . $ticket->id . '/reopen') }}"
         data-reopen-text="{{ __('Reopen') }}"
         >
+        
         <thead>
             <tr rowspan="2">
-                <th class="text-left" colspan="4">Title:  
+                <th class="text-left" colspan="3">Title:  
                     <span style="font-weight: normal">{{ $ticket->title }}</span> 
                 </th>
-                <th class="text-left" colspan="4">Type:  
+                <th class="text-left" colspan="3">Type:  
                     <span style="font-weight: normal">{{ $ticket->type->name }}</span> 
                 </th>
             </tr>
 
             <tr rowspan="2">
-                <th class="text-left" colspan="4">Details:  
+                <th class="text-left" colspan="3">Details:  
                     <span style="font-weight: normal">{{ $ticket->details }}</span>  
                 </th>
-                <th class="text-left" colspan="4"> Author:
+                <th class="text-left" colspan="3"> Author:
                     <span style="font-weight: normal">{{ $ticket->author }}</span>  
                 </th>
             </tr>
 
             <tr>
-                <th>ID</th>
-                <th>Details</th>
-                <th>Staff Assigned</th>
-                <th>Date Created</th>
-                <th>Status</th>
+                <th class="col-md-1">ID</th>
+                <th class="col-md-3">Title</th>
+                <th class="col-md-3">Details</th>
+                <th class="col-md-1">Staff Assigned</th>
+                <th class="col-md-1">Date Created</th>
+                <th class="col-md-1">Status</th>
               </tr>
         </thead>
     </table>
@@ -84,6 +86,7 @@
             ajax: base_url,
             columns: [
                 { data: "id" },
+                { data: "title" },
                 { data: "details" },
                 { data: "staff_name"},
                 { data: "human_readable_date"},
