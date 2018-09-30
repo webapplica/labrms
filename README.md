@@ -1,6 +1,6 @@
 # Laboratory Resource Management System
 
-LaRMS is a Resource Management System made specifically for the Laboratory Operations Office of CCIS. It includes the following sub systems:
+Labrms is a Resource Management System made specifically for the Laboratory Operations Office of CCIS. It includes the following sub systems:
 
   - Inventory Management
   - Ticketing Monitoring
