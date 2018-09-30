@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container-fluid panel panel-body table-responsive">
-	<legend>Faculty</legend>
+	<legend>
+		<h3 class="text-muted">Faculty</h3>
+	</legend>
+
 	<table 
 		class="table table-striped table-hover table-bordered" 
 		id='faculty-table'

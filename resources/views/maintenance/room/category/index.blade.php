@@ -52,7 +52,7 @@
 							<input type="hidden" name="_token" value="` + csrf_token + `" />
 							<input type="hidden" name="_method" value="delete" />
 
-							<a href="` + base_url + '/' + callback.id + `/edit" class="btn btn-warning">
+							<a href="` + base_url + '/' + callback.id + `/edit" class="btn btn-default">
 								Update
 							</a>
 
