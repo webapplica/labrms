@@ -28,6 +28,9 @@ class Ticket
 
             Route::get('ticket/{id}/close', 'ClosureController@create');
             Route::post('ticket/{id}/close', 'ClosureController@store');
+            
+            Route::get('ticket/{id}/reopen', 'ReopenController@create');
+            Route::post('ticket/{id}/reopen', 'ReopenController@store');
         });
     }
 }
