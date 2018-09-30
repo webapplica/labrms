@@ -5,12 +5,11 @@ namespace App\Http\Controllers\ticketing;
 use Illuminate\Http\Request;
 use App\Models\Ticket\Ticket;
 use App\Http\Controllers\Controller;
-use App\Commands\Ticket\ActionTicket;
-use App\Http\Requests\TicketRequest\TicketActionStoreRequest;
+use App\Commands\Ticket\ResolveTicket;
+use App\Http\Requests\TicketRequest\TicketResolveStoreRequest;
 
-class ActionController extends Controller
+class ResolutionController extends Controller
 {
-
     /**
      * Show the form for creating a new resource.
      *
@@ -19,7 +18,7 @@ class ActionController extends Controller
     public function create(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
-        return view('ticket.action.create', compact('ticket'));
+        return view('ticket.resolve.create', compact('ticket'));
     }
 
     /**
@@ -28,9 +27,9 @@ class ActionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(TicketActionStoreRequest $request, $id)
+    public function store(TicketResolveStoreRequest $request, $id)
     {
-        $this->dispatch(new ActionTicket($request, $id));
+        $this->dispatch(new ResolveTicket($request, $id));
         return redirect('ticket/' . $id)->with('success-message', __('tasks.success'));
     }
 }
