@@ -67,6 +67,16 @@ trait Fetchable
 		return self::TRANSFERRED_STATUS;
 	}
 
+    /**
+     * Returns the equivalent status for resolved ticket
+     *
+     * @return string
+     */
+	public function getResolvedStatus()
+	{
+		return self::RESOLVED_STATUS;
+	}
+
 	/**
 	 * Returns the table linked to the ticket. Returns null if
 	 * the tag cannot be found on any of the tables

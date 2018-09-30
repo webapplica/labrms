@@ -14,6 +14,7 @@ use App\Models\Ticket\Type;
 use App\Http\Modules\Ticket\Mutable;
 use App\Http\Modules\Ticket\Fetchable;
 use App\Http\Modules\Ticket\Filterable;
+use App\Http\Modules\Ticket\Questionable;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ticket extends Model
 {
 
-	use Filterable, Fetchable, Mutable;
+	use Filterable, Fetchable, Mutable, Questionable;
 
 	const OPEN_STATUS = 'Open';
 	const CLOSED_STATUS = 'Closed';
