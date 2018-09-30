@@ -1,9 +1,9 @@
 # Laboratory Resource Management System
 
-LaRMS is a Resource Management System made specifically for the Laboratory Operations Office of the developers current company. It includes the following subsystems:
+LaRMS is a Resource Management System made specifically for the Laboratory Operations Office of CCIS. It includes the following sub systems:
 
-  - Inventory
-  - Ticketing
+  - Inventory Management
+  - Ticketing Monitoring
   - Reservation
 
 # Current Features
@@ -17,7 +17,7 @@ LaRMS is a Resource Management System made specifically for the Laboratory Opera
 LabRMS uses a number of open source projects to work properly:
 
 * Laravel - PHP Framework
-* [JQuery] - Javascript library
+* [Jquery] - Javascript library
 * Bootstrap - Mobile responsive front-end
 * Backpack.io -  backup and restore modules
 
@@ -25,7 +25,7 @@ Other packages and plugins are credited to their respective owners.
 
 ### Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) v4+ to run.
+Labrms requires a web server with php 7.1+ and mysql to start
 
 Install the dependencies and devDependencies and start the server.
 
@@ -115,14 +115,6 @@ initial accounts:
   - php artisan routes:cache
 
 ```
-
-### Plugins
-
-LabRMS is currently extended with the following plugins. Instructions on how to use them in your own application are linked below.
-
-| Plugin | README |
-| ------ | ------ |
-
 
 ### Development
 
