@@ -15,7 +15,30 @@
 		      
 	@include('errors.alert')
 
-	{{ Form::open(['method' => 'post', 'url' => url('ticket/' . $ticket->id . '/action'),  'id' => 'ticket-form']) }}
+	{{ Form::open(['method' => 'post', 'url' => url('ticket/' . $ticket->id . '/transfer'),  'id' => 'ticket-form']) }}
+
+		<div class="form-group">
+			{{ Form::label('staff', 'Staff') }}
+			<select
+				name="staff"
+				class="form-control"
+				>
+				<option>None</option>
+
+				@foreach($users as $user)
+					<option 
+						value="{{ $user->id }}">
+					@if($user->id == old('staff'))
+						selected
+					@endif
+						{{ $user->firstname_first }}
+					</option>
+
+				@endforeach
+		</select>
+
+			<p class="text-info" style="font-size: 12px;">Set this field to whom you want to transfer the ticket to</p>
+		</div>
 
 		<div class="form-group">
 			{{ Form::label('subject', 'Subject') }}

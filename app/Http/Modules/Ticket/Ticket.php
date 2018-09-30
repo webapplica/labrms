@@ -20,8 +20,8 @@ class Ticket
             Route::get('ticket/{id}/action', 'ActionController@create');
             Route::post('ticket/{id}/action', 'ActionController@store');
 
-            // Route::get('ticket/{id}/transfer', 'TransferController');
-            // Route::post('ticket/{id}/transfer', 'TransferController');
+            Route::get('ticket/{id}/transfer', 'TransferController@create');
+            Route::post('ticket/{id}/transfer', 'TransferController@store');
 
             Route::get('ticket/{id}/resolve', 'ResolutionController@create');
             Route::post('ticket/{id}/resolve', 'ResolutionController@store');

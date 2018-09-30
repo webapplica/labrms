@@ -85,6 +85,7 @@ trait AccountRoles
 	{
 		return self::$adminId;
 	}
+	
 	/**
 	 * Checks if the access level belongs to admin
 	 * 
@@ -94,6 +95,20 @@ trait AccountRoles
 	public function scopeAdmin($query)
 	{
 		return $query->where('accesslevel', '=', 0);
+	}
+	
+	/**
+	 * Filter the query where the user is a staff except the 
+	 * given list of array
+	 *
+	 * @param Builder $query
+	 * @param array $array
+	 * @return void
+	 */
+	public function scopeStaffExcept($query, array $array)
+	{
+		return $query->whereNotIn('id', $array)
+				->whereIn('accesslevel', $this->getStaffIds());
 	}
 
 	/**
