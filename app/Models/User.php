@@ -54,7 +54,7 @@ class User extends \Eloquent implements Authenticatable
 	];
 
 	protected $appends = [
-		'full_name', 'image_url', 'access_type', 'status_name'
+		'full_name', 'image_url', 'access_type', 'status_name', 'firstname_first'
 	];
 
 	private static $avatarUrl = [
@@ -65,7 +65,7 @@ class User extends \Eloquent implements Authenticatable
 		4 => 'images/logo/Student/student-logo-16.png',
 	];
 
-	protected static function getAvatarUrl($id)
+	public static function getAvatarUrl($id)
 	{
 		return isset(self::$avatarUrl[$id]) ? self::$avatarUrl[$id] : 'None';
 	}
@@ -73,6 +73,11 @@ class User extends \Eloquent implements Authenticatable
 	public function getFullNameAttribute()
 	{
 		return  $this->lastname . ', ' . $this->firstname . ' ' . trim($this->middlename);
+	}
+
+	public function getFirstNameFirstAttribute()
+	{
+		return  $this->firstname . ' ' . $this->lastname;
 	}
 
 	public function getAccessTypeAttribute()
