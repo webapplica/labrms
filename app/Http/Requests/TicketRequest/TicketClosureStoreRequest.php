@@ -5,7 +5,7 @@ namespace App\Http\Requests\TicketRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
-class TicketResolveStoreRequest extends FormRequest
+class TicketClosureStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

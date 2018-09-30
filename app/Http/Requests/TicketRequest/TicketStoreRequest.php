@@ -24,7 +24,7 @@ class TicketStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'subject' => 'required|max:256|string',
+            'subject' => 'required|max:100|string',
             'details' => 'required|max:256|string',
             'type' => 'required|exists:ticket_types,name',
             'author' => 'max:100'

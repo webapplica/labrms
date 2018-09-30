@@ -4,18 +4,18 @@
 <div class="container-fluid col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 panel panel-body panel-padding">
 
 	<legend>
-		<h3 class="text-muted">Ticket {{ $ticket->title }}: Resolve</h3>
+		<h3 class="text-muted">Ticket {{ $ticket->title }}: Close</h3>
 	</legend>
 
 	<ul class="breadcrumb">
 		<li><a href="{{ url('ticket') }}">Ticket</a></li>
 		<li><a href="{{ url('ticket/' . $ticket->id) }}">{{ $ticket->title }}</a></li>
-		<li class="active">Action</li>
+		<li class="active">Close</li>
 	</ul>
 		      
 	@include('errors.alert')
 
-	{{ Form::open(['method' => 'post', 'url' => url('ticket/' . $ticket->id . '/resolve'),  'id' => 'ticket-form']) }}
+	{{ Form::open(['method' => 'post', 'url' => url('ticket/' . $ticket->id . '/close'),  'id' => 'ticket-form']) }}
 
 		<div class="form-group">
 			{{ Form::label('subject', 'Subject') }}

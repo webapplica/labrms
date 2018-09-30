@@ -29,7 +29,7 @@ class TicketActionStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'subject' => 'required|max:256|string',
+            'subject' => 'required|max:100|string',
             'details' => 'required|max:256|string',
         ];
     }

@@ -25,6 +25,9 @@ class Ticket
 
             Route::get('ticket/{id}/resolve', 'ResolutionController@create');
             Route::post('ticket/{id}/resolve', 'ResolutionController@store');
+
+            Route::get('ticket/{id}/close', 'ClosureController@create');
+            Route::post('ticket/{id}/close', 'ClosureController@store');
         });
     }
 }
