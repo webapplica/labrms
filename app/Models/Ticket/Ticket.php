@@ -5,8 +5,8 @@ namespace App\Models\Ticket;
 // use DB;
 // use Auth;
 // use Carbon;
+use App\Models\User;
 use App\Models\Ticket\Tag;
-// use App\Models\User;
 // use App\Models\Room\Room;
 // use App\Models\Item\Item;
 use App\Models\Ticket\Type;
@@ -14,6 +14,7 @@ use App\Models\Ticket\Type;
 use App\Http\Modules\Ticket\Mutable;
 use App\Http\Modules\Ticket\Fetchable;
 use App\Http\Modules\Ticket\Filterable;
+use App\Http\Modules\Ticket\Questionable;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ticket extends Model
 {
 
-	use Filterable, Fetchable, Mutable;
+	use Filterable, Fetchable, Mutable, Questionable;
 
 	const OPEN_STATUS = 'Open';
 	const CLOSED_STATUS = 'Closed';
@@ -37,7 +38,7 @@ class Ticket extends Model
 
 	public $fillable = [
 		'item_id', 'type_id', 'title', 'details', 'author', 'staff_id', 'ticket_id', 'status',
-		'user_id',
+		'user_id', 'main_id', 'parent_id'
 	];
 
 	// public static $rules = array(
@@ -102,7 +103,7 @@ class Ticket extends Model
 	 */
 	public function getHumanReadableDateAttribute()
 	{
-		return Carbon::parse($this->date)->diffForHumans();
+		return Carbon::parse($this->date)->format('M d Y h:s a');
 	}
 
 	/**
@@ -121,10 +122,15 @@ class Ticket extends Model
 	// 	return $this->belongsTo(User::class, 'user_id', 'id');
 	// }
 
-	// public function staff()
-	// {
-	// 	return $this->belongsTo(User::class, 'staff_id', 'id');
-	// }
+	/**
+	 * Returns the user where the staff_id exists
+	 *
+	 * @return void
+	 */
+	public function staff()
+	{
+		return $this->belongsTo(User::class, 'staff_id', 'id');
+	}
 
 	/**
 	 * Returns relationship with tags table

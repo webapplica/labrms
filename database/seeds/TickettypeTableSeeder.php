@@ -16,7 +16,7 @@ class TicketTypeTableSeeder extends Seeder {
 
 	    App\TicketType::insert(array(
 	    	[ 'name'=>'Complaint'],
-			[ 'name'=>'Action Taken'],
+			[ 'name'=>'Action'],
 			[ 'name'=>'Transfer'],
 			[ 'name'=>'Maintenance'],
 			[ 'name'=>'Lent'],

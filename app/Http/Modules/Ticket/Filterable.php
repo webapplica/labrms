@@ -115,5 +115,18 @@ trait Filterable
 		return $query->whereHas('room', function($query) use ($id) {
 			$query->where('id', '=', $id);
 		});
-	}
+    }
+    
+    /**
+     * Filters result which has link to the id specified
+     *
+     * @param Builder $query
+     * @param int $id
+     * @return void
+     */
+    public function scopeRelatedTo($query, int $id)
+    {
+        return $query->where('main_id', '=', $id)
+                    ->orWhere('parent_id', '=', $id);
+    }
 }
