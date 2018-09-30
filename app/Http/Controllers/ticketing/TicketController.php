@@ -63,6 +63,7 @@ class TicketController extends Controller
 	public function show(Request $request, $id)
 	{
 		if($request->ajax()) {
+			$id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 			return datatables(Ticket::relatedTo($id)->get())->toJson();
 		}
 
