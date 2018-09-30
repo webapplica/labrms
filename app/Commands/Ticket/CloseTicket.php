@@ -19,13 +19,18 @@ class CloseTicket
         $this->id = $id;
 	}
 
-	public function handle(Ticket $ticket)
+	public function handle()
 	{
         $request = $this->request;
+        $ticket = Ticket::findOrFail($this->id);
+
+        if(! $ticket->isResolvedStatus()) {
+            return;
+        }
 
         DB::beginTransaction();
 
-        Ticket::findOrFail($this->id)->update([
+        $ticket->update([
             'status' => $ticket->getClosedStatus(),
             'closed_by' => Auth::user()->firstname_first
         ]);

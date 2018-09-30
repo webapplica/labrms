@@ -19,13 +19,18 @@ class ActionTicket
         $this->id = $id;
 	}
 
-	public function handle(Ticket $ticket)
+	public function handle()
 	{
         $request = $this->request;
+        $ticket = Ticket::findOrFail($this->id);
+
+        if(! $ticket->isOpenStatus()) {
+            return;
+        }
 
         DB::beginTransaction();
 
-		Ticket::create([
+        Ticket::create([
             'title' => $request->subject,
             'details' => $request->details,
             'author' => Auth::user()->firstname_first,
