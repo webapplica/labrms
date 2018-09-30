@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\UnitRequest;
 
+use App\Models\Unit;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UnitUpdateRequest extends FormRequest
@@ -13,7 +14,7 @@ class UnitUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,10 +24,23 @@ class UnitUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $unit = Unit::findOrFail($this->unit);
         return [
-            'name' => 'required',
+            'name' => 'required|unique:units,name,' . $unit->name . ',name',
             'description' => 'max:50',
             'abbreviation' => 'max:10'
         ];
+    }
+    
+    public function validationData()
+    {
+        if (method_exists($this->route(), 'parameters')) {
+            $this->request->add($this->route()->parameters('id'));
+            $this->query->add($this->route()->parameters('id'));
+
+            return array_merge($this->route()->parameters(), $this->all());
+        }
+
+        return $this->all();
     }
 }

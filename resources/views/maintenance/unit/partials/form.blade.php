@@ -16,7 +16,7 @@
 
 <div class="form-group">
     {{ Form::label('description','Description') }}
-    {{ Form::text('description', isset($unit->description) ? $unit->description : old('description'), [
+    {{ Form::textarea('description', isset($unit->description) ? $unit->description : old('description'), [
       'class' => 'form-control',
       'placeholder' => 'Description'
     ]) }}

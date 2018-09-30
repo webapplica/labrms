@@ -12,10 +12,11 @@ class Unit extends Model
 	public $fillable = ['name', 'description', 'abbreviation'];
 
 	/**
-	 * [scopeName description]
-	 * @param  [type] $query [description]
-	 * @param  [type] $value [description]
-	 * @return [type]        [description]
+	 * Filter the query by unit name
+	 * 
+	 * @param  Builder $query
+	 * @param  string $value
+	 * @return        
 	 */
 	public function scopeName($query, $value)
 	{
@@ -23,10 +24,11 @@ class Unit extends Model
 	}
 
 	/**
-	 * [scopeAbbreviation description]
-	 * @param  [type] $query [description]
-	 * @param  [type] $value [description]
-	 * @return [type]        [description]
+	 * Filter the query by unit abbreviation
+	 * 
+	 * @param  Builder $query
+	 * @param  string $value
+	 * @return        
 	 */
 	public function scopeAbbreviation($query, $value)
 	{

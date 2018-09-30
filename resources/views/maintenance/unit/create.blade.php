@@ -13,11 +13,10 @@
 
     @include('errors.alert')
 
-    <form action="{{ url('maintenance/unit') }}" method="post">
+    <form action="{{ url('unit') }}" method="post">
 
         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-        <input type="hidden" name="_method" value="PUT" />
-
+        
         @include('maintenance.unit.partials.form')
 
         <div class="form-group">
@@ -25,7 +24,7 @@
                 <span class="hidden-xs">Submit</span>
             </button>
 
-            <button id="cancel" class="btn btn-md btn-default" type="button" onClick="window.location.href='{{ url("maintenance/unit") }}'" >
+            <button id="cancel" class="btn btn-md btn-default" type="button" onClick="window.location.href='{{ url("unit") }}'" >
                 <span class="hidden-xs">Cancel</span>
             </button>
         </div>

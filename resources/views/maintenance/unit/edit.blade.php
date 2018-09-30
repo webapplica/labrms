@@ -9,11 +9,11 @@
       <li class="active">Update</li>
     </ol>
 
-    @include('alert.errors')
+    @include('errors.alert')
 
     {{ Form::open([
         'method' => 'put',
-        'route' => array('unit.update', $unit->id),
+        'url' => url('unit/'. $unit->id),
         'id' => 'unit-form'
     ]) }}
 
@@ -24,7 +24,7 @@
                 Update
             </button>
 
-            <a id="cancel-btn" class="btn btn-md btn-default" type="button" href="{{ url('maintenance/unit') }}" >
+            <a id="cancel-btn" class="btn btn-md btn-default" type="button" href="{{ url('unit') }}" >
                 Cancel
             </a>
         </div>
