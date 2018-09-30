@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ticketing;
 
 use App\Models\User;
-use App\Models\Ticket;
+use App\Models\Ticket\Type;
+use App\Models\Ticket\Ticket;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Commands\Ticket\ComplaintTicket;
 
 class TicketController extends Controller 
 {
@@ -18,12 +19,11 @@ class TicketController extends Controller
 	public function index(Request $request, Ticket $ticket)
 	{
 		if($request->ajax()) {
-			$ticket = Ticket::oldest('date')->involved()->get();
+			$ticket = Ticket::authorIsCurrentUser()->root()->oldest('date')->get();
 			return datatables($ticket)->toJson();
 		}
 
-		return view('ticket.index')
-				->with('ticket', $ticket);
+		return view('ticket.index');
 	}
 
 
@@ -48,7 +48,7 @@ class TicketController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$this->dispatch(new ComplaintTicket($request));
+		$this->dispatch(new CreateTicket($request));
 		return redirect('ticket')->with('success-message', __('tasks.success'));
 
 	}
@@ -94,7 +94,7 @@ class TicketController extends Controller
 	public function update(Request $request, $id)
 	{
 		$this->dispatch(new UpdateTicket($request, $id));
-		return redirect('/')->with('success-message', __('tasks.success'));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 
 	}
 
@@ -107,7 +107,7 @@ class TicketController extends Controller
 	public function transfer(Request $request, $id)
 	{
 		$this->dispatch(new TransferTicket($request, $id));
-		return redirect('/')->with('success-message', __('tasks.success'));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 	}
 
 	/**
@@ -120,32 +120,32 @@ class TicketController extends Controller
 	{
 
 		$this->dispatch(new CloseTicket($request, $id));
-		return redirect('/')->with('success-message', __('tasks.success'));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 	}
 
 	/**
-	 * Restore the specified resource
+	 * Tags the ticket status as reopened
 	 *
-	 * @param  int  $id
-	 * @return Response
+	 * @param Request $request
+	 * @param [type] $id
+	 * @return void
 	 */
 	public function reopen(Request $request, $id)
 	{
 		$this->dispatch(new ReopenTicket($request, $id));
-		return redirect('/')->with('success-message', __('tasks.success'));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 	}
 	
 	/**
-	*
-	*	@return ajax: 'success' or 'error'
-	*	normal: view with prompt
-	*
-	*
-	*/
+	 * Tags the ticket as resolved
+	 *
+	 * @param Request $request
+	 * @return void
+	 */
 	public function resolve(Request $request)
 	{
 		$this->dispatch(new ResolveTicket($request, $id));
-		return redirect('/')->with('success-message', __('tasks.success'));
+		return redirect('ticket')->with('success-message', __('tasks.success'));
 	}
 
 }

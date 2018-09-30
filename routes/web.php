@@ -25,11 +25,11 @@ Route::post('/', 'HomeController@dashboard');
 |
 */
 
-App\Http\Modules\Account\Routes::all();
+// App\Http\Modules\Account\Routes::all();
+// App\Http\Modules\Reservation\Routes::all();
 App\Http\Modules\Maintenance\Routes::all();
-App\Http\Modules\Reservation\Routes::all();
+App\Http\Modules\Ticket\Ticket::routes();
 
 // require_once(base_path('routes/partials/inventory.php'));
 // require_once(base_path('routes/partials/software-inventory.php'));
-// require_once(base_path('routes/partials/ticketing.php'));
 // require_once(base_path('routes/partials/workstation.php'));
