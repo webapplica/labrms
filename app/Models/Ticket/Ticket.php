@@ -103,7 +103,7 @@ class Ticket extends Model
 	 */
 	public function getHumanReadableDateAttribute()
 	{
-		return Carbon::parse($this->date)->diffForHumans();
+		return Carbon::parse($this->date)->format('M d Y h:s a');
 	}
 
 	/**
