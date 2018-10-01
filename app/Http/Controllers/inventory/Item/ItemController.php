@@ -62,13 +62,13 @@ class ItemController extends Controller
 	 */
 	public function show(Request $request, $id)
 	{
+		$inventory = Inventory::with('type')->findOrFail($id);
 
 		if($request->ajax()) {
-			$inventory = Inventory::with('type')->findOrFail($id);
-			return datatables($inventory)->toJson();
+			return datatables($inventory->items)->toJson();
 		}
 
-		return view('inventory.item.show');
+		return view('inventory.item.show', compact('inventory'));
 	}
 	
 	/**

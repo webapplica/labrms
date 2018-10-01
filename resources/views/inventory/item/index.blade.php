@@ -10,7 +10,7 @@
 		class="table table-hover table-striped table-bordered table-condensed" 
 		id="inventory-table"
 		data-base-url="{{ url('inventory') }}"
-		data-view-profiled-url="{{ url('item/profile') }}">
+		data-view-profiled-url="{{ url('inventory') }}">
 		<thead>
 			<th class="col-md-1">ID</th>
 			<th class="col-md-1">Model</th>
@@ -73,9 +73,9 @@
 	    });
 
 	 	$("div.toolbar").html(`
-			<button id="add-inventory" class="btn btn-md btn-primary">
+			<button id="add-inventory" class="btn btn-md btn-success">
 				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-				<span id="nav-text">Add</span>
+				<span id="nav-text">Add New Inventory</span>
 			</button>
 		`);
 

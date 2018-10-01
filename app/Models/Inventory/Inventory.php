@@ -7,6 +7,7 @@ namespace App\Models\Inventory;
 // use App\Ticket;
 // use Carbon\Carbon;
 // use App\ItemProfile;
+use App\Models\Item\Item;
 use App\Models\Item\Type;
 use App\Models\Inventory\Log;
 use Illuminate\Database\Eloquent\Model;
@@ -121,10 +122,15 @@ class Inventory extends Model
   //   return $query->where('model','=',$model);
   // }
 
-  // public function items()
-  // {
-  //   return $this->hasMany('App\Item','inventory_id','id');
-  // }
+    /**
+     * Returns relationship on items model
+     *
+     * @return void
+     */
+    public function items()
+    {
+        return $this->hasMany(Item::class,'inventory_id','id');
+    }
 
     /**
      * Returns relationship on type model
@@ -141,10 +147,10 @@ class Inventory extends Model
   //   return $this->belongsTo('App\Unit','unit_name','name');
   // }
 
-  public function logs()
-  {
-    return $this->hasMany(Log::class, 'inventory_id', 'id');
-  }
+    public function logs()
+    {
+        return $this->hasMany(Log::class, 'inventory_id', 'id');
+    }
 
   // public function receipts()
   // {
