@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Inventory;
+namespace App\Http\Controllers\Inventory\Item;
 
+use App\Models\Unit;
+use App\Models\Item\Type;
 use Illuminate\Http\Request;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
+use App\Commands\Inventory\AddInventory;
 
-class InventoryController extends Controller 
+class ItemController extends Controller 
 {
 
 	/**
@@ -17,7 +20,7 @@ class InventoryController extends Controller
 	public function index(Request $request)
 	{
 		if($request->ajax()) {
-			$inventory = Inventory::with('item.type')->get();
+			$inventory = Inventory::with('type')->get();
 			return datatables($inventory)->toJson();
 		}
 
@@ -34,7 +37,7 @@ class InventoryController extends Controller
 	public function create(Request $request)
 	{
 		$types = Type::pluck('name','id');
-		$units = Unit::pluck('abbreviation', 'abbreviation')->toArray()->prependNull('None');
+		$units = Unit::pluck('abbreviation', 'id')->toArray();
 
 		return view('inventory.item.create', compact('types', 'units'));
 	}
@@ -46,12 +49,7 @@ class InventoryController extends Controller
 	 */
 	public function store(Request $request)
 	{
-
 		$this->dispatch(new AddInventory($request));
-		if($request->has('redirect-profiling')) {
-			return redirect('item/profile/create?id=' . $inventory->id)->with('success-message', __('tasks.success'));
-		}
-
 		return redirect('inventory')->with('success-message', __('tasks.success'));
 	}
 
@@ -64,13 +62,13 @@ class InventoryController extends Controller
 	 */
 	public function show(Request $request, $id)
 	{
+		$inventory = Inventory::with('type')->findOrFail($id);
 
 		if($request->ajax()) {
-			$inventory = Inventory::with('item.type')->findOrFail($id);
-			return datatables($inventory)->toJson();
+			return datatables($inventory->items)->toJson();
 		}
 
-		return view('inventory.item.show');
+		return view('inventory.item.show', compact('inventory'));
 	}
 	
 	/**
@@ -79,11 +77,11 @@ class InventoryController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($id)
-	{
-		$inventory = Inventory::findOrFail($id);
-		return view('inventory.item.edit', compact('inventory'));
-	}
+	// public function edit($id)
+	// {
+	// 	$inventory = Inventory::findOrFail($id);
+	// 	return view('inventory.item.edit', compact('inventory'));
+	// }
 
 	/**
 	 * Update the specified resource in storage.
@@ -91,12 +89,12 @@ class InventoryController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update(Request $request, $id)
-	{
-		$this->dispatch(new UpdateItem($request, $id));
-		return redirect('inventory')->with('success-message', __('tasks.success'));
+	// public function update(Request $request, $id)
+	// {
+	// 	$this->dispatch(new UpdateItem($request, $id));
+	// 	return redirect('inventory')->with('success-message', __('tasks.success'));
 
-	}
+	// }
 
 	/**
 	 * Remove the specified resource from storage.
@@ -104,10 +102,10 @@ class InventoryController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy(Request $request)
-	{
-		$this->dispatch(new ReleaseItem($request, $id));
-		return redirect("inventory/$id/")->with('success-message', __('tasks.success'));
-	}
+	// public function destroy(Request $request)
+	// {
+	// 	$this->dispatch(new ReleaseItem($request, $id));
+	// 	return redirect("inventory/$id/")->with('success-message', __('tasks.success'));
+	// }
 
 }

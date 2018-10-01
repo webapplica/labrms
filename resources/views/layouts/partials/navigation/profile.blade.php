@@ -12,13 +12,13 @@
 
         <!-- dropdown items -->
         <ul class="dropdown-menu">
-            <li>{{ link_to('profile','Profile') }}</li>
-            <li>{{ link_to('settings','Password') }}</li>
+            {{-- <li>{{ link_to('profile','Profile') }}</li> --}}
+            {{-- <li>{{ link_to('settings','Password') }}</li> --}}
             @if(Auth::user()->isStaff())
-            <li>{{ link_to('reports','Reports') }}</li>
+            {{-- <li>{{ link_to('reports','Reports') }}</li> --}}
             @endif
-            <li>{{ link_to('help','Help') }}</li>
-            <li role="separator" class="divider"></li>
+            {{-- <li>{{ link_to('help','Help') }}</li> --}}
+            {{-- <li role="separator" class="divider"></li> --}}
             <li>{{ link_to('logout','Logout') }}</li>
         </ul> <!-- end of dropdown items -->
 

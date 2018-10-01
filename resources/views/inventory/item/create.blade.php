@@ -1,34 +1,43 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid" id="page-body">
 	<div class='col-md-offset-3 col-md-6'>
-		<div class="panel panel-body" style="padding-top: 20px;padding-left: 40px;padding-right: 40px;">
+		<div class="panel panel-body" style="padding: 20px 40px;">
 
-	 		{{ Form::open(['method'=>'post','url'=>'inventory','class'=>'form-horizontal','id'=>'inventoryForm']) }}
+	 		{{ Form::open(['method'=>'post', 'url'=>'inventory', 'id'=>'item-inventory-form']) }}
 
-			<legend><h3 style="color:#337ab7;"><span id="form-name">Inventory</span></h3></legend>
+			<legend><h3 style="color:#337ab7;"><span id="form-name">Inventory: Item</span></h3></legend>
 			<ul class="breadcrumb">
-				<li><a href="{{ url('inventory') }}">Item Inventory</a></li>
-				<li class="active">Add</li>
+				<li><a href="{{ url('inventory') }}">Inventory</a></li>
+				<li>Item</li>
+				<li class="active">Create</li>
 			</ul>
 
 			@include('errors.alert')
 
 			<div class="form-group">
-				<div class="col-sm-12">
-					<label>Receipt Number</label>
-					<input type="text"  class="form-control" placeholder="Receipt Number" name="receipt" value="{{ old('receipt') }}" id="receipt" />
-					<div id="receipt-existing" class="col-sm-12"></div>
-				</div>
+				<label>Receipt Number</label>
+				<input 
+					type="text"  
+					class="form-control" 
+					placeholder="Receipt Number" 
+					name="receipt" 
+					value="{{ old('receipt') }}" 
+					id="receipt" />
 			</div>
 
-			@include('inventory.item.form')
+			@include('inventory.item.partials.form')
 
 			<div class="form-group">
-				<div class="col-sm-12">
-					<button type="submit" value="create" name="action" id="submit" class="btn btn-lg btn-primary btn-flat btn-block"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit </button>
-				</div>
+				<button 
+					type="submit" 
+					value="create" 
+					name="action" 
+					id="submit" 
+					class="btn btn-lg btn-primary btn-flat btn-block">
+					<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit 
+				</button>
 			</div>
 
 			{{ Form::close() }}
@@ -36,9 +45,10 @@
 	</div>
 </div>
 @stop
-@section('script')
+
+{{-- @section('scripts-include')
 <script type="text/javascript">
-	$(document).ready(function(){
+	$(document).ready(function () {
 
 		$('#receipt').autocomplete({
 			source: "{{ url('receipt') }}"
@@ -97,4 +107,4 @@
 		}
 	})
 </script>
-@stop
+@stop --}}

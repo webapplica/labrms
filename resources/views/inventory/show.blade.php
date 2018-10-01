@@ -1,28 +1,36 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
 @section('content')
-@include('modal.inventory.release')
-<div class="container-fluid" id="page-body">
-	<div class="" style="background-color: white;padding: 20px;">
-		<legend><h3 class="text-muted">Inventory Logs</h3></legend>
+<div class="container-fluid panel panel-body" style="padding: 20px;">
+		<legend>
+			<h3 class="text-muted">Inventory: Logs</h3>
+		</legend>
+
 		<ul class="breadcrumb">
 			<li class='active'><a href="{{ url('inventory') }}">Inventory</a></li>
 			<li>{{ $inventory->code }}</li>
 			<li>Logs</li>
 		</ul>
-		<table class="table table-hover table-striped table-condensed table-bordered table-responsive" id="inventoryTable">
+
+		<table 
+			class="table table-hover table-striped table-condensed table-bordered table-responsive" 
+			id="inventory-table"
+			data-base-url="{{ url("inventory/$inventory->id/log") }}"
+			data-release-url="{{ url("inventory/$inventory->id/release") }}"
+			data-receive-url="{{ url("inventory/$inventory->id/receive") }}"
+			>
 			<thead>
 	          <tr rowspan="2">
 	              <th class="text-left" colspan="4">Code:  
 	                <span style="font-weight:normal">{{ $inventory->code }}</span> 
 	              </th>
 	              <th class="text-left" colspan="4">Type:  
-	                <span style="font-weight:normal">{{ $inventory->itemtype->name }}</span> 
+	                <span style="font-weight:normal">{{ $inventory->item_type_name }}</span> 
 	              </th>	
 	          </tr>
 	          <tr rowspan="2">
 	              <th class="text-left" colspan="4">Brand:  
-	                <span style="font-weight:normal">{{ $inventory->model }}</span> 
+	                <span style="font-weight:normal">{{ $inventory->brand }}</span> 
 	              </th>
 	              <th class="text-left" colspan="4">Model:  
 	                <span style="font-weight:normal">{{ $inventory->model }}</span> 
@@ -37,8 +45,8 @@
 	              </th>
 	          </tr>
 	          <tr rowspan="2">
-					<th>Log Number</th>
-					<th>User</th>
+					<th>ID</th>
+					<th>Accountable</th>
 					<th>Details</th>
 					<th>Quantity Released</th>
 					<th>Quantity Received</th>
@@ -50,14 +58,19 @@
 	</div>
 </div>
 @stop
-@section('script')
-{{ HTML::script(asset('js/moment.min.js')) }}
+
+@section('scripts-include')
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('#inventoryTable').DataTable({
-			"processing": true,
+	$(document).ready(function () {
+		var table = $('#inventory-table');
+		var base_url = table.data('base-url');
+		var release_url = table.data('release-url');
+		var receive_url = table.data('receive-url');
+
+		var dataTable = table.DataTable({
+			processing: true,
 			serverSide: true,
-	        ajax: "{{ url("inventory/$inventory->id/log") }}",
+	        ajax: base_url,
 	    	columnDefs:[
 				{ targets: 'no-sort', orderable: false },
 	    	],
@@ -79,16 +92,9 @@
 	    } );
 
 	    $('.toolbar').html(`
-	    		<button type="button" id="release" class="btn btn-danger btn-sm" data-id="{{ $inventory->id }}" data-target="#releaseInventoryModal" data-toggle="modal">Release</button>
-	    	`)
-
-		$('#releaseInventoryModal').on('show.bs.modal', function (e) {
-		  	$('#inventory-id').val('{{ $inventory->id }}')
-		})
-
-	    @if( Session::has('show-modal') )
-	    	$('#releaseInventoryModal').modal('show')
-	    @endif
+			<a href="` + release_url + `" role="button" id="release" class="btn btn-danger btn-sm">Release</a>
+			<a href="` + receive_url + `" role="button" id="release" class="btn btn-success btn-sm">Receive</a>
+		`)
 	} );
 </script>
 @stop
