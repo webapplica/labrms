@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Inventory;
+namespace App\Http\Controllers\Inventory\Item;
 
+use App\Models\Unit;
+use App\Models\Item\Type;
 use Illuminate\Http\Request;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
+use App\Commands\Inventory\AddInventory;
 
-class InventoryController extends Controller 
+class ItemController extends Controller 
 {
 
 	/**
@@ -31,29 +34,24 @@ class InventoryController extends Controller
 	 *
 	 * @return Response
 	 */
-	// public function create(Request $request)
-	// {
-	// 	$types = Type::pluck('name','id');
-	// 	$units = Unit::pluck('abbreviation', 'abbreviation')->toArray()->prependNull('None');
+	public function create(Request $request)
+	{
+		$types = Type::pluck('name','id');
+		$units = Unit::pluck('abbreviation', 'id')->toArray();
 
-	// 	return view('inventory.item.create', compact('types', 'units'));
-	// }
+		return view('inventory.item.create', compact('types', 'units'));
+	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 *
 	 * @return Response
 	 */
-	// public function store(Request $request)
-	// {
-
-	// 	$this->dispatch(new AddInventory($request));
-	// 	if($request->has('redirect-profiling')) {
-	// 		return redirect('item/profile/create?id=' . $inventory->id)->with('success-message', __('tasks.success'));
-	// 	}
-
-	// 	return redirect('inventory')->with('success-message', __('tasks.success'));
-	// }
+	public function store(Request $request)
+	{
+		$this->dispatch(new AddInventory($request));
+		return redirect('inventory')->with('success-message', __('tasks.success'));
+	}
 
 
 	/**

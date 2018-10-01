@@ -15,8 +15,13 @@ class Inventory
     public static function routes()
     {
         Route::namespace('inventory')->middleware(['auth', 'role.staff'])->group(function () {
+
+            Route::namespace('item')->group(function() {
+                Route::get('inventory','ItemController@index');
+                Route::get('inventory/create', 'ItemController@create');
+                Route::post('inventory', 'ItemController@store');
+            });
             
-            Route::get('inventory','InventoryController@index');
             // Route::resource('item/profile','ItemsController');
             // Route::prefix('inventory')->group(function(){
             //     Route::get('/search',[

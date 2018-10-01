@@ -17,7 +17,6 @@
 			<th class="col-md-1">Model</th>
 			<th class="col-md-1">Brand</th>
 			<th class="col-md-1">Type</th>
-			<th class="col-md-1">Category</th>
 			<th class="col-md-1">Unit</th>
 			<th class="col-md-1">Quantity</th>
 			<th class="col-md-1">Unprofiled</th>
@@ -52,8 +51,7 @@
 					{ data: "code" },
 					{ data: "model" },
 					{ data: "brand" },
-					{ data: "itemtype.name" },
-					{ data: "itemtype.category" },						
+					{ data: "item_type_name" },					
 					{ data: "unit_name" },
 					{ data: "quantity" },
 					{ data: "unprofiled" },

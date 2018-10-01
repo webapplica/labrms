@@ -47,7 +47,7 @@ class Inventory extends Model
   // ];
 
     protected $appends = [
-        'quantity', 'unprofiled'
+        'quantity', 'unprofiled', 'item_type_name'
     ];
 
     /**
@@ -57,7 +57,10 @@ class Inventory extends Model
      */
     public function getQuantityAttribute()
     {
-        return $this->logs->sum('quantity') + $this->receipts->sum('pivot.profiled_items');
+        $log = isset($this->logs) ? $this->logs->sum('quantity') : 0;
+        $receipts = isset($this->receipts) ? $this->receipts->sum('pivot.profiled_items') : 0;
+
+        return  $log + $receipts;
     }
 
     /**
@@ -68,6 +71,17 @@ class Inventory extends Model
     public function getUnprofiledAttribute()
     {
         return $this->logs->sum('quantity');
+    }
+
+    /**
+     * Returns the current linked name of the type
+     *
+     * @return void
+     */
+    public function getItemTypeNameAttribute()
+    {
+        $name = isset($this->type) ? $this->type->name : 'None';
+        return $name;
     }
 
   // public function getBrandAttribute($value)
@@ -139,12 +153,18 @@ class Inventory extends Model
   //           ->withTimestamps();
   // }
 
-  // public static function generateCode()
-  // {
-  //   $value = Inventory::pluck('id')->count() + 1;
-  //   $code = 'INV' . str_pad($value, 6, '0', STR_PAD_LEFT);
-  //   return $code;
-  // }
+    /**
+     * Generate code for inventory
+     *
+     * @return string
+     */
+    public static function generateCode()
+    {
+        $inventory_count = Inventory::pluck('id')->count() + 1;
+        $code = 'INV' . str_pad($inventory_count, 6, '0', STR_PAD_LEFT);
+        
+        return $code;
+    }
 
   /**
   *
