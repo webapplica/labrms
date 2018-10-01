@@ -21,6 +21,8 @@ class Inventory
                 Route::get('inventory/create', 'ItemController@create');
                 Route::post('inventory', 'ItemController@store');
             });
+
+            Route::get('inventory/{id}/log', 'LogController@index');
             
             // Route::resource('item/profile','ItemsController');
             // Route::prefix('inventory')->group(function(){

@@ -2,7 +2,8 @@
 
 namespace App\Models\Inventory;
 
-// use Carbon\Carbon;
+use Carbon\Carbon;
+use App\Models\User;
 // use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,9 +13,9 @@ class Log extends Model
     protected $primaryKey = 'id';
     public $fillable = [ 'details', 'quantity', 'inventory_id', 'user_id' ];
 
-    // protected $appends = [
-    //     'user_info', 'quantity_issued', 'quantity_received', 'parsed_date'
-    // ]; 
+    protected $appends = [
+        'user_info', 'quantity_issued', 'quantity_received', 'parsed_date'
+    ]; 
 
     // public function __construct()
     // {
@@ -23,27 +24,47 @@ class Log extends Model
     //     }
     // }
 
-    // public function getUserInfoAttribute()
-    // {
-    //     $user = $this->user;
-    //     return $user->lastname . ", " . $user->firstname;
-    // }
+    /**
+     * Returns information of the user who inputted the data
+     *
+     * @return
+     */
+    public function getUserInfoAttribute()
+    {
+        $user = $this->user;
+        return $user->lastname . ", " . $user->firstname;
+    }
 
-    // public function getParsedDateAttribute()
-    // {
-    //     $date = Carbon\Carbon::parse($this->date)->format('M d, Y h:m a');
-    //     return $date;
-    // }
+    /**
+     * Returns date added
+     *
+     * @return
+     */
+    public function getParsedDateAttribute()
+    {
+        $date = Carbon::parse($this->date)->format('M d, Y h:m a');
+        return $date;
+    }
 
-    // public function getQuantityIssuedAttribute()
-    // {
-    //     return ( $this->quantity <= 0 ) ? abs($this->quantity) : 0 ;
-    // }
+    /**
+     * Returns quantity issued
+     *
+     * @return
+     */
+    public function getQuantityIssuedAttribute()
+    {
+        return ($this->quantity <= 0) ? abs($this->quantity) : 0;
+    }
 
-    // public function getQuantityReceivedAttribute()
-    // {
-    //     return ( $this->quantity > 0 ) ? $this->quantity : 0 ;
-    // }
+    /**
+     * Returns quantity received
+     *
+     * @return
+     */
+    public function getQuantityReceivedAttribute()
+    {
+        return ($this->quantity > 0) ? $this->quantity : 0;
+    }
 
     // public function scopeFindByInventoryID($query, $value)
     // {
@@ -55,8 +76,13 @@ class Log extends Model
     // 	return $this->belongsTo('App\Inventory', 'inventory_id', 'id');
     // }
 
-    // public function user()
-    // {
-    //     return $this->belongsTo('App\User', 'user_id', 'id');
-    // }
+    /**
+     * Fetch the relationship to users table
+     *
+     * @return
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

@@ -60,16 +60,16 @@ class ItemController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	// public function show(Request $request, $id)
-	// {
+	public function show(Request $request, $id)
+	{
 
-	// 	if($request->ajax()) {
-	// 		$inventory = Inventory::with('item.type')->findOrFail($id);
-	// 		return datatables($inventory)->toJson();
-	// 	}
+		if($request->ajax()) {
+			$inventory = Inventory::with('type')->findOrFail($id);
+			return datatables($inventory)->toJson();
+		}
 
-	// 	return view('inventory.item.show');
-	// }
+		return view('inventory.item.show');
+	}
 	
 	/**
 	 * Show the form for editing the specified resource.
