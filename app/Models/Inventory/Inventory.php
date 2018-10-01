@@ -48,7 +48,7 @@ class Inventory extends Model
   // ];
 
     protected $appends = [
-        'quantity', 'unprofiled', 'item_type_name'
+        'quantity', 'unprofiled', 'item_type_name', 'summarized_name',
     ];
 
     /**
@@ -83,6 +83,16 @@ class Inventory extends Model
     {
         $name = isset($this->type) ? $this->type->name : 'None';
         return $name;
+    }
+
+    /**
+     * Returns the summary of inventory information
+     *
+     * @return void
+     */
+    public function getSummarizedNameAttribute()
+    {
+        return $this->brand . '-' . $this->model . '-' . $this->item_type_name;
     }
 
   // public function getBrandAttribute($value)
