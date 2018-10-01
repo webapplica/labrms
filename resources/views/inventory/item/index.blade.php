@@ -10,7 +10,6 @@
 		class="table table-hover table-striped table-bordered table-condensed" 
 		id="inventory-table"
 		data-base-url="{{ url('inventory') }}"
-		data-profile-item-url="{{ url('item/profile/create?id=') }}"
 		data-view-profiled-url="{{ url('item/profile') }}">
 		<thead>
 			<th class="col-md-1">ID</th>
@@ -31,7 +30,6 @@
 	$(document).ready(function () {
 		var table = $('#inventory-table');
 		var base_url = table.data('base-url');
-		var profile_item_url = table.data('profile-item-url');
 		var view_profiled_url = table.data('view-profiled-url');
 
 	    var dataTable = table.DataTable({
@@ -58,7 +56,6 @@
 					{ data: function (callback) {
 
 						log_url = base_url + '/' + callback.id + '/log';
-						profile_url = profile_item_url + '/' + callback.id;
 						view_profiled = view_profiled_url + '/' + callback.id;
 
 						return `
@@ -66,13 +63,9 @@
 								<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
 								<span class="hidden-sm hidden-xs">Logs</span>
 							</a>
-							<a href="` + profile_url + `" id="profile" class="btn btn-success btn-sm" type="button">
-								<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-								<span class="hidden-sm hidden-xs">Profile</span>
-							</a>
 							<a href="` + view_profiled + `" id="view" class="btn btn-sm btn-default" type="button">
-								<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-								<span class="hidden-sm hidden-xs">View</span>
+								<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+								<span class="hidden-sm hidden-xs">View Profiled</span>
 							</a>
 						`
 					}}
