@@ -26,7 +26,7 @@
 
 		<div class="form-group">
 			<label for="inventory-id">
-				Inventory
+				Inventory	
 			</label>
 			{{ Form::text('inventory_name', $inventory->summarized_name, [
 				'class' => 'form-control',

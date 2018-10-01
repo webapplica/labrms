@@ -3,6 +3,7 @@
 namespace App\Commands\Inventory;
 
 use App\Models\Unit;
+use App\Models\Receipt;
 use App\Models\Item\Type;
 use Illuminate\Http\Request;
 use App\Models\Ticket\Ticket;
@@ -32,7 +33,11 @@ class AddInventory
 		$unit = Unit::findOrFail($this->request->unit)->name;
 		$user = Auth::user();
 
-        DB::beginTransaction();
+		DB::beginTransaction();
+		
+		$receipt = Receipt::firstOrCreate([
+			'number' => $this->request->receipt, 
+		]);
 
 		$inventory = Inventory::firstOrCreate([
 			'itemtype_id' => $type_id, 
@@ -66,7 +71,12 @@ class AddInventory
             'user_id' => $user->id,
             'staff_id' => $user->id,
             'status' => $ticket->getClosedStatus(),
-        ]);
+		]);
+		
+		$inventory->receipts()->attach($receipt->id, [
+			'received_quantity' => $quantity,
+			'profiled_items' => 0,
+		]);
 
         DB::commit();
 		

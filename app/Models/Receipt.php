@@ -12,7 +12,7 @@ class Receipt extends Model
 	protected $primaryKey = 'id';
 	public $timestamps = false;
 	protected $fillable = [
-		'number', 'purchaseorder_number', 'purchaseorder_date', 'invoice_number', 'invoice_date', 'fund_code'
+		'number', 'purchaseorder_number', 'purchaseorder_date', 'invoice_number', 'invoice_date', 'fund_code',
 	];
 
 	//Validation rules!

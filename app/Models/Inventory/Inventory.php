@@ -7,6 +7,7 @@ namespace App\Models\Inventory;
 // use App\Ticket;
 // use Carbon\Carbon;
 // use App\ItemProfile;
+use App\Models\Receipt;
 use App\Models\Item\Item;
 use App\Models\Item\Type;
 use App\Models\Inventory\Log;
@@ -157,17 +158,27 @@ class Inventory extends Model
   //   return $this->belongsTo('App\Unit','unit_name','name');
   // }
 
+    /**
+     * Returns relationship on inventory transactions
+     *
+     * @return void
+     */
     public function logs()
     {
         return $this->hasMany(Log::class, 'inventory_id', 'id');
     }
 
-  // public function receipts()
-  // {
-  //   return $this->belongsToMany('App\Receipt', 'inventory_receipt', 'inventory_id', 'receipt_id')
-  //           ->withPivot('received_quantity', 'received_unitcost', 'profiled_items')
-  //           ->withTimestamps();
-  // }
+    /**
+     * Returns relationship on receipts table
+     *
+     * @return void
+     */
+    public function receipts()
+    {
+        return $this->belongsToMany(Receipt::class, 'inventory_receipt', 'inventory_id', 'receipt_id')
+            ->withPivot('received_quantity', 'received_unitcost', 'profiled_items')
+            ->withTimestamps();
+    }
 
     /**
      * Generate code for inventory
