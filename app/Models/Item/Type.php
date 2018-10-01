@@ -2,8 +2,8 @@
 
 namespace App\Models\Item;
 
-use App\Models\Item;
-use App\Models\Inventory;
+// use App\Models\Item;
+// use App\Models\Inventory;
 use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model 
@@ -19,22 +19,22 @@ class Type extends Model
 	 * 
 	 * @var $categories
 	 */
-	private static $categories = [
-		'equipment' => 'Equipment',
-		'supply' => 'Supply',
-		'fixture' => 'Fixture',
-		'furniture' => 'Furniture'
-	];
+	// private static $categories = [
+	// 	'equipment' => 'Equipment',
+	// 	'supply' => 'Supply',
+	// 	'fixture' => 'Fixture',
+	// 	'furniture' => 'Furniture'
+	// ];
 
 	/**
 	 * Sets the fetched category to uppercase first letter
 	 * 
 	 * @param $value
 	 */
-	public function setCategoryAttribute($value)
-	{
-		$this->attributes['category'] = ucfirst($value);
-	}
+	// public function setCategoryAttribute($value)
+	// {
+	// 	$this->attributes['category'] = ucfirst($value);
+	// }
 
 	/**
 	 * Returns none if the item has no category
@@ -42,34 +42,34 @@ class Type extends Model
 	 * @param  [string] $value 
 	 * @return string
 	 */
-	public function getCategoryAttribute($value)
-	{
-		if( isset($value) || $value !== "" || $value !== null ) {
-			return "None";
-		}
+	// public function getCategoryAttribute($value)
+	// {
+	// 	if( isset($value) || $value !== "" || $value !== null ) {
+	// 		return "None";
+	// 	}
 
-		return ucfirst($value);
-	}
+	// 	return ucfirst($value);
+	// }
 
 	/**
 	 * Returns list of categories the item have
 	 * 
 	 * @return array
 	 */
-	public function categories()
-	{
-		return self::$categories;
-	}
+	// public function categories()
+	// {
+	// 	return self::$categories;
+	// }
 
 	/**
 	 * returns list of items the type linked to
 	 * 
 	 * @return object
 	 */
-	public function items()
-	{
-		return $this->hasManyThrough( Item::class, Inventory::class, 'id', 'id');
-	}
+	// public function items()
+	// {
+	// 	return $this->hasManyThrough( Item::class, Inventory::class, 'id', 'id');
+	// }
 
 	/**
 	 * filters search result by the type with the name provided
@@ -78,10 +78,10 @@ class Type extends Model
 	 * @param  string $value 
 	 * @return object
 	 */
-	public function scopeName($query, $value)
-	{
-		return $query->where('name', '=', $value);
-	}
+	// public function scopeName($query, $value)
+	// {
+	// 	return $query->where('name', '=', $value);
+	// }
 
 	/**
 	 * filters search result by the type with the category provided
@@ -90,8 +90,8 @@ class Type extends Model
 	 * @param  string $value 
 	 * @return object
 	 */
-	public function scopeCategory($query,$category)
-	{
-		return $query->where('category', '=', $category);
-	}
+	// public function scopeCategory($query,$category)
+	// {
+	// 	return $query->where('category', '=', $category);
+	// }
 }
