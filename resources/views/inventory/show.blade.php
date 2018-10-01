@@ -16,6 +16,8 @@
 			class="table table-hover table-striped table-condensed table-bordered table-responsive" 
 			id="inventory-table"
 			data-base-url="{{ url("inventory/$inventory->id/log") }}"
+			data-release-url="{{ url("inventory/$inventory->id/release") }}"
+			data-receive-url="{{ url("inventory/$inventory->id/receive") }}"
 			>
 			<thead>
 	          <tr rowspan="2">
@@ -62,6 +64,8 @@
 	$(document).ready(function () {
 		var table = $('#inventory-table');
 		var base_url = table.data('base-url');
+		var release_url = table.data('release-url');
+		var receive_url = table.data('receive-url');
 
 		var dataTable = table.DataTable({
 			processing: true,
@@ -88,7 +92,8 @@
 	    } );
 
 	    $('.toolbar').html(`
-			<a role="button" id="release" class="btn btn-danger btn-sm">Release</a>
+			<a href="` + release_url + `" role="button" id="release" class="btn btn-danger btn-sm">Release</a>
+			<a href="` + receive_url + `" role="button" id="release" class="btn btn-success btn-sm">Receive</a>
 		`)
 	} );
 </script>

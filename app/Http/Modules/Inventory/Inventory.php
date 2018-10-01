@@ -21,8 +21,15 @@ class Inventory
                 Route::get('inventory/create', 'ItemController@create');
                 Route::post('inventory', 'ItemController@store');
                 Route::get('inventory/{id}', 'ItemController@show');
+
                 Route::get('inventory/{id}/profile', 'ProfileController@create');
                 Route::post('inventory/{id}/profile', 'ProfileController@store');
+
+                Route::get('inventory/{id}/release', 'ReleaseController@create');
+                Route::post('inventory/{id}/release', 'ReleaseController@store');
+
+                Route::get('inventory/{id}/receive', 'ReceiveController@create');
+                Route::post('inventory/{id}/receive', 'ReceiveController@store');
             });
 
             Route::get('inventory/{id}/log', 'LogController@index');

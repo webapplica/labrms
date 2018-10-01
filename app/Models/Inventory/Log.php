@@ -66,10 +66,17 @@ class Log extends Model
         return ($this->quantity > 0) ? $this->quantity : 0;
     }
 
-    // public function scopeFindByInventoryID($query, $value)
-    // {
-    //     return $query->where('inventory_id', '=', $value);
-    // }
+    /**
+     * Filters the log by inventory id
+     *
+     * @param Builder $query
+     * @param string $value
+     * @return void
+     */
+    public function scopeFilterByInventory($query, $id)
+    {
+        return $query->where('inventory_id', '=', $id);
+    }
 
     // public function inventory()
     // {
