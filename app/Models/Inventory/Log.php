@@ -11,7 +11,7 @@ class Log extends Model
 {
     protected $table = 'inventory_transactions';
     protected $primaryKey = 'id';
-    public $fillable = [ 'details', 'quantity', 'inventory_id', 'user_id' ];
+    public $fillable = [ 'details', 'quantity', 'inventory_id', 'user_id', 'remaining_balance' ];
 
     protected $appends = [
         'user_info', 'quantity_issued', 'quantity_received', 'parsed_date'

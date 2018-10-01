@@ -48,6 +48,7 @@ class AddInventory
 
 		$log = Log::find($inventory->id);
 		$sum = (isset($log) ? $log->sum('quantity') : 0 ) + $quantity;
+		$details =  'Count for inventory ' . $inventory->brand . ' - ' . $inventory->model . ' has been updated with ' . $quantity . ' ' . $unit . '.';
 
 		Log::create([
 			'inventory_id' => $inventory->id,
@@ -57,7 +58,6 @@ class AddInventory
 			'user_id' => $user->id,
 		]);
 		
-		$details =  'Count for inventory ' . $inventory->brand . ' - ' . $inventory->model . ' has been updated with ' . $quantity . ' ' . $unit . '.';
         Ticket::create([
             'title' => 'Inventory quantity updated',
             'details' => $details,
