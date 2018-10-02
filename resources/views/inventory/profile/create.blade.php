@@ -19,315 +19,149 @@
 	{{ Form::open([ 'method' => 'post', 'url' => url('inventory/' . $inventory->id . '/profile'), 'id' => 'profile-form' ]) }}
 	
 		<div class="form-group">
-			<p class="text-muted">
-				<span class="pull-right">Unprofiled Items: {{ $unprofiled_items_count }}</span>
+			<p class="text-muted pull-right">
+				<span class="label label-success label-lg">Date Received: {{ 'Unset' }}</span>
+				<span class="label label-primary label-lg">Unprofiled Items: {{ $unprofiled_items_count }}</span>
 			</p>
 		</div>
 
-		<div class="form-group">
-			<label for="inventory-id">
-				Inventory	
-			</label>
-			{{ Form::text('inventory_name', $inventory->summarized_name, [
-				'class' => 'form-control',
-				'placeholder' => "$inventory->brand-$inventory->model" ,
-				'readonly',
-				'style' => 'background-color: white;'
-			]) }}
-			<input type="hidden" value="{{ $inventory->id }}" name="inventory" />
-		</div>
-		
-		<div class="form-group">
-			{{ Form::label('receipt_id', 'Acknowledgement Receipt') }}
-			{{ Form::select('receipt_id', $receipts, old('receipt_id'), [
-				'class' => 'form-control readonly-white',
-				'style' => 'background-color:white;'
-			]) }}
-		</div>
-		
-		<div class="form-group">
-			{{ Form::label('date', 'Date Received') }}
-			<input 
-				id="dateReceived" 
-				class="form-control" 
-				placeholder="Date Received" 
-				readonly
-				name="datereceived" 
-				type="text" 
-				style="background-color: white;">
-		</div>
+		{{-- form for linking items to current table --}}
+		@include('inventory.profile.partials.create_form')
+		{{-- form for linking items to current table --}}
 
-		<div class="form-group">
-			{{ Form::label('quantity', 'Quantity To Profile') }}
-			{{ Form::number('quantity', old('quantity'),[
-				'id' => 'quantity',
-				'class' => 'form-control',
-				'placeholder' => 'Quantity To Profile',
-				'min' => '1',
-				'required'
+		{{-- display the table for items --}}
+		@include('inventory.profile.partials.item_table')
+		{{-- display the table for items --}}
+		
+		<div class="form-group pull-right">
+			{{ Form::button('Add Item', [
+				'class' => 'btn btn-md btn-success',
+				'name' => 'add-item',
+				'id' => 'add-item-btn'
 			]) }}
 
-			<input type="checkbox" id="lock-quantity" value="1" {{ old('lock-quantity') ? 'checked' : '' }} name="lock-quantity"> Lock? 
+			{{ Form::submit('Profile', [
+				'class' => 'btn btn-md btn-primary',
+				'name' => 'Profile',
+				'id' => 'submit-btn',
+			]) }}
 		</div>
-		
-		<div class="form-group">
-			{{ Form::label('location','Location') }}
-			<select name="location" id="location" class="form-control">
-				@foreach($locations as $key=>$value)
-					<option {{ (old('location') == $key) ? 'selected=selected' : ($value == 'Server') ? 'selected=selected' : null }} value="{{ $key }}">{{ $value }}</option>
-				@endforeach
-			</select>
-			<p class="text-muted pull-right" style="font-size: 10px;"><span class="text-danger">Note:</span> The Default Storage Location is <strong>Server Room</strong></p>
-		</div>
-		
-		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingOne">
-					<h4 class="panel-title">
-						<a 
-							class="collapsed" 
-							role="button" 
-							data-toggle="collapse" 
-							data-parent="#accordion" 
-							href="#collapseOne" 
-							aria-expanded="false" 
-							aria-controls="collapseOne" 
-							style="text-decoration: none;">
-							Property Number Generator <span class="pull-right glyphicon glyphicon-triangle-bottom"></span>
-						</a>
-					</h4>
-			</div>
 
-			<div id="collapseOne" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="headingOne">
-			    <div class="panel-body">
-					<p class="text-muted">If you have constant, incrementing value for property number, use this to fill the propertynumber of the each</p>
-					<div class="form-group">
-						<div class="col-sm-12">
-							{{ Form::label('propertynumber-assitant', 'Property Number Constant Value Fillers:') }}
-							<p class="text-muted" style="font-size: 12px;">
-								This will fill up the property number whatever constant value it contains
-							</p>
-							<input type="text" class="form-control" id="propertynumber-assitant" placeholder="PUP-0000-0000" />
-						</div>
-					</div>
-
-					<div class="form-group">
-						<div class="col-sm-12">
-							<p class="text-muted" style="font-size: 12px;">
-								Note: This will append number after the constant value you filled up
-							</p>
-							<input type="checkbox" id="is-incrementing" /> Is Incrementing?
-							<input type="number" placeholder="Starting Value" class="form-control" id="is-incrementing-value" disabled />
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<table id="items-table" class="table table-bordered table-hover" style="margin-top: 20px;">
-			<thead>
-				<th>ID</th>
-				<th>University Property Number</th>
-				<th>Local Property Number</th>
-				<th>Serial ID</th>
-			</thead>
-		</table>
-		
-		<div class="form-group">
-				{{ Form::submit('Profile', [
-					'class' => 'btn btn-lg btn-primary btn-block',
-					'name' => 'Profile'
-				]) }}
-		</div>
+		<div class="clearfix"></div>
 	{{ Form::close() }}
 </div>
 @stop
 
 @section('scripts-include')
-{{ HTML::script(asset('js/moment.min.js')) }}
 <script type="text/javascript">
-	$(document).ready(function(){
+	(function($) {
+		var table = $('#items-table');
+		var tbody = $('#items-table > tbody');
+		var addItemsButton = $('#add-item-btn');
+		var quantityToProfile = $('.profile-quantity');
+		
+		// append the following html entities on click of
+		// add items button
+		addItemsButton.on('click', function (callback) {
 
-		$('#lock-quantity').trigger('click')
+			// append the following elements on table body
+			tbody.append(
 
-		$('#lock-quantity').on('click', function(){
-			if($(this).is(':checked')) {
-				$('#quantity').prop('readonly', 'readonly')
-			}else {
-				$('#quantity').prop('readonly', '')
+				// append a table row with items-table__trow class
+				$('<tr />', {'class': 'items-table__trow'}).append(
 
-			}
-		})
+					// append a table data with input form displaying the
+					// property number of the university
+					$('<td />').append(
+						$('<input />', {
+							type: 'text',
+							name: 'property-number[]',
+							class: 'form-control property-number',
+							placeholder: 'Input university property number here',
+						})
+					),
+					
+					// append a table data with input form displaying the
+					// property number of the local office
+					$('<td />').append(
+						$('<input />', {
+							type: 'text',
+							name: 'local-property-number[]',
+							class: 'form-control local-property-number',
+							placeholder: 'Input local property number here',
+						})
+					),
+					
+					// append a table data with input form displaying the
+					// serial id of the university
+					$('<td />').append(
+						$('<input />', {
+							type: 'text',
+							name: 'serial-id[]',
+							class: 'form-control serial-id',
+							placeholder: 'Input serial id here',
+						})
+					),
+					
+					// append a table data with the remove button
+					$('<td />').append(
+						$('<button />', {
+							type: 'button',
+							name: '[]',
+							class: 'remove-btn btn btn-sm btn-danger',
+							text: ' Remove',
+						}).prepend( $('<span />', { class: 'glyphicon glyphicon-remove'}))
+					)
+				)
+			);
 
-		$('#next').on('click',function(event){
-			event.preventDefault()
-			quantity = $('#quantity').val()
-			if ( quantity == "" ){
-				swal('Error Occurred!','Quantity must be greater than zero','error')
-			} else if ( quantity == null ){
-				swal('Error Occurred!','Quantity must be greater than zero','error')
-			} else if ( quantity == 0 ){
-				swal('Error Occurred!','Quantity must be greater than zero','error')
-			} else if( quantity > parseInt( $('#total').text() ) ) {
-				swal('Error Occurred!','Quantity must not be greater than unprofiled items','error')
-			} else if( quantity > 30 ) {
-				swal('Error Occurred!','Batch process has a limit of 30 items only!','error')
-			} else {
-				pageOne()
-			}
+			// check if the table has elements on load
+			// if the table has elements, removes the 'no data specified'
+			// text if it exists. If the table has no elements, shows the
+			// 'no data specified' text
+			checkTableLength();
 		});
 
-		$('#is-incrementing').on('change',function(){
-			if($('#is-incrementing').is(':checked'))
-			{
+		// on button click of remove button, triggers functions to display
+		// or hide no data specified text
+		table.on('click', '.remove-btn', function(callback) {
+			$(this).closest('tr').remove();
+			checkTableLength();
+		});
 
-				$('#is-incrementing-value').removeProp('disabled')
-			} else {
-				$('#is-incrementing-value').prop('disabled','disabled')
+		// check if the table has elements on load
+		// if the table has elements, removes the 'no data specified'
+		// text if it exists. If the table has no elements, shows the
+		// 'no data specified' text
+		$(document).ready(function() {
+			checkTableLength();
+		});
+
+		// function to show or remove the 'no data specified' row on the table
+		var checkTableLength = function () {
+			var childElementsLength = tbody.children().length;
+
+			// shows the 'no data specified' row on the table
+			// if the child element is less that zero 
+			if(childElementsLength <= 0) {
+				tbody.append(
+					$('<tr />', {'class': 'items-table__trow no-data-specified', rowspan: 2}).append(
+						$('<td />', { colspan: 4, text: 'No data specified', class: 'text-center' })
+					),
+				);
+			} 
+			
+			// removes the 'no data specified' row on the table
+			// if the child element is greater that zero 
+			// sets the value of child element of the table
+			else {
+				$('.no-data-specified').remove();
+				childElementsLength = tbody.children().length;
 			}
-		})
-
-		$('#quantity').on('focusin change keyup keypress',function(){
-			quantity = $('#quantity').val()
-
-			if(quantity > 30)
-			{
-					$('#quantity-error').remove()
-					$('#quantity').after('<p class="text-danger" id="quantity-error" style="font-size: 12px;">Warning! The system accepts profile up to 30 items only.</p>')
-
-				$('#quantity').val(30)
-			}
-
-			if( quantity == "" )
-			{
-					$('#quantity-error').remove()
-					$('#quantity').after('<p class="text-danger" id="quantity-error" style="font-size: 12px;">Warning! This is a required field.</p>')
-			}
-
-			if( !isNaN(quantity) && quantity != "" && quantity <= 0 )
-			{
-					$('#quantity-error').remove()
-					$('#quantity').after('<p class="text-danger" id="quantity-error" style="font-size: 12px;">Warning! Must have a minimum quantity of one(1).</p>')
-
-				$('#quantity').val(1)
-			}
-
-			if( quantity <= 30 && quantity >= 1 ) {
-
-				$('#quantity-error').fadeOut(400,function(){ $(this).remove() })
-			}
-		})
-
-		function pageOne()
-		{
-			$('#page-one').hide(400);
-			$('#page-two').show(400);
-
-			if(! $('#lock-quantity').is(':checked') || $('tbody tr').length == 0)
-			{
-				$('tbody').html("");
-
-				const1 = "";
-				if($('#propertynumber-assitant').val() != "")
-				{
-					const1 = $('#propertynumber-assitant').val()
-				}
-
-				const2 = "";
-				if($('#is-incrementing').is(":checked"))
-				{
-					const2 = $('#is-incrementing-value').val()
-				}
-
-				quantity = $('#quantity').val();
-				for( var ctr = 1 ; ctr <= quantity ; ctr++ ){
-					insertForm(ctr,const1,const2);
-
-					if($('#is-incrementing').is(":checked"))
-					{
-						const2++
-					}
-				}
-			}
-
+			
+			quantityToProfile.text(childElementsLength);
 		}
 
-		function pageTwo()
-		{
-			$('#page-two').hide(400);
-			$('#page-one').show(400);
-		}
-
-		$('#previous').on('click',function(){
-			pageTwo()
-		});
-
-	    function insertForm(row,const1 = "",const2 = "")
-	    {
-	      $('tbody').append(`
-				<tr>
-					<td>`+row+`</td>
-					<td>
-						<input type="text" name="item[`+(row-1)+`][universitypropertynumber]" class="form-control" >
-					</td>
-					<td>
-						<input type="text" name="item[`+(row-1)+`][propertynumber]" class="form-control" placeholder="Property Number" value="`+ const1 + const2 + `">
-					</td>
-					<td>
-						<input type="text" name="item[`+(row-1)+`][serialid]" class="form-control" placeholder="Serial Number">
-					</td>
-				</tr>
-	      `)
-	    }
-
-		$('#propertynumber').on('focus',function(){
-			var current = $('#propertynumber').val()
-			var constant = "PUP-";
-			$('#propertynumber').val( constant + current )
-		});
-
-		$( "#dateReceived" ).datepicker({
-			  changeMonth: true,
-			  changeYear: false,
-			  maxAge: 59,
-			  minAge: 15,
-		});
-
-		$('#inventory-help').click(function(){
-			$('#inventory-help').popover('show')
-		});
-
-		@if(Input::old('dateReceived'))
-			$('#dateReceived').val({{ Input::old('dateReceived') }});
-			setDate("#dateReceived");
-		@else
-			$('#dateReceived').val("{{ Carbon\Carbon::now()->toFormattedDateString() }}");
-			setDate("#dateReceived");
-		@endif
-
-		$('#dateReceived').on('change',function(){
-			setDate("#dateReceived");
-		});
-
-		$
-
-		function setDate(object){
-				var object_val = $(object).val()
-				var date = moment(object_val).format('MMM DD, YYYY');
-				$(object).val(date);
-		}
-
-		$.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-			type: 'get',
-            url: '{{ url("inventory/$inventory->id") }}' ,
-			dataType: 'json',
-			success: function(response){
-				$('#total').text(parseInt(response.unprofiled));
-			}
-		})
-	});
+	}(jQuery));
 </script>
 @stop
