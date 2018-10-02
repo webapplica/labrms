@@ -7,6 +7,7 @@ use App\Models\Room\Room;
 use Illuminate\Http\Request;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
+use App\Commands\Inventory\Profiling\BatchProfiling;
 
 class ProfileController extends Controller
 {
@@ -41,9 +42,10 @@ class ProfileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
-        //
+        $this->dispatch(new BatchProfiling($request, $id));
+        return redirect('inventory/' . $request->id . '/profile')->with('success-message', __('tasks.success'));
     }
 
     /**
