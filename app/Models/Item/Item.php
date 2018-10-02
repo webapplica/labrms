@@ -81,7 +81,7 @@ class Item extends Model
 	];
 
 	protected $appends = [
-		'location_name', 'parsed_date_received', 'parsed_date_profiled', 'reservation_status'
+		'parsed_date_received', 'parsed_date_profiled', 'reservation_status'
 	];
 
 	/**
@@ -112,16 +112,6 @@ class Item extends Model
 	public function getParsedDateProfiledAttribute()
 	{
 		return Carbon::parse($this->created_at)->toFormattedDateString();
-	}
-
-	/**
-	 * Return the location of current item
-	 *
-	 * @return void
-	 */
-	public function getLocationNameAttribute()
-	{
-		return isset($this->room) ? $this->room->name : "Not Set" ;
 	}
 
 	/**
