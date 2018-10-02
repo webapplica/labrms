@@ -4,70 +4,74 @@ namespace App\Models\Item;
 
 // use DB;
 // use Auth;
-// use Carbon;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Item extends Model
 {
 	// use SoftDeletes;
+
+	const WORKING_STATUS = 'working';
 	
 	protected $table = 'items';
 	protected $primaryKey = 'id';
 	protected $dates = ['deleted_at'];
 	public $timestamps = true;
 	public $fillable = [
-		'local_id', 'property_number', 'serialid', 'location', 'datereceived', 'status'
+		'local_id', 'property_number', 'serial_number', 'location', 'date_received', 'status',
+		'inventory_id', 'receipt_id', 'profiled_by', 'warranty', 'lent_at', 'lent_by', 'deployed_at',
+		'deployed_by', 'for_reservation'
 	];
 	
-	public static $rules = array(
-		'University Property Number' => 'min:5|max:100|unique:items,local_id',
-		'Property Number' => 'min:5|max:100|unique:items,property_number',
-		'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
-		'Location' =>'required',
-		'Date Received' =>'required|date',
-		'Status' =>'required|min:5|max:50'
+	// public static $rules = array(
+	// 	'University Property Number' => 'min:5|max:100|unique:items,local_id',
+	// 	'Property Number' => 'min:5|max:100|unique:items,property_number',
+	// 	'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
+	// 	'Location' =>'required',
+	// 	'Date Received' =>'required|date',
+	// 	'Status' =>'required|min:5|max:50'
 
-	);
+	// );
 	
-	public static $updateRules = array(
-		'Property Number' => 'min:5|max:100',
-		'Serial Number' => 'min:5|max:100',
-		'Location' =>'',
-		'Date Received' =>'date',
-		'Status' =>'min:5|max:50'
-	);
+	// public static $updateRules = array(
+	// 	'Property Number' => 'min:5|max:100',
+	// 	'Serial Number' => 'min:5|max:100',
+	// 	'Location' =>'',
+	// 	'Date Received' =>'date',
+	// 	'Status' =>'min:5|max:50'
+	// );
 
-	public static $updateForReservationRules = array(
-		'id' => 'required|exists:items,id',
-		'checked' => 'required|boolean',
-	);
+	// public static $updateForReservationRules = array(
+	// 	'id' => 'required|exists:items,id',
+	// 	'checked' => 'required|boolean',
+	// );
 
-	public function scopeEnabledReservation($query)
-	{
-		$query->where('for_reservation', '=', 1);
-	}
+	// public function scopeEnabledReservation($query)
+	// {
+	// 	$query->where('for_reservation', '=', 1);
+	// }
 
-	public function scopeDisabledReservation($query)
-	{
-		$query->where('for_reservation', '=', 0);
-	}
+	// public function scopeDisabledReservation($query)
+	// {
+	// 	$query->where('for_reservation', '=', 0);
+	// }
 
-	public function disableReservation()
-	{
-		$this->for_reservation = 0;
-		$this->save();
+	// public function disableReservation()
+	// {
+	// 	$this->for_reservation = 0;
+	// 	$this->save();
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
-	public function enableReservation()
-	{
-		$this->for_reservation = 1;
-		$this->save();
+	// public function enableReservation()
+	// {
+	// 	$this->for_reservation = 1;
+	// 	$this->save();
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	public static $category = [
 		'equipment',
@@ -196,6 +200,20 @@ class Item extends Model
 	// 	return $query->where('local_id','=',$local_id);
 	// }
 
+	/**
+	 * Filters the current search result by id
+	 *
+	 * @param Builder $query
+	 * @param int $id
+	 * @return object
+	 */
+	public function scopeFilterByTypeId($query, int $id)
+	{
+		return $query->whereHas('inventory', function($query) use ($id) {
+			$query->where('type_id', '=', $id);
+		});
+	}
+
 	/*
 	*
 	*	Limit the scope by propertynumber
@@ -257,6 +275,26 @@ class Item extends Model
 
 
 	// }
+
+	/**
+	 * Generate code based on the format given
+	 *
+	 * @param object $inventory
+	 * @return void
+	 */
+	public function generateCode($inventory)
+	{
+		$type = $inventory->type_id;
+		$local_constant_id = config('app.local.constant');
+		$local_id_count = Item::filterByType($inventory->type_id)->count() + 1;
+
+		return $local_constant_id . '-' . $type . '-' . $local_id_count;
+	}
+
+	public function getWorkingStatus()
+	{
+		return self::WORKING_STATUS;
+	}
 
 	/**
 	*
