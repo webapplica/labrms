@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\Room\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\RoomCategory;
+
 class RoomCategoryTableSeeder extends Seeder
 {
     /**
@@ -12,9 +13,9 @@ class RoomCategoryTableSeeder extends Seeder
      */
     public function run()
     {
-        App\RoomCategory::truncate();
+        Category::truncate();
         
-        App\RoomCategory::insert(array(
+        Category::insert(array(
           [ 'name' => 'Systems Development'], 
           [ 'name' => 'Software Application'],
           [ 'name' => 'Programming'],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Ticket\Type;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,9 +13,9 @@ class TicketTypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-        App\TicketType::truncate();
+        Type::truncate();
 
-	    App\TicketType::insert(array(
+	    Type::insert(array(
 	    	[ 'name'=>'Complaint'],
 			[ 'name'=>'Action'],
 			[ 'name'=>'Transfer'],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Room\Room;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,9 +14,8 @@ class RoomTableSeeder extends Seeder {
 	 
 	public function run()
 	{
-    App\Room::truncate();
-
-   	App\Room::insert(array(
+    Room::truncate();
+   	Room::insert(array(
        [
         'name' => 'S501',
         'created_at' => date('Y-m-d H:i:s'),
