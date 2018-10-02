@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Item\Type;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,10 +12,10 @@ class ItemTypeTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-		App\ItemType::truncate();
+		Type::truncate();
 
 		//insert some dummy records
-		App\ItemType::insert(array(
+		Type::insert(array(
 			[
 			   'name' => 'System Unit',
 			   'description' => 'Computer set',

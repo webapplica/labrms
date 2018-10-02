@@ -88,7 +88,7 @@
 				{ data: "local_id" },
 				{ data: "property_number" },
 				{ data: "serial_number" },
-				{ data: "location_name" },
+				{ data: "location" },
 				{ data: "parsed_date_received" },
 				{ data: "parsed_date_profiled"},
 				{ data: "status" },

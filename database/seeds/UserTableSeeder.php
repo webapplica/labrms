@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\User;
 
 class UserTableSeeder extends Seeder {
 
@@ -13,10 +13,10 @@ class UserTableSeeder extends Seeder {
 	 */
 	public function run()
 	{
-        App\User::truncate();
+        User::truncate();
 
 		//insert some dummy records
-		App\User::insert([
+		User::insert([
 			[
 			   'username' => 'admin',
 			   'password' => Hash::make('123456789'),

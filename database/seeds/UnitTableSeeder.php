@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Unit;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,8 +13,8 @@ class UnitTableSeeder extends Seeder
      */
     public function run()
     {
-		App\Unit::truncate();
-        App\Unit::insert([
+		Unit::truncate();
+        Unit::insert([
         	array(
         		'name' => 'Set',
                 'abbreviation' => 'SET',

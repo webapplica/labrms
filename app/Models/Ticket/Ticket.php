@@ -6,9 +6,9 @@ namespace App\Models\Ticket;
 // use Auth;
 // use Carbon;
 use App\Models\User;
+use App\Models\Item\Item;
 use App\Models\Ticket\Tag;
 // use App\Models\Room\Room;
-// use App\Models\Item\Item;
 use App\Models\Ticket\Type;
 // use App\Models\Workstation;
 use App\Http\Modules\Ticket\Mutable;
@@ -142,10 +142,15 @@ class Ticket extends Model
 		return $this->belongsTo(Type::class, 'type_id', 'id');
 	}
 
-	// public function item()
-	// {
-	// 	return $this->belongsToMany(Item::class, 'item_ticket', 'item_id', 'ticket_id');
-	// }
+	/**
+	 * Returns relationship with items table
+	 *
+	 * @return void
+	 */
+	public function item()
+	{
+		return $this->belongsToMany(Item::class, 'item_ticket', 'ticket_id', 'item_id');
+	}
 
 	/**
 	 * Returns relationship with tags table
