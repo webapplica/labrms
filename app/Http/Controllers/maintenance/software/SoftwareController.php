@@ -61,7 +61,10 @@ class SoftwareController extends Controller
 	public function edit(Request $request, $id)
 	{
 		$software = Software::findOrFail($id);
-		return view('maintenance.software.edit', compact('software'));
+		$softwareTypes = SoftwareType::pluck('type', 'type');
+		$licenseTypes = $software->getLicenseTypes();
+
+		return view('maintenance.software.edit', compact('software', 'softwareTypes', 'licenseTypes'));
 	}
 
 	/**

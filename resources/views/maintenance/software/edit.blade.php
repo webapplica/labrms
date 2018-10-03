@@ -1,116 +1,27 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
-@section('style')
-<link rel="stylesheet" href="{{ asset('css/style.min.css') }}" />
-<style>
-	#page-body,#page-two,#page-three{
-		display:none;
-	}
-</style>
-@stop
 @section('content')
-<div class="container-fluid" id="page-body">
-	<div class='col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6'>
-		<div class="panel panel-body ">
-			<legend><h3 class="text-muted">Software Update</h3></legend>
+<div class="container-fluid col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 panel panel-body ">
+	<legend>
+		<h3 class="text-muted">Software {{ $software->name }}: Update</h3>
+	</legend>
 	
-			@include('errors.alert')
+	<ol class="breadcrumb">
+		<li><a href="{{ url('software') }}">Software</a></li>
+		<li class="active">{{ $software->name }}</li>
+		<li class="active">Edit</li>
+	</ol>
 
-			<ol class="breadcrumb">
-			  <li><a href="{{ url('software') }}">Software</a></li>
-			  <li class="active">{{ $software->name }}</li>
-			  <li class="active">Edit</li>
-			</ol>
+	@include('errors.alert')
 
-			{{ Form::open(['method'=>'put','route'=>array('software.update',$software->id),'class'=>'form-horizontal']) }}
-			<div id="page-one">
-				<!-- Software types -->
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('softwaretype','Software Type') }}
-					{{ Form::select('softwaretype',['Loading all Software Types ...'],Input::old('softwaretype'),[
-						'id' => 'softwaretype',
-						'class' => 'form-control'
-					]) }}
-					</div>
-				</div>
-				<!-- Title -->
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('name','Software Name') }}
-					{{ Form::text('name',Input::old('name'),[
-						'id' => 'name',
-						'class'=>'form-control',
-						'placeholder'=>'Software Name'
-					]) }}
-					</div>
-				</div>
-				<!-- Company -->
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('company','Company') }}
-					{{ Form::text('company',Input::old('company'),[
-						'id' => 'company',
-						'class'=>'form-control',
-						'placeholder'=>'Company'
-					]) }}
-					</div>
-				</div>
-				<!-- License Type -->
-				<div class="form-group">
-					<div class="col-sm-12">
-					{{ Form::label('licensetype','License Type') }}
-					{{ Form::select('licensetype',['Loading all License Types ...'],Input::old('licensetype'),[
-						'id' => 'licensetype',
-						'class' => 'form-control'
-					]) }}
-					</div>
-				</div>
-				<div class="col-sm-12">
-					<div class="form-group">
-						<button type="button" class="btn btn-primary col-md-offset-9 col-md-3" id="next">Next</button>
-					</div>
-				</div>
-			</div>
-			<div id="page-two">
-					<div class="form-group">
-						<!-- description -->
-						<div class="col-sm-12">
-							{{ Form::label('minrequirement','Minimum System Requirements') }}
-							{{ Form::textarea('minrequirement',Input::old('minrequirement'),[
-								'id'=>'minreq',
-								'class'=>'form-control',
-								'placeholder'=>'Enter minimum system requirements here...',
-								'data-autoresize',
-								'rows' => '2'
-							]) }}
-						</div>
-					</div>
-					<div class="form-group">
-						<!-- description -->
-						<div class="col-sm-12">
-							{{ Form::label('maxrequirement','Recommended System Requirements') }}
-							{{ Form::textarea('maxrequirement',Input::old('maxrequirement'),[
-								'id' => 'maxreq',
-								'class'=>'form-control',
-								'placeholder'=>'maximum system requirements here...',
-								'data-autoresize',
-								'rows' => '2'
-							]) }}
-						</div>
-					</div>
-				<div class="form-group">
-					<div class=" col-md-offset-6 col-md-3">
-						<button type="button" class="btn btn-default btn-block" id="previous">Previous</button>
-					</div>
-					<div class="col-md-3">
-						<button type="submit" class="btn btn-primary btn-block">Update</button>
-					</div>
-				</div>
-			</div>
-			{{ Form::close() }}
+	{{ Form::open(['method' => 'put', 'route' => array('software.update', $software->id)]) }}
+
+		@include('maintenance.software.partials.form')
+
+		<div class="form-group">
+			<button type="submit" class="btn btn-md btn-primary btn-block">Update</button>
 		</div>
-	</div>
+	{{ Form::close() }}
 </div>
 @stop
 @section('script')

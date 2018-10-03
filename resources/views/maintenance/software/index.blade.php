@@ -31,6 +31,7 @@
 		var table = $('#software-table');
 		var base_url = table.data('base-url');
 		var create_url = table.data('create-url');
+		var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
 	    var dataTable = table.DataTable( {
 	    	serverSide: true,
@@ -54,10 +55,17 @@
 	            { data: "minimum_requirements" },
 	            { data: "recommended_requirements" },
 	            { data: function(callback) {
-					linkUrl = base_url + '/' + callback.id;
+					viewLink = base_url + '/' + callback.id;
+					editLink = base_url + '/' + callback.id + '/edit';
 
 					return `
-						<a href="` + linkUrl + `" class="btn btn-default btn-md">View</a>
+						<form method="post" action="` + viewLink + `">
+							<input type="hidden" name="_method" value="DELETE" />
+							<input type="hidden" name="_token" value="` + csrf_token + `" />
+							<a href="` + viewLink + `" class="btn btn-default btn-md">View</a>
+							<a href="` + editLink + `" class="btn btn-info btn-md">Update</a>
+							<button type="submit" class="btn btn-danger btn-md">Update</button>
+						</form>
 					`;
 	          	} }
 	        ],
