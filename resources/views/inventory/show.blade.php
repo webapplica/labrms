@@ -92,8 +92,8 @@
 	    } );
 
 	    $('.toolbar').html(`
-			<a href="` + release_url + `" role="button" id="release" class="btn btn-danger btn-sm">Release</a>
-			<a href="` + receive_url + `" role="button" id="release" class="btn btn-success btn-sm">Receive</a>
+				<a href="` + release_url + `" role="button" id="release" class="btn btn-danger btn-sm">Release</a>
+				<a href="` + receive_url + `" role="button" id="release" class="btn btn-success btn-sm">Receive</a>
 		`)
 	} );
 </script>

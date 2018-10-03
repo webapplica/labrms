@@ -31,10 +31,10 @@ class Routes
             // Route::resource('maintenance/activity','MaintenanceActivityController');
             // Route::resource('purpose','PurposeController');
             // Route::resource('schedule','LaboratoryScheduleController');
-            // Route::resource('software','SoftwareController',[ 'except' => array('show') ]);
             // Route::resource('software/license','SoftwareLicenseController');
-            Route::namespace('software')->prefix('software')->group(function() {
-                Route::resource('type','TypeController');
+            Route::namespace('software')->group(function() {
+                Route::resource('software', 'SoftwareController');
+                Route::resource('software/type','TypeController');
             });
 
             // Route::resource('semester','SemesterController');

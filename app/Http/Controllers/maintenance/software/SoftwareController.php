@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Commands\Software\UpdateSoftware;
 use App\Commands\Software\RemoveSoftware;
 use App\Commands\Software\RegisterSoftware;
+use App\Models\Software\Type as SoftwareType;
+use App\Http\Requests\SoftwareRequest\SoftwareStoreRequest;
 
 class SoftwareController extends Controller 
 {
@@ -23,7 +25,7 @@ class SoftwareController extends Controller
 			return datatables(Software::all())->toJson();
 		}
 
-		return view('software.index');
+		return view('maintenance.software.index');
 	}
 
 	/**
@@ -31,9 +33,12 @@ class SoftwareController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function create(Request $request)
+	public function create(Request $request, Software $software)
 	{
-		return view('software.create');
+		$softwareTypes = SoftwareType::pluck('type', 'type');
+		$licenseTypes = $software->getLicenseTypes();
+
+		return view('maintenance.software.create', compact('softwareTypes', 'licenseTypes'));
 	}
 
 	/**
@@ -41,7 +46,7 @@ class SoftwareController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function store(Request $request)
+	public function store(SoftwareStoreRequest $request)
 	{
 		$this->dispatch(new RegisterSoftware($request));
 		return redirect('software')->with('success-message', __('tasks.success'));
@@ -56,7 +61,7 @@ class SoftwareController extends Controller
 	public function edit(Request $request, $id)
 	{
 		$software = Software::findOrFail($id);
-		return view('software.edit', compact('software'));
+		return view('maintenance.software.edit', compact('software'));
 	}
 
 	/**
