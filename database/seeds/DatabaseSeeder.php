@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder {
 		DB::table('reservations')->truncate();
 		DB::table('room_reservation')->truncate();
 		DB::table('receipts')->truncate();
+		DB::table('room_category')->truncate();
 		DB::table('units')->truncate();
 		DB::table('ticket_attachments')->truncate();
 		DB::table('reservations')->truncate();
@@ -41,7 +42,7 @@ class DatabaseSeeder extends Seeder {
 		$this->call(ItemTypeTableSeeder::class);
 		$this->call(TicketTypeTableSeeder::class);
 		// $this->call(PurposeTableSeeder::class);
-		// $this->call(SoftwareTypeTableSeeder::class);
+		$this->call(SoftwareTypeTableSeeder::class);
 		$this->call(LanguageTableSeeder::class);
 		$this->call(SettingsTableSeeder::class);
 		$this->call(UnitTableSeeder::class);

@@ -67,24 +67,6 @@ class RoomTableSeeder extends Seeder {
         'updated_at' => date('Y-m-d H:i:s')
        ]
     ));
-
-    DB::table('room_category')->insert([
-      [ 'room_id' => 1, 'category_id' => 6],
-      [ 'room_id' => 2, 'category_id' => 7],
-      [ 'room_id' => 3, 'category_id' => 7],
-      [ 'room_id' => 4, 'category_id' => 5],
-      [ 'room_id' => 4, 'category_id' => 7],
-      [ 'room_id' => 5, 'category_id' => 8],
-      [ 'room_id' => 8, 'category_id' => 1],
-      [ 'room_id' => 8, 'category_id' => 4],
-      [ 'room_id' => 10, 'category_id' => 4],
-      [ 'room_id' => 10, 'category_id' => 6],
-      [ 'room_id' => 10, 'category_id' => 9],
-      [ 'room_id' => 11, 'category_id' => 10],
-
-
-    ]);
-
 	}
 
 
