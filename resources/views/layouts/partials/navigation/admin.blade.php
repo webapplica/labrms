@@ -23,7 +23,7 @@
         {{-- <li>{{ link_to('semester','Semester') }}</li> --}}
         <li>{{ link_to('unit','Unit') }}</li>
         {{-- <li>{{ link_to('software','Software') }}</li> --}}
-        {{-- <li>{{ link_to('software/type','Software Types') }}</li> --}}
+        <li>{{ link_to('software/type','Software Types') }}</li>
     </ul> <!-- end of dropdown items -->
 </li> <!-- end of maintenance dropdown tab -->
 

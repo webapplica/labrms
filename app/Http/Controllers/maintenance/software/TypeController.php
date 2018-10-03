@@ -15,13 +15,13 @@ class TypeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         if($request->ajax()) {
             return datatables(Type::all())->toJson();
         }
 
-        return view('software.type.index');
+        return view('maintenance.software.type.index');
     }
 
     /**
@@ -31,7 +31,7 @@ class TypeController extends Controller
      */
     public function create()
     {
-        return view('software.type.create');
+        return view('maintenance.software.type.create');
     }
 
     /**
@@ -47,17 +47,6 @@ class TypeController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        return view('software.type.show');
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -65,7 +54,8 @@ class TypeController extends Controller
      */
     public function edit($id)
     {
-        return view('software.type.edit');
+        $type = Type::findOrFail($id);
+        return view('maintenance.software.type.edit', compact('type'));
     }
 
     /**

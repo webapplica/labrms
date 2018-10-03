@@ -33,7 +33,10 @@ class Routes
             // Route::resource('schedule','LaboratoryScheduleController');
             // Route::resource('software','SoftwareController',[ 'except' => array('show') ]);
             // Route::resource('software/license','SoftwareLicenseController');
-            // Route::resource('software/type','SoftwareTypesController');
+            Route::namespace('software')->prefix('software')->group(function() {
+                Route::resource('type','TypeController');
+            });
+
             // Route::resource('semester','SemesterController');
             // Route::resource('receipt', 'ReceiptsController');
             
