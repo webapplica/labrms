@@ -12,14 +12,14 @@
 		data-base-url="{{ url('software') }}"
 		data-create-url="{{ url('software/create') }}">
 		<thead>
-			<th>ID</th>
-			<th>Software name</th>
-			<th>Company</th>
-			<th>License type</th>
-			<th>Software type</th>
-			<th>Minimum System Requirements</th>
-			<th>Recommended System Requirements</th>
-			<th class="no-sort"></th>
+			<th class="col-md-1">ID</th>
+			<th class="col-md-1">Software name</th>
+			<th class="col-md-1">Company</th>
+			<th class="col-md-1">License type</th>
+			<th class="col-md-1">Software type</th>
+			<th class="col-md-1">Minimum System Requirements</th>
+			<th class="col-md-1">Recommended System Requirements</th>
+			<th class="col-md-1 no-sort"></th>
 		</thead>
 	</table>
 </div>

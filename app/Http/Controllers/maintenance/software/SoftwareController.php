@@ -51,6 +51,18 @@ class SoftwareController extends Controller
 		$this->dispatch(new RegisterSoftware($request));
 		return redirect('software')->with('success-message', __('tasks.success'));
 	}
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show(Request $request, $id)
+	{
+		$software = Software::findOrFail($id);
+		return view('maintenance.software.show', compact('software'));
+
+	}
 
 	/**
 	 * Show the form for editing the specified resource.
