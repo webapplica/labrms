@@ -18,6 +18,8 @@ class ItemController extends Controller
     public function show($id)
     {
         $item = Item::with('inventory', 'tickets')->findOrFail($id);
-        return view('inventory.profile.show', compact('item'));
+        $tickets = $item->tickets->sortByDesc('created_at');
+
+        return view('inventory.profile.show', compact('item', 'tickets'));
     }
 }

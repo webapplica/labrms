@@ -76,7 +76,7 @@
         </thead>
         <tbody>
         </tbody>
-            @forelse($item->tickets as $ticket)
+            @forelse($tickets as $ticket)
                 <tr>
                     <td>{{ $ticket->id }}</td>
                     <td>{{ $ticket->title }}</td>
