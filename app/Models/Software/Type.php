@@ -1,18 +1,16 @@
 <?php
 
-namespace App;
+namespace App\Models\Software;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SoftwareType extends \Eloquent
+class Type extends Model
 {
     protected $table = 'software_types';
-	
-	public $timestamps = false;
-
+	protected $primaryKey = 'id';
+	public $timestamps = true;
 	public $fillable = ['type'];
-	public $incrementing = false;
-	protected $primaryKey = 'type';
+	
 	public static $rules = array(
 		'Type' => 'required|string|min:5|max:100'
 	);

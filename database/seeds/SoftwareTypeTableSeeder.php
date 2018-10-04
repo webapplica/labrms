@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\Software\Type;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\SoftwareType;
+
 class SoftwareTypeTableSeeder extends Seeder
 {
     /**
@@ -12,9 +13,8 @@ class SoftwareTypeTableSeeder extends Seeder
      */
     public function run()
     {
-        App\SoftwareType::truncate();
-        
-       	App\SoftwareType::insert(array(
+        Type::truncate();
+       	Type::insert(array(
            ['type' => 'Word processing Software'],
            //MS Word, WordPad and Notepad
            ['type' => 'Database Software'],
