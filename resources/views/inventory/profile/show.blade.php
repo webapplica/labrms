@@ -18,10 +18,10 @@
 
     <div style="margin: 10px 0;">
         <a href="{{ url('item/' . $item->id . '/edit') }}" class="btn btn-default">Information Update</a>
-        <a href="{{ url('item/' . $item->id . '/action/add') }}" class="btn btn-primary">Add Action</a>
-        <a href="{{ url('item/' . $item->id . '/action/status-update') }}" class="btn btn-warning">Status Update</a>
-        <a href="{{ url('item/' . $item->id . '/action/reservation-update') }}" class="btn btn-success">Add to Reservation</a>
-        <a href="{{ url('item/' . $item->id . '/action/condemn') }}" class="btn btn-danger">Condemn</a>
+        <a href="{{ url('item/' . $item->id . '/activity/add') }}" class="btn btn-primary">Add Activity</a>
+        <a href="{{ url('item/' . $item->id . '/activity/status-update') }}" class="btn btn-warning">Status Update</a>
+        <a href="{{ url('item/' . $item->id . '/activity/reservation-update') }}" class="btn btn-success">Add to Reservation</a>
+        <a href="{{ url('item/' . $item->id . '/activity/condemn') }}" class="btn btn-danger">Condemn</a>
     </div>
 
     <div class="panel panel-default">
