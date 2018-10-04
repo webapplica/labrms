@@ -18,3 +18,4 @@ public/web - Copy\.config
 public/\.htaccess
 
 public/web\.config
+public/render
