@@ -34,6 +34,9 @@ class Inventory
             Route::namespace('profiling')->group(function() {
                 Route::get('item/{id}/activity/add', 'ActivityController@create');
                 Route::post('item/{id}/activity/add', 'ActivityController@store');
+                
+                Route::get('item/{id}/activity/condemn', 'CondemnController@create');
+                Route::post('item/{id}/activity/condemn', 'CondemnController@store');
             });
 
             Route::get('inventory','InventoryController@index');

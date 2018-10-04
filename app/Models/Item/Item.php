@@ -8,13 +8,14 @@ use Carbon\Carbon;
 use App\Models\Ticket\Ticket;
 use App\Models\Inventory\Inventory;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Item extends Model
 {
-	// use SoftDeletes;
+	use SoftDeletes;
 
 	const WORKING_STATUS = 'working';
+	const CONDEMN_STATUS = 'condemn';
 	
 	protected $table = 'items';
 	protected $primaryKey = 'id';
@@ -283,9 +284,24 @@ class Item extends Model
 		return $local_constant_id . '-' . $type . '-' . $local_id_count;
 	}
 
+	/**
+	 * Returns the status for working
+	 *
+	 * @return string
+	 */
 	public function getWorkingStatus()
 	{
 		return self::WORKING_STATUS;
+	}
+
+	/**
+	 * Returns the status for condemn
+	 *
+	 * @return string
+	 */
+	public function getCondemnStatus()
+	{
+		return self::CONDEMN_STATUS;
 	}
 
 	/**
