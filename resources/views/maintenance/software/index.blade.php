@@ -17,9 +17,9 @@
 			<th class="col-md-1">Company</th>
 			<th class="col-md-1">License type</th>
 			<th class="col-md-1">Software type</th>
-			<th class="col-md-1">Minimum System Requirements</th>
-			<th class="col-md-1">Recommended System Requirements</th>
-			<th class="col-md-1 no-sort"></th>
+			<th class="col-md-2">Minimum System Requirements</th>
+			<th class="col-md-2">Recommended System Requirements</th>
+			<th class="col-md-2 no-sort"></th>
 		</thead>
 	</table>
 </div>
