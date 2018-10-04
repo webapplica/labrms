@@ -17,7 +17,7 @@ class HomeController extends Controller
     public function dashboard()
     {
         if(Auth::check()) {
-            $tickets = Ticket::paginate(20);
+            $tickets = Ticket::authorIsCurrentUser()->root()->latest('date')->paginate(20);
             return view('dashboard.index', compact('tickets'));
         }
 
