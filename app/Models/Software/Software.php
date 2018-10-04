@@ -2,6 +2,7 @@
 
 namespace App\Models\Software;
 
+use App\Models\Software\License;
 use Illuminate\Database\Eloquent\Model;
 
 class Software extends Model
@@ -50,9 +51,15 @@ class Software extends Model
 		return collect(array_combine(self::$licenseTypes, self::$licenseTypes));
 	}
 
-	// public function license() { 
-	// 	return $this->hasMany(License::class, 'software_id', 'id');
-	// }
+	/**
+	 * Link to software license model
+	 *
+	 * @return void
+	 */
+	public function licenses() 
+	{ 
+		return $this->hasMany(License::class, 'software_id', 'id');
+	}
 
 	// public function rooms(){
 	// 	return $this->belongsToMany('App\Room', 'room_software', 'software_id', 'room_id')

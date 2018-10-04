@@ -6,6 +6,8 @@
 		<h3 class="text-muted">Software: {{ $software->name }}</h3>
 	</legend>
 
+	@include('errors.alert')
+
 	<ol class="breadcrumb">
 		<li><a href="{{ url('software') }}">Software</a></li>
 		<li class="active">{{ $software->name }}</li>
@@ -47,12 +49,34 @@
 		</div>
 	</div>
 
-	<div class="panel panel-default col-sm-6">
+	<div class="panel panel-default col-sm-6" style="border: none; border-radius: 0;">
 		<!-- Default panel contents -->
 		<div class="panel-heading">
 			Software Licenses
-			<a href="{{ url('software/' . $software->id . '/' . 'license/create') }}" class="btn btn-success btn-sm pull-right">Add New</a>
-			<div class="clearfix"></div>
+		</div>
+
+		<div class="panel-body">
+			<p>You can add new software license by inputting the license on the field below and submit it by clicking the button beside it.</p>
+			
+			<form method="post" action="{{ url('software/' . $software->id . '/license') }}" id="add-license-form">
+				<div class="input-group">
+						<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+						<input 
+							type="text" 
+							name="license" 
+							class="form-control" 
+							aria-describedby="input-group-add-license"
+							placeholder="Enter license code here..." />
+						<span 
+							role="button" 
+							type="submit" 
+							class="input-group-addon btn-success" 
+							id="input-group-add-license" 
+							onclick="$(this).closest('form').submit()">
+							{{ __('Add') }}
+						</span>
+				</div>
+			</form>
 		</div>
 
 		<!-- Table -->
@@ -65,25 +89,61 @@
 				</tr>
 			</thead>
 			<tbody>
+
+				@forelse($licenses as $license)
 				<tr>
-					<td class="col-md-2">1</td>
-					<td class="col-md-3">XSCD-S3S4-G943-SL2S</td>
+					<td class="col-md-2">{{ $license->id }}</td>
+					<td class="col-md-3">{{ $license->key }}</td>
 					<td class="col-md-1">
-						<form method="post" action="{{ url('software/license') }}">
-						
+						<form method="post" action="{{ url('software/' . $license->id . '/license') }}">
+							<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+							<input type="hidden" name="_method" value="DELETE" />
 							<button type="submit" class="btn btn-sm btn-danger">Remove</button>
 						</form>
 					</td>
 				</tr>
+				@empty
+				<tr>
+					<td class="col-md-2 text-center" colspan=4>No record found</td>
+				</tr>
+				@endforelse
+
 			</tbody>
 		</table>
 	</div>
-	<div class="panel panel-default col-sm-offset-1 col-sm-5">
+	<div class="panel panel-default col-sm-6" style="border: none; border-radius: 0;">
 		<!-- Default panel contents -->
 		<div class="panel-heading">
 			Room Assignment
-			<a href="{{ url('software/' . $software->id . '/' . 'room/assign') }}" class="btn btn-success btn-sm pull-right">Attach to a room</a>
-			<div class="clearfix"></div>
+		</div>
+
+		<div class="panel-body">
+			<p>You can assign new room to this software by selecting the room you want to link and click the add button beside it</p>
+			
+			<form method="post" action="{{ url('software/' . $software->id . '/assign/room') }}" id="assign-room-form">
+				<div class="input-group">
+						<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+						<select
+							name="room"
+							class="form-control">
+
+							@foreach($rooms as $room)
+								<option value="{{ $room->id }}">
+									{{ $room->name }}
+								</option>
+							@endforeach
+
+						</select>
+						<span 
+							role="button" 
+							type="submit" 
+							class="input-group-addon btn-success" 
+							id="input-group-add-license" 
+							onclick="$(this).closest('form').submit()">
+							{{ __('Assign') }}
+						</span>
+				</div>
+			</form>
 		</div>
 
 		<!-- Table -->

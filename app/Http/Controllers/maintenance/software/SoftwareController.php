@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Maintenance\Software;
 
+use App\Models\Room\Room;
 use Illuminate\Http\Request;
 use App\Models\Software\Software;
 use App\Http\Controllers\Controller;
@@ -60,7 +61,10 @@ class SoftwareController extends Controller
 	public function show(Request $request, $id)
 	{
 		$software = Software::findOrFail($id);
-		return view('maintenance.software.show', compact('software'));
+		$rooms = Room::all();
+		$licenses = $software->licenses;
+
+		return view('maintenance.software.show', compact('software', 'rooms', 'licenses'));
 
 	}
 
