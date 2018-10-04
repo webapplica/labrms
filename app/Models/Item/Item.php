@@ -5,6 +5,8 @@ namespace App\Models\Item;
 // use DB;
 // use Auth;
 use Carbon\Carbon;
+use App\Models\Ticket\Ticket;
+use App\Models\Inventory\Inventory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -124,15 +126,15 @@ class Item extends Model
 	// 	return $this->hasManyThrough('App\ItemType','App\Inventory','id','id');
 	// }
 
-	/*
-	*
-	*	Foreign key referencing inventory table
-	*
-	*/
-	// public function inventory()
-	// {
-	// 	return $this->belongsTo('App\Inventory', 'inventory_id', 'id');
-	// }
+	/**
+	 * References inventory table
+	 *
+	 * @return void
+	 */
+	public function inventory()
+	{
+		return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
+	}
 
 	/*
 	*
@@ -155,15 +157,15 @@ class Item extends Model
 	// }
 
 
-	/*
-	*
-	*	Foreign key referencing ticket table
-	*
-	*/
-	// public function tickets()
-	// {
-	// 	return $this->belongsToMany('App\Ticket','item_ticket','item_id','ticket_id');
-	// }
+	/**
+	 * References tickets table
+	 *
+	 * @return void
+	 */
+	public function tickets()
+	{
+		return $this->belongsToMany(Ticket::class,'item_ticket','item_id','ticket_id');
+	}
 
 	// public function scopefindByLocation($query,$location)
 	// {

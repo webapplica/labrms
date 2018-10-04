@@ -112,9 +112,9 @@ class Ticket extends Model
 	 *
 	 * @return void
 	 */
-	// public function generateCode()
+	// public function getCodeAttribute()
 	// {
-	// 	$this->code = Carbon::now()->format('y') . '-' . Carbon::now()->format('m') . '-' . $this->id;
+	// 	return Carbon::now()->format('y') . '-' . Carbon::now()->format('m') . '-' . $this->id;
 	// }
 
 	// public function user()
