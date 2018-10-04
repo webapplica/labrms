@@ -20,7 +20,6 @@
 	
 		<div class="form-group">
 			<p class="text-muted pull-right">
-				<span class="label label-success label-lg">Date Received: {{ 'Unset' }}</span>
 				<span class="label label-primary label-lg">Unprofiled Items: {{ $unprofiled_items_count }}</span>
 			</p>
 		</div>
