@@ -19,8 +19,8 @@ class ProfileController extends Controller
      */
     public function create(Request $request, $id)
     {
-        $inventory = Inventory::findOrFail($id);
-        $receipts = Receipt::pluck('number', 'id');
+        $inventory = Inventory::with('receipts')->findOrFail($id);
+        $receipts = $inventory->receipts->pluck('number', 'id');
         $locations = Room::pluck('name', 'id');
         $unprofiled_items_count = $inventory->unprofiled;
 
