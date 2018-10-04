@@ -54,6 +54,7 @@
 				<th>Location</th>
 				<th>Date Received</th>
 				<th>Date Profiled</th>
+				<th>Reservation Status</th>
 				<th>Status</th>
 				<th class="no-sort"></th>
 			</tr>
@@ -93,6 +94,7 @@
 				{ data: "location" },
 				{ data: "parsed_date_received" },
 				{ data: "parsed_date_profiled"},
+				{ data: "reservation_status" },
 				{ data: "status" },
 				{ data: function(callback){
 					return `

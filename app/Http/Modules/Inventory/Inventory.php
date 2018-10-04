@@ -37,6 +37,9 @@ class Inventory
                 
                 Route::get('item/{id}/activity/condemn', 'CondemnController@create');
                 Route::post('item/{id}/activity/condemn', 'CondemnController@store');
+
+                Route::get('item/{id}/activity/reservation-update', 'ReservationController@create');
+                Route::post('item/{id}/activity/reservation-update', 'ReservationController@store');
             });
 
             Route::get('inventory','InventoryController@index');

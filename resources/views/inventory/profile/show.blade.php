@@ -17,10 +17,10 @@
     </ul>
 
     <div style="margin: 10px 0;">
-        <a href="{{ url('item/' . $item->id . '/edit') }}" class="btn btn-default">Information Update</a>
-        <a href="{{ url('item/' . $item->id . '/activity/add') }}" class="btn btn-primary">Add Activity</a>
+        <a href="{{ url('item/' . $item->id . '/edit') }}" class="btn btn-primary">Information Update</a>
+        <a href="{{ url('item/' . $item->id . '/activity/add') }}" class="btn btn-default">Add Activity</a>
         <a href="{{ url('item/' . $item->id . '/activity/status-update') }}" class="btn btn-warning">Status Update</a>
-        <a href="{{ url('item/' . $item->id . '/activity/reservation-update') }}" class="btn btn-success">Add to Reservation</a>
+        <a href="{{ url('item/' . $item->id . '/activity/reservation-update') }}" class="btn btn-success">Reservation Status Update</a>
         <a href="{{ url('item/' . $item->id . '/activity/condemn') }}" class="btn btn-danger">Condemn</a>
     </div>
 
