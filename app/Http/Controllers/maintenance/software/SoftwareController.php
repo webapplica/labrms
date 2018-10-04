@@ -61,10 +61,11 @@ class SoftwareController extends Controller
 	public function show(Request $request, $id)
 	{
 		$software = Software::findOrFail($id);
-		$rooms = Room::all();
 		$licenses = $software->licenses;
+		$room_assignments = $software->rooms;
+		$rooms = Room::whereNotIn('id', $room_assignments->pluck('id'))->get();
 
-		return view('maintenance.software.show', compact('software', 'rooms', 'licenses'));
+		return view('maintenance.software.show', compact('software', 'rooms', 'licenses', 'room_assignments'));
 
 	}
 

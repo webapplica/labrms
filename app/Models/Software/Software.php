@@ -2,6 +2,7 @@
 
 namespace App\Models\Software;
 
+use App\Models\Room\Room;
 use App\Models\Software\License;
 use Illuminate\Database\Eloquent\Model;
 
@@ -57,14 +58,19 @@ class Software extends Model
 	 * @return void
 	 */
 	public function licenses() 
-	{ 
+	 { 
 		return $this->hasMany(License::class, 'software_id', 'id');
 	}
 
-	// public function rooms(){
-	// 	return $this->belongsToMany('App\Room', 'room_software', 'software_id', 'room_id')
-	// 			->withTimestamps();
-	// }
+	/**
+	 * List all the rooms the software is assigned to
+	 *
+	 * @return void
+	 */
+	public function rooms(){
+		return $this->belongsToMany(Room::class, 'room_software', 'software_id', 'room_id')
+				->withTimestamps();
+	}
 
 	// public function workstations()
 	// {

@@ -2,10 +2,10 @@
 
 namespace App\Commands\Software\Room;
 
-use App\Models\Software;
 use Illuminate\Http\Request;
+use App\Models\Software\Software;
 
-class UnassignSoftware
+class UnassignRoom
 {
 	protected $request;
 	protected $id;

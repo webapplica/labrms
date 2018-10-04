@@ -5,7 +5,7 @@ namespace App\Commands\Activity;
 use App\Models\Software;
 use Illuminate\Http\Request;
 
-class RegisterSoftware
+class UnassignRoom
 {
 	protected $request;
 	protected $id;

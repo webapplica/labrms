@@ -89,7 +89,6 @@
 				</tr>
 			</thead>
 			<tbody>
-
 				@forelse($licenses as $license)
 				<tr>
 					<td class="col-md-2">{{ $license->id }}</td>
@@ -107,7 +106,6 @@
 					<td class="col-md-2 text-center" colspan=4>No record found</td>
 				</tr>
 				@endforelse
-
 			</tbody>
 		</table>
 	</div>
@@ -156,16 +154,23 @@
 				</tr>
 			</thead>
 			<tbody>
+				@forelse($room_assignments as $room)
 				<tr>
-					<td>1</td>
-					<td>S501</td>
-					<td>
-						<form method="post" action="{{ url('software/license') }}">
-						
+					<td class="col-md-2">{{ $room->id }}</td>
+					<td class="col-md-3">{{ $room->name }}</td>
+					<td class="col-md-1">
+						<form method="post" action="{{ url('software/' . $software->id . '/unassign/room/' . $room->id) }}">
+							<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+							<input type="hidden" name="_method" value="DELETE" />
 							<button type="submit" class="btn btn-sm btn-danger">Remove</button>
 						</form>
 					</td>
 				</tr>
+				@empty
+				<tr>
+					<td class="col-md-2 text-center" colspan=4>No record found</td>
+				</tr>
+				@endforelse
 			</tbody>
 		</table>
 	</div>
