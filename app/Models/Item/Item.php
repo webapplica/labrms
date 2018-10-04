@@ -278,7 +278,7 @@ class Item extends Model
 	public function generateCode($inventory)
 	{
 		$type = $inventory->itemtype_id;
-		$local_constant_id = config('app.local.constant');
+		$local_constant_id = config('app.local_id');
 		$local_id_count = Item::filterByTypeId($type)->count() + 1;
 
 		return $local_constant_id . '-' . $type . '-' . $local_id_count;

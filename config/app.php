@@ -17,6 +17,7 @@ return [
     'abbr' => env('APP_ABBR', 'RMS'),
     'lang' => env('APP_LANG', 'en'),
     'charset' => env('APP_CHARSET', 'utf-8'),
+    'local_id' => env('LOCAL_ID', 'LOCAL'),
 
     /*
     |--------------------------------------------------------------------------
