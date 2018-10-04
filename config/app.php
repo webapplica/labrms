@@ -182,19 +182,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
 
-        /*
-        * Backpack Service Providers...
-        */
-        // Backpack\Base\BaseServiceProvider::class,
-        // Backpack\CRUD\CrudServiceProvider::class,
-        // Backpack\LangFileManager\LangFileManagerServiceProvider::class,
-        // Spatie\Backup\BackupServiceProvider::class,
-        // Backpack\BackupManager\BackupManagerServiceProvider::class,
-        // Backpack\LogManager\LogManagerServiceProvider::class,   
-        // Backpack\Settings\SettingsServiceProvider::class,
-        // Cviebrock\EloquentSluggable\ServiceProvider::class, 
-        // Backpack\PageManager\PageManagerServiceProvider::class,
-
+        // Barryvdh\Snappy\ServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         
 
@@ -250,6 +238,8 @@ return [
         'HTML' => Collective\Html\HtmlFacade::class,
         'Input' => Illuminate\Support\Facades\Input::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        // 'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
+        // 'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
 
     ],
 
