@@ -203,7 +203,7 @@ class Item extends Model
 	public function scopeFilterByTypeId($query, int $id)
 	{
 		return $query->whereHas('inventory', function($query) use ($id) {
-			$query->where('type_id', '=', $id);
+			$query->where('itemtype_id', '=', $id);
 		});
 	}
 
@@ -277,9 +277,9 @@ class Item extends Model
 	 */
 	public function generateCode($inventory)
 	{
-		$type = $inventory->type_id;
+		$type = $inventory->itemtype_id;
 		$local_constant_id = config('app.local.constant');
-		$local_id_count = Item::filterByType($inventory->type_id)->count() + 1;
+		$local_id_count = Item::filterByTypeId($type)->count() + 1;
 
 		return $local_constant_id . '-' . $type . '-' . $local_id_count;
 	}
