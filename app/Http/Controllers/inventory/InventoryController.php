@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Inventory\Item;
+namespace App\Http\Controllers\Inventory;
 
 use App\Models\Unit;
 use App\Models\Item\Type;
@@ -9,7 +9,7 @@ use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
 use App\Commands\Inventory\AddInventory;
 
-class ItemController extends Controller 
+class InventoryController extends Controller 
 {
 
 	/**
