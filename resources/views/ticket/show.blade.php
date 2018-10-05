@@ -9,7 +9,7 @@
     <ol class="breadcrumb">
         <li><a href="{{ url('/') }}">Dashboard</a></li>
         <li><a href="{{ url('ticket') }}">Ticket</a></li>
-        <li>{{ $ticket->title }}</li>
+        <li>{{ $ticket->id }}</li>
     </ol>
 
     @include('errors.alert')

@@ -6,18 +6,12 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
-        "backpack/backupmanager": "^1.2",
-        "backpack/base": "^0.7.25",
-        "backpack/crud": "^3.2",
-        "backpack/langfilemanager": "^1.0",
-        "backpack/logmanager": "^2.3",
-        "backpack/pagemanager": "^1.1",
-        "backpack/settings": "^2.0",
-        "doctrine/dbal": "^2.8",
-        "guzzlehttp/guzzle": "^6.3",
+        "barryvdh/laravel-snappy": "^0.4.0",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4",
+        "maatwebsite/excel": "~2.1.0",
+        "predis/predis": "^1.1",
         "yajra/laravel-datatables-oracle": "~8.0"
     },
     "require-dev": {
@@ -56,7 +50,6 @@
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
+        "sort-packages": true
     }
 }

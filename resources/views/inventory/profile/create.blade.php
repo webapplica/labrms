@@ -4,13 +4,12 @@
 <div class="container-fluid col-md-offset-3 col-md-6 panel panel-body">
 
 	<legend>
-		<h3 class="text-muted">Item Profiling</h3>
+		<h3 class="text-muted">Item Profiling: {{ $inventory->brand . ' ' . $inventory->model }}</h3>
 	</legend>
 
 	<ol class="breadcrumb">
 		<li><a href="{{ url('inventory') }}">Inventory</a></li>
-		<li>{{ $inventory->brand }}</li>
-		<li>{{ $inventory->model }}</li>
+		<li><a href="{{ url('inventory/' . $inventory->id) }}">{{ $inventory->brand . ' ' . $inventory->model }}</a></li>
 		<li class="active">Profile</li>
 	</ol>
 
@@ -20,7 +19,6 @@
 	
 		<div class="form-group">
 			<p class="text-muted pull-right">
-				<span class="label label-success label-lg">Date Received: {{ 'Unset' }}</span>
 				<span class="label label-primary label-lg">Unprofiled Items: {{ $unprofiled_items_count }}</span>
 			</p>
 		</div>

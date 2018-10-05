@@ -21,7 +21,7 @@ class TicketController extends Controller
 	public function index(Request $request, Ticket $ticket)
 	{
 		if($request->ajax()) {
-			$ticket = Ticket::authorIsCurrentUser()->root()->oldest('date')->get();
+			$ticket = Ticket::authorIsCurrentUser()->root()->latest('date')->get();
 			return datatables($ticket)->toJson();
 		}
 

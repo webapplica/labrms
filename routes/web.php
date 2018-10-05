@@ -32,5 +32,7 @@ App\Http\Modules\Software\Routes::all();
 App\Http\Modules\Ticket\Ticket::routes();
 App\Http\Modules\Inventory\Inventory::routes();
 
+Route::get('report', 'ReportController@index');
+
 // require_once(base_path('routes/partials/software-inventory.php'));
 // require_once(base_path('routes/partials/workstation.php'));

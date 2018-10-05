@@ -19,6 +19,7 @@
 		width="100%"
 		data-base-url="{{ url('inventory/' . $inventory->id) }}"
 		data-profile-items-url="{{ url('inventory/' . $inventory->id . '/profile') }}"
+		data-item-url="{{ url('item') }}"
 		>
 		<thead>
 			<tr rowspan="2">
@@ -53,6 +54,7 @@
 				<th>Location</th>
 				<th>Date Received</th>
 				<th>Date Profiled</th>
+				<th>Reservation Status</th>
 				<th>Status</th>
 				<th class="no-sort"></th>
 			</tr>
@@ -66,6 +68,7 @@
 		var table = $('#inventory-table');
 		var base_url = table.data('base-url');
 		var profile_items_url = table.data('profile-items-url');
+		var item_url = table.data('item-url');
 
 		var dataTable = table.DataTable({
 			serverSide: true,
@@ -91,22 +94,14 @@
 				{ data: "location" },
 				{ data: "parsed_date_received" },
 				{ data: "parsed_date_profiled"},
+				{ data: "reservation_status" },
 				{ data: "status" },
 				{ data: function(callback){
 					return `
 
-						<a href="{{ url('item/profile/history') }}/`+callback.id+`" class="btn btn-sm btn-default">
+						<a href="` + item_url + `/` + callback.id + `" class="btn btn-sm btn-default btn-block">
 							<span class="glyphicon glyphicon-list" aria-hidden="true"></span> View
 						</a>
-
-						<button class="btn btn-success btn-sm" data-toggle="modal" data-id="`+callback.id+`" data-property_number="`+callback.property_number+`" data-serial_number="`+callback.serial_number+`" data-location="`+callback.location_name+`" data-target="#assignModal" id="assign">
-							<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Assign
-						</button>
-
-						<button class="btn btn-danger btn-sm delete" type="button" data-id="`+callback.id+`">
-							<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-							<span class="hidden-sm hidden-xs">Condemn</span>
-						</button>
 					`
 				} }
 			],

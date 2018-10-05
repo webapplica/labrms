@@ -5,7 +5,7 @@ namespace App\Commands\User;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class RegisterUser
+class ChangePassword
 {
 	protected $request;
 	const DEFAULT_STATUS = 1;

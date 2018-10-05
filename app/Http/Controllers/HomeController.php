@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use Illuminate\Http\Request;
+use App\Models\Ticket\Ticket;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -16,7 +17,8 @@ class HomeController extends Controller
     public function dashboard()
     {
         if(Auth::check()) {
-            return view('dashboard.index');
+            $tickets = Ticket::authorIsCurrentUser()->root()->latest('date')->paginate(20);
+            return view('dashboard.index', compact('tickets'));
         }
 
         return redirect('login');
