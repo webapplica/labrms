@@ -14,37 +14,30 @@ class Routes
      */
     public static function routes()
     {
-        Route::middleware(['auth'])->group(function(){
+        Route::middleware(['auth', 'role.staff'])->namespace('workstation')->group(function() {
             
-            Route::post('workstation/deploy',[
-                'as' => 'workstation.deploy',
-                'uses' => 'WorkstationController@deploy'
-            ]);
+            Route::post('workstation/{id}/deploy', 'DeploymentController@deploy');
+            Route::post('workstation/{id}transfer', 'TransferController@transfer');
             
-            Route::post('workstation/transfer',[
-                'as' => 'workstation.transfer',
-                'uses' => 'WorkstationController@transfer'
-            ]);
-        
-            Route::get('workstation/{id}/softwares', 'WorkstationSoftwareController@getAllWorkstationSoftware');
+            /**
+             * Routes for the list of softwares the workstation has
+             */
+            Route::namespace('software')->group(function() {
+                Route::get('workstation/{id}/software', 'AssignmentController@index');
+                Route::post('workstation/{id}/software', 'AssignmentController@store');
+
+            });
+
+            /**
+             * Routes for the list of license the specific software of workstation has
+             */
+            Route::namespace('license')->group(function() {
+                Route::get('workstation/{id}/software/{id}/license', 'LicenseController@index');
+                Route::post('workstation/{id}/software/{id}/license', 'LicenseController@store');
+
+            });
+
             Route::resource('workstation', 'WorkstationController');
-            Route::get('workstation/view/software','WorkstationSoftwareController@index');
-            Route::get('workstation/software/{id}/assign','WorkstationSoftwareController@create');
-            Route::get('workstation/software/{id}/remove','WorkstationSoftwareController@destroyView');
-            Route::delete('workstation/software/{id}/remove',[
-                'as' => 'workstation.software.destroy',
-                'uses' => 'WorkstationSoftwareController@destroy'
-            ]);
-            
-            Route::post('workstation/software/{id}/assign',[
-                    'as' => 'workstation.software.assign',
-                    'uses' => 'WorkstationSoftwareController@store'
-            ]);
-        
-            Route::post('workstation/software/{id}/license/update',[
-                    'as' => 'workstation.software.assign',
-                    'uses' => 'WorkstationSoftwareController@update'
-            ]);
         });
     }
 }
