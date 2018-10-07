@@ -4,7 +4,7 @@ namespace App\Http\Modules\Inventory;
 
 use Illuminate\Support\Facades\Route;
 
-class Inventory
+class Routes
 {
 
     /**

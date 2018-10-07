@@ -29,8 +29,8 @@ App\Http\Modules\Account\Routes::all();
 // App\Http\Modules\Reservation\Routes::all();
 App\Http\Modules\Maintenance\Routes::all();
 App\Http\Modules\Software\Routes::all();
-App\Http\Modules\Ticket\Ticket::routes();
-App\Http\Modules\Inventory\Inventory::routes();
+App\Http\Modules\Ticket\Routes::routes();
+App\Http\Modules\Inventory\Routes::routes();
 
 Route::get('report', 'ReportController@index');
 

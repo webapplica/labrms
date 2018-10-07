@@ -4,7 +4,7 @@ namespace App\Http\Modules\Ticket;
 
 use Illuminate\Support\Facades\Route;
 
-class Ticket
+class Routes
 {
 
     /**

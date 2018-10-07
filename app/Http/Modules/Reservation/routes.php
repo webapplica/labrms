@@ -2,7 +2,7 @@
 
 namespace App\Http\Modules\Reservation;
 
-use Route; 
+use Illuminate\Support\Facades\Route; 
 
 class Routes
 {
