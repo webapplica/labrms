@@ -1,140 +1,126 @@
-@extends('layouts.master-blue')
+@extends('layouts.app')
 
-@section('style')
+@section('styles-include')
 <style tyle="text/css">
-  .form-group > .col-sm-12 > span {
-    display: block;
-    font-size: 0.9em;
-    color: #545659;
-  }
+    .form-group > .col-sm-12 > span {
+        display: block;
+        font-size: 0.9em;
+        color: #545659;
+    }
 </style>
 @endsection
 
 @section('content')
 <div class="container-fluid" id="page-body">
+    <div class="panel panel-default col-md-offset-3 col-md-6" style="padding: 10px">
+        <div class="panel-body">
 
-  <div class="panel panel-default col-md-offset-3 col-md-6" style="padding: 10px">
-    <div class="panel-body">
+            <legend>
+                <h3 class="text-primary">Workstation</h3>
+            </legend>
 
-      <legend><h3 class="text-primary">Workstation</h3></legend>
-      <ul class="breadcrumb">
-        <li><a href="{{ url('workstation') }}">Workstation</a></li>
-        <li class="active">Add</li>
-      </ul>
- 
-      @include('errors.alert')
+            <ul class="breadcrumb">       
+                <li><a href="{{ url('workstation') }}">Workstation</a></li>
+                <li class="active">Assemble</li>
+            </ul>
 
-      {{ Form::open(['method'=>'post','route'=>array('workstation.store'), 'class' => 'form-horizontal']) }}
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('os','OS License Key') }}
+            @include('errors.alert')
 
-              {{ Form::text('os', isset($workstation->oskey) ? $workstation->oskey : old('os')  ,[
-                'id' => 'os',
-                'class'=>'form-control',
-                'placeholder'=>'Operating System Key'
-              ]) }}
-            </div>
-          </div>
+            {{ Form::open(['method' => 'post','route' => array('workstation.store')]) }}
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('systemunit','System Unit') }}
-              <span>Note: This field is required. Please input the property number for this item. </span>
-              {{ Form::text('systemunit',Input::old('systemunit'),[
-                'id'=>'systemunit',
-                'class'=>'form-control',
-                'placeholder' => 'System Unit'
-              ]) }}
-            </div>
-          </div>
+                <div class="form-group">
+                    {{ Form::label('os','OS License Key') }}
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('monitor','Monitor') }}
-              <span>Note: This field accepts a property number.</span>
-              {{ Form::text('monitor',Input::old('monitor'),[
-                'id'=>'monitor',
-                'class'=>'form-control',
-                'placeholder' => 'Monitor'
-              ]) }}
-            </div>
-          </div>
+                    {{ Form::text('os', isset($workstation->oskey) ? $workstation->oskey : old('os'), [
+                        'id' => 'os',
+                        'class' => 'form-control',
+                        'placeholder' => 'OS License Key'
+                    ]) }}
+                </div>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('avr','AVR') }}
-              <span>Note: This field accepts a property number.</span>
-              {{ Form::text('avr',Input::old('avr'),[
-                'id'=>'avr',
-                'class'=>'form-control',
-                'placeholder' => 'AVR'
-              ]) }}
-            </div>
-          </div>
+                <div class="form-group">
+                    {{ Form::label('systemunit','System Unit') }}
+                    {{ Form::text('systemunit', old('systemunit'), [
+                        'id' => 'systemunit',
+                        'class' => 'form-control',
+                        'placeholder' => 'This field accepts a local id for input',
+                    ]) }}
+                </div>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('keyboard','Keyboard') }}
-              <span>Note: This field accepts a property number.</span>
-              {{ Form::text('keyboard',Input::old('keyboard'),[
-                'id'=>'keyboard',
-                'class'=>'form-control',
-                'placeholder' => 'Keyboard'
-              ]) }}
-            </div>
-          </div>
+                <div class="form-group">
+                    {{ Form::label('monitor', 'Monitor') }}
+                    {{ Form::text('monitor',old('monitor'), [
+                        'id' => 'monitor',
+                        'class' => 'form-control',
+                        'placeholder' => 'This field accepts a local id for input',
+                    ]) }}
+                </div>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              {{ Form::label('mouse','Mouse') }}
-              <span> Note: This accepts the system-generated ID for its input. </span>
-              {{ Form::text('mouse',Input::old('mouse'),[
-                'id'=>'mouse',
-                'class'=>'form-control',
-                'placeholder' => 'Mouse'
-              ]) }}
-            </div>
-          </div>
+                <div class="form-group">
+                    {{ Form::label('avr', 'AVR') }}
+                    {{ Form::text('avr',old('avr'), [
+                        'id' => 'avr',
+                        'class' => 'form-control',
+                        'placeholder' => 'This field accepts a local id for input.'
+                    ]) }}
+                </div>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button class="btn btn-primary btn-lg btn-block" name="create" type="submit"><span class="glyphicon glyphicon-check"></span> Add</button>
-            </div>
-          </div>
+                <div class="form-group">
+                    {{ Form::label('keyboard','Keyboard') }}
+                    {{ Form::text('keyboard', old('keyboard'), [
+                        'id' => 'keyboard',
+                        'class' => 'form-control',
+                        'placeholder' => 'This field accepts a local id for input'
+                    ]) }}
+                </div>
 
-      {{ Form::close() }}
+                <div class="form-group">
+                    {{ Form::label('mouse', 'Mouse: ') }}
+                    {{ Form::checkbox('mouse', old('mouse'), [
+                        'id' => 'mouse',
+                    ]) }}
+                </div>
+
+                <div class="form-group">
+                    <button 
+                        class="btn btn-primary btn-lg btn-block" 
+                        name="create" 
+                        type="submit">
+                        <span class="glyphicon glyphicon-check"></span> Add
+                    </button>
+                </div>
+
+            {{ Form::close() }}
+        </div>      
     </div>
-  </div>
-</div><!-- Container -->
+</div>
 @stop
-@section('script')
-<script>
-  $(document).ready(function(){
 
-    $('#keyboard').autocomplete({
-      source: "{{ url('get/item/profile/keyboard/propertynumber') }}"
+@section('scripts-include')
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('#keyboard').autocomplete({
+            source: "{{ url('get/item/profile/keyboard/propertynumber') }}"
+        });
+
+        $('#monitor').autocomplete({
+            source: "{{ url('get/item/profile/monitor/propertynumber') }}"
+        });
+
+        $('#systemunit').autocomplete({
+            source: "{{ url('get/item/profile/systemunit/propertynumber') }}"
+        });
+
+        $('#avr').autocomplete({
+            source: "{{ url('get/item/profile/avr/propertynumber') }}"
+
+        });
+
+        $('#mouse').autocomplete({
+            source: "{{ url('get/item/profile/mouse/propertynumber') }}"
+        });
+
     });
-
-    $('#monitor').autocomplete({
-      source: "{{ url('get/item/profile/monitor/propertynumber') }}"
-    });
-
-    $('#systemunit').autocomplete({
-      source: "{{ url('get/item/profile/systemunit/propertynumber') }}"
-
-    });
-
-    $('#avr').autocomplete({
-      source: "{{ url('get/item/profile/avr/propertynumber') }}"
-
-    });
-
-    $('#mouse').autocomplete({
-      source: "{{ url('get/item/profile/mouse/propertynumber') }}"
-
-    });
-
-  });
 </script>
 @stop
