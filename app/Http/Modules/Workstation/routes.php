@@ -14,7 +14,7 @@ class Routes
      */
     public static function routes()
     {
-        Route::middleware(['auth', 'role.staff'])->namespace('inventory/workstation')->group(function() {
+        Route::middleware(['auth', 'role.staff'])->namespace('inventory\workstation')->group(function() {
             
             Route::post('workstation/{workstation}/deploy', 'AssignmentController@deploy');
             Route::post('workstation/{workstation}transfer', 'AssignmentController@transfer');
