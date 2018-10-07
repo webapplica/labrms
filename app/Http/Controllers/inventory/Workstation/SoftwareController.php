@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Inventory\Workstation\Software;
+namespace App\Http\Controllers\inventory\workstation;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class SoftwareController extends Controller 
+class SoftwareController extends Controller
 {
 	/**
 	 * Display a listing of the resource.
@@ -14,9 +14,9 @@ class SoftwareController extends Controller
 	 */
 	public function index()
 	{
-		$workstations = App\Workstation::all();
 		
 		if($request->ajax()) {
+            $workstations = Workstation::all();
 			return datatables($workstations)->toJson();
 		}
 
@@ -97,6 +97,4 @@ class SoftwareController extends Controller
 		$this->dispatch(new UnassignSoftware($request, $id));
 		return redirect("workstation/$id/software")->with('success-message', __('tasks.success'));
 	}
-
-
 }

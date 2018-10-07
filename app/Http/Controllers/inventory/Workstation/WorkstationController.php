@@ -23,7 +23,6 @@ class WorkstationController extends Controller
 		return view('workstation.index');
 	}
 
-
 	/**
 	 * Show the form for creating a new resource.
 	 *
@@ -61,36 +60,7 @@ class WorkstationController extends Controller
 			return datatables($workstation->tickets)->toJson();
 		}
 
-		// $workstation = App\Workstation::find($id);
-
-		// if( App\Workstation::where('id', '=', $id)->count() <= 0 ) return view('errors.404');
-
-		// $room = $workstation->systemunit->pluck('location')->first();
-		// $software = App\Software::whereHas('rooms', function($query) use ($room) {
-		// 				$query->where('room_id','=', $room);
-		// 			})->get();
-
-		// $mouse_issued = App\Ticket::whereIn('id', function($query) use ($id)
-		// {
-		// 	$query->where('workstation_id','=',$id)
-		// 		->from('workstation_ticket')
-		// 		->select('ticket_id');
-		// })->where('details', 'like', "%As Mouse Brand%")->count();
-
-		// $ticket_type = App\TicketType::firstOrCreate([ 'name' => 'Receive' ]);
-		// $total = App\Ticket::whereIn('id',function($query) use ($id)
-		// {
-		// 	$query->where('workstation_id','=',$id)
-		// 		->from('workstation_ticket')
-		// 		->select('ticket_id')
-		// 		->pluck('ticket_id');
-		// })->where('type_id','=', $ticket_type )->count();
-
 		return view('workstation.show');
-			// ->with('workstation',$workstation)
-			// ->with('software',$software)
-			// ->with('total_tickets',$total)
-			// ->with('mouseissued',$mouse_issued);
 	}
 
 	/**
@@ -113,11 +83,9 @@ class WorkstationController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-
-		Session::flash('success-message','Workstation  updated');
+		$this->dispatch(new UpdateWorkstation($request, $id));
 		return redirect('workstation')->with('success-message', __('tasks.success'));
 	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -130,31 +98,4 @@ class WorkstationController extends Controller
 		$this->dispatch(new DisassembleWorkstation($request, $id));
 		return redirect('workstation')->with('success-message', __('tasks.success'));
 	}
-
-	/**
-	*
-	*	function for deploying workstation to another location
-	*	@param $room accepts room name
-	*	@param $workstation accepts workstation id list
-	*
-	*/
-	public function deploy(Request $request, $id)
-	{
-		$this->dispatch(new DeployWorkstation($request, $id));
-		return redirect('workstation')->with('success-message', __('tasks.success'));
-	}
-
-	/**
-	*
-	*	function for transfering workstation to another location
-	*	@param $room accepts room name
-	*	@param $workstation accepts workstation id list
-	*
-	*/
-	public function transfer(Request $request, $id)
-	{
-		$this->dispatch(new TransferWorkstation($request, $id));
-		return redirect('workstation')->with('success-message', __('tasks.success'));
-	}
-
 }

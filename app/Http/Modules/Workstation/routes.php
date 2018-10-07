@@ -14,17 +14,17 @@ class Routes
      */
     public static function routes()
     {
-        Route::middleware(['auth', 'role.staff'])->namespace('workstation')->group(function() {
+        Route::middleware(['auth', 'role.staff'])->namespace('inventory/workstation')->group(function() {
             
-            Route::post('workstation/{id}/deploy', 'DeploymentController@deploy');
-            Route::post('workstation/{id}transfer', 'TransferController@transfer');
+            Route::post('workstation/{id}/deploy', 'AssignmentController@deploy');
+            Route::post('workstation/{id}transfer', 'AssignmentController@transfer');
             
             /**
              * Routes for the list of softwares the workstation has
              */
             Route::namespace('software')->group(function() {
-                Route::get('workstation/{id}/software', 'AssignmentController@index');
-                Route::post('workstation/{id}/software', 'AssignmentController@store');
+                Route::get('workstation/{id}/software', 'SoftwareController@index');
+                Route::post('workstation/{id}/software', 'SoftwareController@store');
 
             });
 
