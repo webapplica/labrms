@@ -2,10 +2,13 @@
 
 namespace App\Commands\Workstation;
 
+use Carbon\Carbon;
 use App\Models\Room\Room;
 use App\Models\Item\Item;
 use App\Http\Modules\Generator\Code;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Workstation\Workstation;
+use App\Modeles\Ticket\Type as TicketType;
 
 class AssembleWorkstation
 {
@@ -69,10 +72,46 @@ class AssembleWorkstation
 			'name' => $code
 		]);
 
-		// create a workstation ticket to record the changes in the ticket
+		// create a ticket to record the assembly in the workstation
+		$ticket = Ticket::create([
+			'title' => 'Item Profiling',
+			'details' => 'Workstsation ' . $item->local_id . ' assembled on ' . Carbon::now()->toFormattedDateString() . ' by '. Auth::user()->firstname_first . '. ',
+			'type_id' => TicketType::firstOrCreate([ 'name' => 'Action' ])->id,
+			'staff_id' => Auth::user()->id,
+			'user_id' => Auth::user()->id,
+			'parent_id' => null,
+			'main_id' => null,
+			'status' => $ticket->getClosedStatus(),
+			'author' => Auth::user()->firstname_first,
+		]);
+		
+		// linked the ticket to the item
+		$ticket->workstation()->attach($workstation->id);
+
 		// for each item, create an item ticket to record assembly on the said item
+		// and linked the ticket to the items
+		foreach($items as $item)
+		{
+			// create a new ticket for each item on workstation
+			// sets the ticket =to closed
+			$ticket = Ticket::create([
+				'title' => 'Item assigned to a workstation',
+				'details' => 'Item ' . $item->local_id . ' assigned to ' . $workstation->name . ' on ' . Carbon::now()->toFormattedDateString() . ' by '. Auth::user()->firstname_first . '. ',
+				'type_id' => TicketType::firstOrCreate([ 'name' => 'Action' ])->id,
+				'staff_id' => Auth::user()->id,
+				'user_id' => Auth::user()->id,
+				'parent_id' => null,
+				'main_id' => null,
+				'status' => $ticket->getClosedStatus(),
+				'author' => Auth::user()->firstname_first,
+			]);
+			
+			// linked the ticket to the item
+			$ticket->item()->attach($item->id);
+		}
 
 		// end the transaction, commit the query
+		// all the records will be added to the database
 		DB::commit();
 	}
 }
