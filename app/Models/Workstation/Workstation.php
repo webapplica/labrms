@@ -16,22 +16,23 @@ class Workstation extends Model
 	protected $primaryKey = 'id';
 	public $timestamps = false;
 	public $fillable = [
-		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id'
-	];
-
-	public static $rules = array(
-		'License Key' => 'min:2|max:50',
-		'AVR' => 'exists:items,property_number',
-		'Monitor' => 'exists:items,property_number',
-		'System Unit' => 'required|exists:items,property_number',
-		'Keyboard' => 'exists:items,property_number',
-		'Mouse' => 'exists:items,local_id'
-	);
-
-	protected $appends = [
-		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
+		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 
 		'location'
 	];
+
+	// public static $rules = array(
+	// 	'License Key' => 'min:2|max:50',
+	// 	'AVR' => 'exists:items,property_number',
+	// 	'Monitor' => 'exists:items,property_number',
+	// 	'System Unit' => 'required|exists:items,property_number',
+	// 	'Keyboard' => 'exists:items,property_number',
+	// 	'Mouse' => 'exists:items,local_id'
+	// );
+
+	// protected $appends = [
+	// 	'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
+	// 	'location'
+	// ];
 
 	// public function getSystemUnitLocalAttribute()
 	// {
@@ -76,51 +77,76 @@ class Workstation extends Model
 	// 	return $var;
 	// }
 
-	public function room()
+	// public function room()
+	// {
+	// 	return $this->belongsTo(Room::class, 'room_id', 'id');
+	// }
+
+	// public function systemunit()
+	// {
+	// 	return $this->belongsTo(Item::class, 'systemunit_id', 'id');
+	// }
+
+	// public function monitor()
+	// {
+	// 	return $this->belongsTo(Item::class, 'monitor_id', 'id');
+	// }
+
+	// public function keyboard()
+	// {
+	// 	return $this->belongsTo(Item::class, 'keyboard_id', 'id');
+	// }
+
+	// public function avr()
+	// {
+	// 	return $this->belongsTo(Item::class, 'avr_id', 'id');
+	// }
+
+	// public function mouse()
+	// {
+	// 	return $this->belongsTo(Item::class, 'mouse_id', 'id');
+	// }
+
+	// public function softwares()
+	// {
+	// 	return $this->belongsToMany(Software::class, 'workstation_software', 'workstation_id', 'software_id')
+	// 			->withPivot('license_id')
+	// 			->withTimestamps();
+	// }
+
+	/**
+	 * Filters the query by property number
+	 *
+	 * @param Builder $query
+	 * @param string $propertyNumber
+	 * @return object
+	 */
+	public function scopePropertyNumber($query, $propertyNumber)
 	{
-		return $this->belongsTo(Room::class, 'room_id', 'id');
+		return $query->where('property_number', $propertyNumber);
 	}
 
-	public function systemunit()
+	/**
+	 * Filters the query by property number list
+	 *
+	 * @param Builder $query
+	 * @param string $listOfPropertyNumbers
+	 * @return object
+	 */
+	public function scopeinPropertyNumber($query, $listOfPropertyNumbers)
 	{
-		return $this->belongsTo(Item::class, 'systemunit_id', 'id');
+		return $query->whereIn('property_number', $listOfPropertyNumbers);
 	}
 
-	public function monitor()
-	{
-		return $this->belongsTo(Item::class, 'monitor_id', 'id');
-	}
-	public function keyboard()
-	{
-		return $this->belongsTo(Item::class, 'keyboard_id', 'id');
-	}
+	// public function tickets()
+	// {
+	// 	return $this->belongsToMany(Ticket::class, 'workstation_ticket', 'workstation_id', 'ticket_id');
+	// }
 
-	public function avr()
-	{
-		return $this->belongsTo(Item::class, 'avr_id', 'id');
-	}
-
-	public function mouse()
-	{
-		return $this->belongsTo(Item::class, 'mouse_id', 'id');
-	}
-
-	public function softwares()
-	{
-		return $this->belongsToMany(Software::class, 'workstation_software', 'workstation_id', 'software_id')
-				->withPivot('license_id')
-				->withTimestamps();
-	}
-
-	public function tickets()
-	{
-		return $this->belongsToMany(Ticket::class, 'workstation_ticket', 'workstation_id', 'ticket_id');
-	}
-
-	public function scopeName($query, $value)
-	{
-		return $query->where('name', '=', $value);
-	}
+	// public function scopeName($query, $value)
+	// {
+	// 	return $query->where('name', '=', $value);
+	// }
 
     // public function assemble()
     // {
@@ -581,24 +607,4 @@ class Workstation extends Model
 	// 	$ticket->type_id = $type->id;
 	// 	$ticket->generate($pc->systemunit->id);
     // }
-
-    /*
-    *
-    * generate workstation name
-    *
-    */
-    public function generateWorkstationName($id = null)
-    {
-    	$cons = config('app.workstation_id');
-    	$id = '-' .  ($id != null) ? $id : (Workstation::count() + 1);
-
-    	if( isset($this->room_id) && $this->room_id != null ) {
-    		$location = '-' . $this->room->name;
-    	}else {
-    		$location = '-TMP';
-    	}
-
-
-    	return $cons . $location . $id;
-    }
 }
