@@ -24,7 +24,8 @@ class AssembleWorkstation
 		// for handling easily
 		$request = $this->request;
 
-		// assign the values from the request 
+		// assign the values from the request class into the 
+		// specific variables
 		$systemunit = $request->systemunit;
 		$monitor = $request->monitor;
 		$avr = $request->avr;
