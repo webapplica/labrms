@@ -69,8 +69,8 @@
             <ul class="dropdown-menu">
                 <!-- tenant inventory tab -->
                 <li>{{ link_to('inventory','Item') }}</li>
-                {{-- <li>{{ link_to('workstation','Workstation') }}</li>
-                <li>{{ link_to('inventory/room','Room') }}</li> --}}
+                <li>{{ link_to('workstation','Workstation') }}</li>
+                {{-- <li>{{ link_to('inventory/room','Room') }}</li> --}}
             </ul> <!-- end of dropdown items -->
         </li> <!-- end of inventory dropdown tab -->
 

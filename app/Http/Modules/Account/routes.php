@@ -2,7 +2,7 @@
 
 namespace App\Http\Modules\Account; 
 
-use Route;
+use Illuminate\Support\Facades\Route;
 use App\Http\Modules\Account\Auth\Routes as AuthenticationRoutes; 
 
 class Routes

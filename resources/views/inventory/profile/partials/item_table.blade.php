@@ -5,7 +5,7 @@
         <small>Quantity to profile: <span class="profile-quantity"></span></small>
     </h3>
 </legend>	
-<small class="text-muted">Instructions: List all the elements you want to profile on the table below</small>
+<small class="text-muted">{{ __('instructions.label') . ': ' . __('instructions.profile_add') }}</small>
 
 <table id="items-table" class="table table-bordered table-hover" style="margin-top: 20px;">
     <thead class="items-table__thead">
