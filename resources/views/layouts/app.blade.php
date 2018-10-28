@@ -26,21 +26,21 @@
     <![endif]-->
 
     @if(isset($isPlainBackground) && $isPlainBackground)
-    {{-- display body color on page load --}}
-    <style type="text/css">
-      body {
-        background-color: {{ isset($bodyBackgroundColor) ? $bodyBackgroundColor : '' }};
-      }
-    </style>
+        {{-- display body color on page load --}}
+        <style type="text/css">
+            body {
+                background-color: {{ isset($bodyBackgroundColor) ? $bodyBackgroundColor : '' }};
+            }
+        </style>
     @else
-    {{-- display an image --}}
-    <style>
-        body {
-          background-color: #8e8e8e;
-          background-size: auto auto;
-          background-image: url('{{ asset("images/background_v3.jpg")  }}');
-        }
-      </style>
+        {{-- display an image --}}
+        <style type="text/css">
+            body {
+                background-color: #8e8e8e;
+                background-size: auto auto;
+                background-image: url('{{ asset("images/background_v3.jpg")  }}');
+            }
+        </style>
     @endif
 
     @yield('styles-include')
@@ -53,38 +53,77 @@
     <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
+
+    {{-- notification functionality --}}
+    <script type="text/javascript">
+
+        // notification functionality for the system
+        // can be added with the different notification provider
+        var notify = {
+
+          // calls sweetalert success message
+          // if the title is not provided, the system
+          // will use the default title message
+          success: function (message, title = 'Success!') {
+              swal(title, message, 'success');
+          },
+
+          // calls sweetalert error message
+          // if the title is not provided, the system
+          // will use the default title message
+          error: function(message, title = 'Oops...') {
+              swal(title, message, 'error');
+          }   
+        };
+    </script>
+    {{-- notification functionality --}}
+
+    {{-- additional scripts needed before other scripts on the body --}}
     @yield('scripts-prepend')
+    {{-- additional scripts needed before other scripts on the body --}}
+
   </head>
   <body id="page-body" class="page page-body page-parent-container">
+
+    {{-- styles on the first part of the body --}}
     @yield('styles-body-prepend')
+    {{-- styles on the first part of the body --}}
+
     {{-- include the partial navigation bar --}}
     @if(Auth::check())
-    <nav id="navigation" class="page-navigation">
-      @include('layouts.partials.nav')
-    </nav>
+        <nav id="navigation" class="page-navigation">
+            @include('layouts.partials.nav')
+        </nav>
     @endif
+    {{-- include the partial navigation bar --}}
+
     {{-- display the content page --}}
     <section id="content" class="page-content">
-      @yield('content')
+        @yield('content')
     </section>
+    {{-- display the content page --}}
+
     {{-- adding scripts after the page loads --}}
     @yield('scripts-append')
+    {{-- adding scripts after the page loads --}}
 
     {{-- footer section --}}
     <footer id="footer" class="page-footer">
-      @include('layouts.partials.footer')
+        @include('layouts.partials.footer')
     </footer>
+    {{-- footer section --}}
 
+    {{-- additional scripts --}}
     @yield('scripts-include')
+    {{-- additional scripts --}}
     
-    {{-- additional scripts used globally --}}
+    {{-- scripts used globally --}}
     <script type="text/javascript">
-      @if( session()->has("success-message") )
-        swal("Success!","{{ session()->pull('success-message') }}","success");
-      @endif
-      @if( session()->has("error-message") )
-        swal("Oops...","{{ session()->pull('error-message') }}","error");
-      @endif
+        @if( session()->has("success-message") )
+            notify.success("{{ session()->pull('success-message') }}");
+        @elseif( session()->has("error-message") )
+            notify.error("{{ session()->pull('error-message') }}");
+        @endif
     </script>
   </body>
 </html>
