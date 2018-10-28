@@ -16,4 +16,7 @@ return [
    
    'terms_and_condition_label' => 'By clicking the request button, you agree to CCIS - LOO Terms and Conditions regarding reservation and lending equipments',
    'notice_before_submission' => 'By submitting a request, you acknowledge our condition of three(3) working days in item reservation unless there is a special event or non-working holidays. Disregarding this notice decreases your chance of approval',
+
+   'confirmation_title' => 'Submitting the form',
+   'confirmation_message' => 'Are you really done filling up all the data? This data is no longer editable',
 ];

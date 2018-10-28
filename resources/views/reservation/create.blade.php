@@ -80,41 +80,42 @@
 			return moment(suggestedDate).format('MMM DD, YYYY');
 		});
 
-		startTime.clockpicker({
-		    placement: 'bottom',
-		    align: 'left',
-		    default: 'now',
-            donetext: 'Select',
-            twelvehour: true,
-            init: function() {
-            	this.val( moment( this.val() ).format("hh:mmA") );
-            },
-            afterDone: function() {
-				message.error('Time ended must be greater than time started');
-            },
-		});
+		// startTime.clockpicker({
+		//     placement: 'bottom',
+		//     align: 'left',
+		//     default: 'now',
+        //     donetext: 'Select',
+        //     twelvehour: true,
+        //     init: function() {
+        //     	this.val( moment( this.val() ).format("hh:mmA") );
+        //     },
+        //     afterDone: function() {
+		// 		message.error('Time ended must be greater than time started');
+        //     },
+		// });
 
-		endTime.clockpicker({
-		    placement: 'bottom',
-		    align: 'left',
-		    fromnow: 1800000,
-		    default: 'now',
-            donetext: 'Select',
-            twelvehour: true,
-            init: function() {
-            	endTime.val(function () {
-					return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
-				});
-            },
-            afterDone: function() {
-				message.error('Time ended must be greater than time started');
-            },
-		});
+		// endTime.clockpicker({
+		//     placement: 'bottom',
+		//     align: 'left',
+		//     fromnow: 1800000,
+		//     default: 'now',
+        //     donetext: 'Select',
+        //     twelvehour: true,
+        //     init: function() {
+        //     	endTime.val(function () {
+		// 			return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
+		// 		});
+        //     },
+        //     afterDone: function() {
+		// 		message.error('Time ended must be greater than time started');
+        //     },
+		// });
 
-		requestButton.click(function() {
+		requestButton.on('click', function() {
+
 			swal({
-				title: "Submitting the form",
-				text: "Are you really done filling up all the data? This data is no longer editable",
+				// title: form.data('confirmation-title),
+				// text: form.data('confirmation-message),
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonColor: "#DD6B55",
