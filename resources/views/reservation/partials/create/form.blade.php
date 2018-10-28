@@ -66,9 +66,6 @@
 			'readonly',
 			'style' => 'background-color: #ffffff;'
 		]) }}
-		<span 
-			id="time-end-error-message" 
-			class="text-danger" ></span>
 	</div>
 </div>
 
@@ -77,11 +74,21 @@
 		{{ Form::label('items', 'Items') }}
 	</div>
 	<div class="col-xs-9"> 
-		{{ Form::select('items[]', $items, old('items'),[
-			'id' => 'items',
-			'class' => 'form-control',
-			'multiple'
-		]) }}
+		<select 
+			id='items'
+			class='form-control'
+			multiple
+			>
+			@forelse($items as $item)
+				<option
+					value="{{ $item->id }}"
+					>
+					{{ $item->descriptive_name }}
+				</option>
+			@empty
+				<option>Empty</option>
+			@endforelse
+		</select> 
 	</div>
 </div>
 

@@ -26,7 +26,7 @@ Route::post('/', 'HomeController@dashboard');
 */
 
 App\Http\Modules\Account\Routes::all();
-// App\Http\Modules\Reservation\Routes::all();
+App\Http\Modules\Reservation\Routes::all();
 App\Http\Modules\Maintenance\Routes::all();
 App\Http\Modules\Software\Routes::all();
 App\Http\Modules\Ticket\Routes::routes();

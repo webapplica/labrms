@@ -3,6 +3,7 @@
 namespace App\Models\Item;
 
 use Carbon\Carbon;
+use App\Models\Room\Room;
 use App\Models\Item\Type;
 use App\Models\Ticket\Ticket;
 use App\Models\Inventory\Inventory;
@@ -49,10 +50,10 @@ class Item extends Model
 	// 	'checked' => 'required|boolean',
 	// );
 
-	// public function scopeEnabledReservation($query)
-	// {
-	// 	$query->where('for_reservation', '=', 1);
-	// }
+	public function scopeAllowedOnReservation($query)
+	{
+		return $query->where('for_reservation', '=', 1);
+	}
 
 	// public function scopeDisabledReservation($query)
 	// {
@@ -83,7 +84,8 @@ class Item extends Model
 	];
 
 	protected $appends = [
-		'parsed_date_received', 'parsed_date_profiled', 'reservation_status'
+		'parsed_date_received', 'parsed_date_profiled', 'reservation_status',
+		'descriptive_name'
 	];
 
 	/**
@@ -146,15 +148,15 @@ class Item extends Model
 	// 	return $this->belongsTo('App\Receipt','receipt_id','id');
 	// }
 
-	/*
-	*
-	*	Foreign key referencing room table
-	*
-	*/
-	// public function room()
-	// {
-	// 	return $this->belongsTo('App\Room', 'location','id');
-	// }
+	/**
+	 * References rooms table
+	 * 
+	 * @return object
+	 */
+	public function room()
+	{
+		return $this->belongsTo(Room::class, 'location', 'id');
+	}
 
 
 	/**

@@ -38,17 +38,17 @@
     <!-- dropdown items -->
     <ul class="dropdown-menu">
         <!-- reservation dropdown tab -->
-        {{-- <li class="dropdown-submenu">
+        <li class="dropdown-submenu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                 Reservation 
             </a>
             <!-- dropdown items -->
             <ul class="dropdown-menu">
                 <li>{{ link_to('reservation/create','Create') }}</li>
-                <li>{{ link_to('reservation/','List') }}</li>
-                <li>{{ link_to('reservation/items/list','Items') }}</li>
+                {{-- <li>{{ link_to('reservation/','List') }}</li>
+                <li>{{ link_to('reservation/items/list','Items') }}</li> --}}
             </ul> <!-- end of dropdown items -->
-        </li> <!-- end of reservation dropdown tab --> --}}
+        </li> <!-- end of reservation dropdown tab -->
 
         <!-- ticket dropdown tab -->
         <li>

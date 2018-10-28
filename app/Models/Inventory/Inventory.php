@@ -49,7 +49,7 @@ class Inventory extends Model
   // ];
 
     protected $appends = [
-        'quantity', 'unprofiled', 'item_type_name', 'summarized_name',
+        'quantity', 'unprofiled', 'item_type_name', 'summarized_name', 'descriptive_name'
     ];
 
     /**
@@ -92,6 +92,16 @@ class Inventory extends Model
      * @return void
      */
     public function getSummarizedNameAttribute()
+    {
+        return $this->brand . '-' . $this->model . '-' . $this->item_type_name;
+    }
+
+    /**
+     * Returns the summary of inventory information
+     *
+     * @return void
+     */
+    public function getDescriptiveNameAttribute()
     {
         return $this->brand . '-' . $this->model . '-' . $this->item_type_name;
     }
