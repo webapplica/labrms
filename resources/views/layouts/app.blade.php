@@ -52,6 +52,7 @@
     <script type="text/javascript" src="{{ asset('js/dataTables.bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
     @yield('scripts-prepend')
   </head>
   <body id="page-body" class="page page-body page-parent-container">
