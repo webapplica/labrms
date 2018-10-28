@@ -33,6 +33,11 @@
 	$(document).ready(function() {
 
 		var form = $('#reservation-form');
+		var reservationDate = $('#date');
+		var startTime = $('#startTime');
+		var endTime = $('#returnTime');
+		var requestButton = $('#request-btn');
+
 		var message = {
 			error: function (object, errorMessage) {
 
@@ -45,67 +50,68 @@
 				object.append(
 					$('<span />', {
 						text: errorMessage,
-						class: 'removable-object'
-					});
+						class: 'removable-object',
+					}),
 				);
 			},
-		}
+		};
 
 		// toggles the select button and textarea on 
 		// check of checkbox corresponding to the form
 		$('#has-purpose-checkbox').change(function() {
 			$('#purpose-select').toggle(200)
 			$('#description-textarea').toggle(200)
-		})
+		});
 
-		$("#date").datepicker({
+		reservationDate.datepicker({
 			language: 'en',
 			showOtherYears: false,
 			todayButton: true,
 			minDate: new Date(),
 			autoClose: true,
 			onSelect: function() {
-				date = $('#date');
-				parsedDate = moment(date.val(),'MM/DD/YYYY').format('MMMM DD, YYYY');
-				date.val(parsedDate);
+				parsedDate = moment(reservationDate.val(),'MM/DD/YYYY').format('MMMM DD, YYYY');
+				reservationDate.val(parsedDate);
 			},
 		});
 
-		$("#date").val(function() {
-			suggestedDate = $('#reservation-form').data('suggested-date');
+		reservationDate.val(function() {
+			suggestedDate = form.data('suggested-date');
 			return moment(suggestedDate).format('MMM DD, YYYY');
 		});
 
-		// $('#startTime').clockpicker({
-		//     placement: 'bottom',
-		//     align: 'left',
-		//     default: 'now',
-        //     donetext: 'Select',
-        //     twelvehour: true,
-        //     init: function() {
-        //     	this.val( moment( this.val() ).format("hh:mmA") );
-        //     },
-        //     afterDone: function() {
-        //     	message.time.error();
-        //     },
-		// });
+		startTime.clockpicker({
+		    placement: 'bottom',
+		    align: 'left',
+		    default: 'now',
+            donetext: 'Select',
+            twelvehour: true,
+            init: function() {
+            	this.val( moment( this.val() ).format("hh:mmA") );
+            },
+            afterDone: function() {
+				message.error('Time ended must be greater than time started');
+            },
+		});
 
-		// $('#returnTime').clockpicker({
-		//     placement: 'bottom',
-		//     align: 'left',
-		//     fromnow: 1800000,
-		//     default: 'now',
-        //     donetext: 'Select',
-        //     twelvehour: true,
-        //     init: function() {
-        //     	$('#endtime').val(moment({{ old('time_end') }}).add("1800000").format("hh:mm A"))
-        //     },
-        //     afterDone: function() {
-        //     	error('#time-end-error-message','*Time ended must be greater than time started')
-        //     },
-		// });
+		endTime.clockpicker({
+		    placement: 'bottom',
+		    align: 'left',
+		    fromnow: 1800000,
+		    default: 'now',
+            donetext: 'Select',
+            twelvehour: true,
+            init: function() {
+            	endTime.val(function () {
+					return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
+				});
+            },
+            afterDone: function() {
+				message.error('Time ended must be greater than time started');
+            },
+		});
 
-		$('#request-btn').click(function() {
+		requestButton.click(function() {
 			swal({
 				title: "Submitting the form",
 				text: "Are you really done filling up all the data? This data is no longer editable",
@@ -119,11 +125,10 @@
 			}, 
 			
 			function(isConfirm) {
-
 					if (isConfirm) {
 						form.submit();
 					} else {
-						swal("Cancelled", "Request Cancelled", "error");
+						notify.error('Request cancelled', 'Cancelled');
 				}
 			});
 		});
