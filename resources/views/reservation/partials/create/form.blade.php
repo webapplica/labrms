@@ -78,7 +78,6 @@
 			id='items'
 			class='form-control multi-select'
 			multiple
-			style="width: 60%;"
 			>
 			@forelse($items as $item)
 				<option
