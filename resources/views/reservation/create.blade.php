@@ -9,6 +9,8 @@
 			method="post" 
 			action="{{ url('reservation') }}" 
 			id="reservation-form"
+			data-confirmation-title="{{ __('reservation.confirmation_title') }}"
+			data-confirmation-message="{{ __('reservation.confirmation_message') }}"
 			data-before-submission-notice="{{ __('reservation.notice_before_submission') }}"
 			data-suggested-date="{{ $suggestedDate }}">
 			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
@@ -113,9 +115,11 @@
 
 		requestButton.on('click', function() {
 
-			swal({
-				// title: form.data('confirmation-title),
-				// text: form.data('confirmation-message),
+			// create a alert message
+			// before submitting the form
+			swal( {
+				title: form.data('confirmation-title'),
+				text: form.data('confirmation-message'),
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonColor: "#DD6B55",
@@ -126,12 +130,12 @@
 			}, 
 			
 			function(isConfirm) {
-					if (isConfirm) {
-						form.submit();
-					} else {
-						notify.error('Request cancelled', 'Cancelled');
+				if (isConfirm) {
+					form.submit();
+				} else {
+					notify.error('Request cancelled', 'Cancelled');
 				}
-			});
+			} );
 		});
 	});
 </script>
