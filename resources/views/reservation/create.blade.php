@@ -3,6 +3,11 @@
 @section('content')
 <div class="col-md-offset-3 col-md-6 panel">
 	<div class="panel-body">
+
+		<legend>
+			<h3 class="text-muted">Reservation Form</h3>
+		</legend>
+
 		@include('errors.alert')
 		<form 
 			class="form-horizontal" 
