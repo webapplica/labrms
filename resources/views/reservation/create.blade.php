@@ -10,10 +10,10 @@
 
 		@include('errors.alert')
 		<form 
-			class="form-horizontal" 
 			method="post" 
 			action="{{ url('reservation') }}" 
 			id="reservation-form"
+			class="form-horizontal"
 			data-confirmation-title="{{ __('reservation.confirmation_title') }}"
 			data-confirmation-message="{{ __('reservation.confirmation_message') }}"
 			data-before-submission-notice="{{ __('reservation.notice_before_submission') }}"
@@ -44,6 +44,7 @@
 		var startTime = $('#startTime');
 		var endTime = $('#returnTime');
 		var requestButton = $('#request-btn');
+		var selectOption = $('.multi-select');
 
 		var message = {
 			error: function (object, errorMessage) {
@@ -86,6 +87,8 @@
 			suggestedDate = form.data('suggested-date');
 			return moment(suggestedDate).format('MMM DD, YYYY');
 		});
+
+		selectOption.multiselect();
 
 		// startTime.clockpicker({
 		//     placement: 'bottom',
