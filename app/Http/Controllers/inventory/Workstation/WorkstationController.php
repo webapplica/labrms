@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory\Workstation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Workstation\Workstation;
+use App\Commands\Workstation\AssembleWorkstation;
 
 class WorkstationController extends Controller 
 {

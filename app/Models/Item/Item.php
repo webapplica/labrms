@@ -194,6 +194,34 @@ class Item extends Model
 	}
 
 	/**
+	 * Filters the result by local ids
+	 *
+	 * @param Builder $query
+	 * @param int $propertyNumber
+	 * @return object
+	 */
+	public function scopeInLocalIds($query, array $local_ids)
+	{
+		return $query->whereIn('local_id',  $local_ids);
+	}
+
+	/**
+	 * Filters the current search result by type name
+	 *
+	 * @param Builder $query
+	 * @param int $id
+	 * @return object
+	 */
+	public function scopeNameOfType($query, string $name)
+	{
+		return $query->whereHas('inventory', function($query) use ($name) {
+			$query->whereHas('type', function($query) use ($name) {
+				$query->where('name', '=', $name);
+			});
+		});
+	}
+
+	/**
 	 * Filters the current search result by id
 	 *
 	 * @param Builder $query

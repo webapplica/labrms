@@ -3,22 +3,21 @@
 namespace App\Models\Ticket;
 
 // use DB;
-// use Auth;
-// use Carbon;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Item\Item;
 use App\Models\Ticket\Tag;
 // use App\Models\Room\Room;
 use App\Models\Ticket\Type;
 // use App\Models\Workstation;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Modules\Ticket\Mutable;
 use App\Http\Modules\Ticket\Fetchable;
+use Illuminate\Database\Eloquent\Model;
 use App\Http\Modules\Ticket\Filterable;
+use App\Models\Workstation\Workstation;
 use App\Http\Modules\Ticket\Questionable;
 // use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
@@ -167,20 +166,35 @@ class Ticket extends Model
 	// 	return $this->belongsToMany(Room::class,'room_ticket','room_id','ticket_id');
 	// }
 
-	// public function parentTicket()
-	// {
-	// 	return $this->belongsTo(Ticket::class, 'parent_id', 'id');
-	// }
+	/**
+	 * Returns relationship with parent ticket
+	 *
+	 * @return void
+	 */
+	public function parentTicket()
+	{
+		return $this->belongsTo(Ticket::class, 'parent_id', 'id');
+	}
 
-	// public function childTickets()
-	// {
-	// 	return $this->hasMany(Ticket::class, 'parent_id', 'id');
-	// }
+	/**
+	 * Returns relationship with child ticket
+	 *
+	 * @return void
+	 */
+	public function childTickets()
+	{
+		return $this->hasMany(Ticket::class, 'parent_id', 'id');
+	}
 
-	// public function pc()
-	// {
-	// 	return $this->belongsToMany(Workstation::class, 'workstation_ticket', 'workstation_id', 'ticket_id');
-	// }
+	/**
+	 * Returns relationship with parent ticket
+	 *
+	 * @return void
+	 */
+	public function workstation()
+	{
+		return $this->belongsToMany(Workstation::class, 'workstation_ticket', 'ticket_id', 'workstation_id');
+	}
 
 	/**
 	 * Fetch the current user as author
