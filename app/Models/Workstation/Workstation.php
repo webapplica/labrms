@@ -1,13 +1,12 @@
 <?php
 
-namespace App;
-
-use Illuminate\Database\Eloquent\Model;
+namespace App\Models\Workstation;
 
 use App\Models\Room\Room;
 use App\Models\Item\Item;
 use App\Models\Ticket\Ticket;
 use App\Models\Software\Software;
+use Illuminate\Database\Eloquent\Model;
 
 class Workstation extends Model
 {

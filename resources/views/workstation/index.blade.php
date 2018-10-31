@@ -82,7 +82,7 @@
 	        ],
 	    } );
 
-	    $('#workstationTable').on('click', '.btn-stop-select', function(e){
+	    $('#workstationTable').on('click', '.btn-stop-select', function(e) {
 	    	e.stopPropagation();
 	    })
 
