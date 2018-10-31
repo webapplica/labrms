@@ -1,85 +1,40 @@
-@extends('layouts.master-blue')
-
-@section('style')
-{{ HTML::style(asset('css/font-awesome.min.css')) }}
-{{ HTML::style(asset('css/style.css')) }}
-<style>
-
-	.modal {
-	  text-align: center;
-	}
-
-	@media screen and (min-width: 768px) { 
-	  .modal:before {
-	    display: inline-block;
-	    vertical-align: middle;
-	    content: " ";
-	    height: 100%;
-	  }
-	}
-
-	.modal-dialog {
-	  display: inline-block;
-	  text-align: left;
-	  vertical-align: middle;
-	}
-
-	#page-body{
-		display: none;
-	}
-
-	.line-either-side {
-		overflow: hidden;
-		text-align: center;
-	}
-	.line-either-side:before,
-	.line-either-side:after {
-		background-color: #e5e5e5;
-		content: "";
-		display: inline-block;
-		height: 1px;
-		position: relative;
-		vertical-align: middle;
-		width: 50%;
-	}
-	.line-either-side:before {
-		right: 0.5em;
-		margin-left: -50%;
-	}
-	.line-either-side:after {
-		left: 0.5em;
-		margin-right: -50%;
-	}
-
-	.toolbar {
-    	float:left;
-	}
-
-	textarea{
-		resize:none;
-		overflow-y:hidden;
-	}
-
-	.overlay{
-		margin-bottom: 10px;
-	}
-
-	.display-information > li > span {
-		letter-spacing: 1.5px;
-	}
-</style>
-@stop
+@extends('layouts.app')
 
 @section('content')
-@include('modal.workstation.software.install')
-@include('modal.workstation.software.edit')
-
 <div class="container-fluid" id="page-body">
 	<div class="panel panel-default" style="padding:0px 20px">
 		<div class="panel-body">
-			<div class="col-sm-12">
-				<legend><h3 class="text-muted">{{ $workstation->name }}</h3></legend>
+			<div class="col-sm-12" style="margin-bottom: 20px;">
+				<legend>
+					<h3 class="text-muted">{{ $workstation->name }}</h3>
+				</legend>
+				<button 
+					id="update" 
+					class="btn btn-sm btn-success" 
+					style="margin-right:5px; padding: 5px 10px;">
+					<span class="glyphicon glyphicon-wrench"></span>  Update Parts
+				</button>
+				<button 
+					id="deploy" 
+					class="btn btn-sm btn-default" 
+					style="margin-right:5px; padding: 5px 10px;">
+					<span class="glyphicon glyphicon-share-alt"></span>  Deploy
+				</button>
+				<button 
+					id="transfer" 
+					class="btn btn-sm btn-warning" 
+					style="margin-right:5px; padding: 5px 10px;">
+					<span class="glyphicon glyphicon-share"></span>  Transfer
+				</button>
+				<button 
+					id="delete" 
+					class="btn btn-sm btn-danger" 
+					data-loading-text="Loading..." 
+					style="margin-right:5px; padding: 5px 10px;">
+					<span class="glyphicon glyphicon-trash"></span> Condemn
+				</button>
 			</div>
+
 			<div class="col-sm-12">	
 				<ul class="breadcrumb">
 					<li><a href="{{ url('workstation') }}">Workstation</a></li>
@@ -87,6 +42,7 @@
 					<li class="active">Information</li>
 				</ul>
 			</div>
+
 			<div class="col-sm-12">
 				  <!-- Default panel contents -->
 				  <h3 class="line-either-side text-info">Basic Information</h3>
@@ -102,71 +58,73 @@
 						{{ $workstation->name }}
 					</span>
 				</li>
+
 				<li class="text-muted">
 					<span>
 						<i class="fa fa-key" aria-hidden="true"></i> License Key: 
 					</span>
 					<span>{{ $workstation->oskey }}</span>
 				</li>
+
 				<li class="text-muted">
 					<span>
 						<i class="fa fa-server" aria-hidden="true"></i> System Unit: 
 					</span>
 					<span>
-						{{ ($workstation->systemunit) ? $workstation->systemunit->local_id : "" }}
 					</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						<i class="fa fa-desktop" aria-hidden="true"></i> Monitor:
 					</span>
 					<span>
-						{{ ($workstation->monitor) ? $workstation->monitor->local_id : "" }}
 					</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						<i class="fa fa-power-off" aria-hidden="true"></i> AVR: 
 					</span>
-					<span>{{ ($workstation->avr) ? $workstation->avr->local_id : "" }}</span>
 				</li>
+				
 				<li class="text-muted" >
 					<span>
 						<i class="fa fa-keyboard-o" aria-hidden="true"></i> Keyboard: 
 					</span>
 					<span>
-						{{ ($workstation->keyboard) ? $workstation->keyboard->local_id : "" }}
 					</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						<i class="fa fa-mouse-pointer" aria-hidden="true"></i> Mouse: 
 					</span>
 					<span>
-						{{ ($workstation->mouse) ? $workstation->mouse->local_id : "" }}
 					</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						<i class="fa fa-location-arrow" aria-hidden="true"></i> Location: 
 					</span>
-					<span>{{ $workstation->systemunit->room->name }}</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						Tickets: 
 					</span>
-					<span>{{ isset($total_tickets) ? $total_tickets : 0 }}</span>
 				</li>
+
 				<li class="text-muted" >
 					<span>
 						Mouse Issued: 
 					</span>
-					<span>{{ isset($mouseissued) ? $mouseissued : 0 }}</span>
 				</li>
 			</ul>
 	                                            
 			<div class="col-sm-12">
+
 			  <!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist">
 			    <li role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
@@ -187,7 +145,8 @@
 					        </thead>
 						</table>
 					</div>
-			    </div>
+				</div>
+				
 			    <div role="tabpanel" class="tab-pane active" id="software">
 			    	<div class="panel panel-body" style="padding: 10px;">
 						<table class="table table-bordered" id="softwareTable">
@@ -197,7 +156,8 @@
 							</thead>
 						</table>
 					</div>
-			    </div>
+				</div>
+				
 			  </div>
 			</div>
 		</div>
@@ -255,7 +215,7 @@ $(document).ready(function(){
         ],
     } );
 
-    $('#softwareTable').on('click','.remove',function(){
+    $('#softwareTable').on('click', '.remove', function() {
     	pc = $(this).data('pc')
     	software = $(this).data('software')
 		var $btn = $(this).button('loading')
@@ -283,16 +243,6 @@ $(document).ready(function(){
     		}
     	})
 
-    })
-
-    $('#installSoftwareWorkstationModal').on('hide.bs.modal',function(){
-    	table.ajax.reload()
-		historyTable.ajax.reload()
-    })
-
-    $('#updateSoftwareWorkstationModal').on('hide.bs.modal',function(){
-    	table.ajax.reload()
-		historyTable.ajax.reload()
     })
 
 })

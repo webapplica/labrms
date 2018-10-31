@@ -62,7 +62,7 @@ class WorkstationController extends Controller
 			return datatables($workstation->tickets)->toJson();
 		}
 
-		return view('workstation.show');
+		return view('workstation.show', compact('workstation'));
 	}
 
 	/**
