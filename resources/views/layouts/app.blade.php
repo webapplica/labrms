@@ -85,7 +85,16 @@
     {{-- additional scripts needed before other scripts on the body --}}
 
   </head>
-  <body id="page-body" class="page page-body page-parent-container">
+  <body 
+    @if( session()->has("success-message") )
+        data-notification-type="success"
+        data-notification-message="{{ session()->pull('success-message') }}"
+    @elseif( session()->has("error-message") )
+        data-notification-type="error"
+        data-notification-message="{{ session()->pull('error-message') }}"
+    @endif
+    id="page-body" 
+    class="page page-body page-parent-container">
 
     {{-- styles on the first part of the body --}}
     @yield('styles-body-prepend')
@@ -121,11 +130,36 @@
     
     {{-- scripts used globally --}}
     <script type="text/javascript">
-        @if( session()->has("success-message") )
-            notify.success("{{ session()->pull('success-message') }}");
-        @elseif( session()->has("error-message") )
-            notify.error("{{ session()->pull('error-message') }}");
-        @endif
+
+        // creates a variable with the function as a global
+        // that is used throughout each and every template
+        var global = {
+
+            // triggers a specific alert type depending on the 
+            // passed data from the server whether it be a
+            // success message or an error message
+            alert: function () {
+                bodyElement = $('#page-body');
+                notificationType = bodyElement.data('notification-type');
+                notificationMessage =  bodyElement.data('notification-message');
+                
+                // if the notification type is success
+                // triggers a success notification message
+                if(notificationType == 'success') {
+                    notify.success(notificationMessage);
+                }
+
+                // if the notification type is error
+                // triggers an error notification message
+                else if(notificationType == 'error') {
+                    notify.error(notificationMessage);
+                }
+            },
+        }
+        
+        // run the alert function that triggers a notification
+        // from sent data of a php script
+        global.alert();
     </script>
   </body>
 </html>
