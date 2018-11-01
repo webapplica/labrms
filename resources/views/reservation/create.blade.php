@@ -43,15 +43,17 @@
 		var reservationDate = $('#date');
 		var startTime = $('.startTime');
 		var endTime = $('.returnTime');
+		var startTimeInput = $('input[name=startTime]');
+		var returnTimeInput = $('input[name=returnTime]');
 		var requestButton = $('#request-btn');
 		var selectOption = $('.multi-select');
 
 		var message = {
 			error: function (object, errorMessage) {
-
+				
 				// removes all temporary error message
 				// by targeting reomvable-object
-				$('.removable-object').remove();
+				message.remove();
 
 				// appends a new error message to the given form
 				// alongside the error message
@@ -62,6 +64,13 @@
 					}),
 				);
 			},
+
+			remove: function () {
+
+				// removes all temporary error message
+				// by targeting reomvable-object
+				$('.removable-object').remove();
+			}
 		};
 
 		// toggles the select button and textarea on 
@@ -100,7 +109,7 @@
             // 	this.val( moment( this.val() ).format("hh:mmA") );
             // },
             afterDone: function() {
-				message.error('Time ended must be greater than time started');
+				checkIfTimeStartIsBeforeEndTime();
             },
 		});
 
@@ -117,9 +126,23 @@
 			// 	});
             // },
             afterDone: function() {
-				message.error('Time ended must be greater than time started');
+				checkIfTimeStartIsBeforeEndTime();
             },
 		});
+
+		function checkIfTimeStartIsBeforeEndTime()
+		{
+			parsedStartTime = moment(startTimeInput.val(), 'hh:mm A');
+			parsedEndTime = moment(returnTimeInput.val(), 'hh:mm A');
+
+			if(! parsedStartTime.isBefore(parsedEndTime)) {
+				message.error(startTime.parent('div'), 'Time ended must be greater than time started');
+			} 
+
+			else {
+				message.remove();
+			}
+		}
 
 		requestButton.on('click', function() {
 
