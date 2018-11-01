@@ -44,13 +44,23 @@
 		{{ Form::label('startTime','Time Start') }}
 	</div>
 	<div class="col-sm-9">
-		{{ Form::text('startTime', old('startTime'), [
+		<div class="input-group startTime">
+			<input 
+				type="text" 
+				class="form-control"
+				name="startTime"
+				value="{{ old('startTime') ?: $defaultStartTime }}" />
+			<span class="input-group-addon">
+				<span class="glyphicon glyphicon-time"></span>
+			</span>
+		</div>
+		{{-- {{ Form::text('startTime', old('startTime'), [
 			'class'=>'form-control',
 			'placeholder'=>'Hour : Min',
 			'id' => 'start-time',
 			'readonly',
 			'style'=>'background-color: #ffffff;'
-		]) }}
+		]) }} --}}
 	</div>
 </div>
 
@@ -59,13 +69,23 @@
  		{{ Form::label('returnTime','Time End') }}
 	</div>
 	<div class="col-sm-9">
-		{{ Form::text('returnTime', old('returnTime'), [
+		<div class="input-group returnTime">
+				<input 
+					type="text" 
+					class="form-control"
+					name="returnTime"
+					value="{{ old('returnTime') ?: $defaultReturnTime }}" />
+			<span class="input-group-addon">
+				<span class="glyphicon glyphicon-time"></span>
+			</span>
+		</div>
+		{{-- {{ Form::text('returnTime', old('returnTime'), [
 			'class' => 'form-control background-white',
 			'placeholder' => 'Hour : Min',
 			'id' => 'returnTime',
 			'readonly',
 			'style' => 'background-color: #ffffff;'
-		]) }}
+		]) }} --}}
 	</div>
 </div>
 

@@ -27,7 +27,9 @@ class ListController extends Controller
 		$purposes = Purpose::pluck('title', 'id');
 		$personnels =  Faculty::all();
 		$suggestedDate = Carbon::now()->addDays(3)->toFormattedDateString();
+		$defaultStartTime = Carbon::now()->format('h:i A');
+		$defaultReturnTime = Carbon::now()->addHours(3)->format('h:i A');
 
-		return view('reservation.create', compact('items', 'rooms', 'purposes', 'personnels', 'suggestedDate'));
+		return view('reservation.create', compact('items', 'rooms', 'purposes', 'personnels', 'suggestedDate', 'defaultStartTime', 'defaultReturnTime'));
 	}
 }

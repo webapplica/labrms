@@ -16,7 +16,9 @@
     <link rel="stylesheet" href="{{ asset('css/nav-styles.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/sweetalert.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" rel="stylesheet" />
+    <link href="{{ asset('css/bootstrap-multiselect.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/jquery-clockpicker.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/bootstrap-clockpicker.min.css') }}" rel="stylesheet" />
 
     @yield('styles-prepend')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -54,7 +56,9 @@
     <script type="text/javascript" src="{{ asset('js/jquery-ui.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/moment.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script src="{{ asset('js/bootstrap-multiselect.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-clockpicker.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-clockpicker.min.js') }}"></script>
 
     {{-- notification functionality --}}
     <script type="text/javascript">

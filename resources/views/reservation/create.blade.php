@@ -41,8 +41,8 @@
 
 		var form = $('#reservation-form');
 		var reservationDate = $('#date');
-		var startTime = $('#startTime');
-		var endTime = $('#returnTime');
+		var startTime = $('.startTime');
+		var endTime = $('.returnTime');
 		var requestButton = $('#request-btn');
 		var selectOption = $('.multi-select');
 
@@ -90,36 +90,36 @@
 
 		selectOption.multiselect();
 
-		// startTime.clockpicker({
-		//     placement: 'bottom',
-		//     align: 'left',
-		//     default: 'now',
-        //     donetext: 'Select',
-        //     twelvehour: true,
-        //     init: function() {
-        //     	this.val( moment( this.val() ).format("hh:mmA") );
-        //     },
-        //     afterDone: function() {
-		// 		message.error('Time ended must be greater than time started');
-        //     },
-		// });
+		startTime.clockpicker({
+		    placement: 'bottom',
+		    align: 'left',
+		    default: 'now',
+            donetext: 'Select',
+            twelvehour: true,
+            // init: function() {
+            // 	this.val( moment( this.val() ).format("hh:mmA") );
+            // },
+            afterDone: function() {
+				message.error('Time ended must be greater than time started');
+            },
+		});
 
-		// endTime.clockpicker({
-		//     placement: 'bottom',
-		//     align: 'left',
-		//     fromnow: 1800000,
-		//     default: 'now',
-        //     donetext: 'Select',
-        //     twelvehour: true,
-        //     init: function() {
-        //     	endTime.val(function () {
-		// 			return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
-		// 		});
-        //     },
-        //     afterDone: function() {
-		// 		message.error('Time ended must be greater than time started');
-        //     },
-		// });
+		endTime.clockpicker({
+		    placement: 'bottom',
+		    align: 'left',
+		    fromnow: 1800000,
+		    default: 'now',
+            donetext: 'Select',
+            twelvehour: true,
+            // init: function() {
+            // 	endTime.val(function () {
+			// 		return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
+			// 	});
+            // },
+            afterDone: function() {
+				message.error('Time ended must be greater than time started');
+            },
+		});
 
 		requestButton.on('click', function() {
 
