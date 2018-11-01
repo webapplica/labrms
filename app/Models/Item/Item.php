@@ -89,6 +89,21 @@ class Item extends Model
 	];
 
 	/**
+	 * Return parsed name for the name using the brand, model and type
+	 *
+	 * @return void
+	 */
+	public function getDescriptiveNameAttribute()
+	{
+		$brand = $this->inventory->brand;
+		$model = $this->inventory->model;
+		$type = $this->inventory->type->name;
+
+		return $brand . '-' . $model . '-' . $type;
+		
+	}
+
+	/**
 	 * Returns the status if the item is available for reservation
 	 *
 	 * @return void
@@ -116,16 +131,6 @@ class Item extends Model
 	public function getParsedDateProfiledAttribute()
 	{
 		return Carbon::parse($this->created_at)->toFormattedDateString();
-	}
-
-	/**
-	 * Returns relationship to type table
-	 *
-	 * @return void
-	 */
-	public function type()
-	{
-		return $this->hasManyThrough(Type::class, Inventory::class, 'id', 'id');
 	}
 
 	/**
