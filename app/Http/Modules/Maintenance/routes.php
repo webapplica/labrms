@@ -29,7 +29,11 @@ class Routes
 
             // Route::resource('lostandfound','LostAndFoundController');
             // Route::resource('maintenance/activity','MaintenanceActivityController');
-            // Route::resource('purpose','PurposeController');
+
+            Route::namespace('reservation')->group(function() {
+                Route::resource('purpose','PurposeController');
+            });
+
             // Route::resource('schedule','LaboratoryScheduleController');
             // Route::resource('software/license','SoftwareLicenseController');
             Route::namespace('software')->group(function() {

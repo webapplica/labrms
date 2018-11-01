@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\reservation;
 
 use Carbon\Carbon;
-use App\Models\Purpose;
 use App\Models\Faculty;
 use App\Models\Item\Item;
 use App\Models\Room\Room;
 use Illuminate\Http\Request;
+use App\Models\Reservation\Purpose;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Reservation;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,17 +12,6 @@ class Purpose extends Model
     public $timestamps = true;
 	  protected $fillable = [
         'title', 'description'
-    ];
-
-    public static $rules = [
-        'title' => 'required|max:50',
-        'description' => 'required',
-        'points' => 'required' 
-    ];
-
-    public static $updateRules = [
-        'title' => '',
-        'description' => ''
     ];
 
     public function scopeTitle($query,$value)

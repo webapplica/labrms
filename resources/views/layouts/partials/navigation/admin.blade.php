@@ -19,7 +19,7 @@
         <li>{{ link_to('room/category','Laboratory Room Category') }}</li>
         {{-- <li>{{ link_to('schedule','Laboratory Schedule') }}</li> --}}
         <li>{{ link_to('room','Laboratory Room') }}</li>
-        {{-- <li>{{ link_to('purpose','Reservation Purpose') }}</li> --}}
+        <li>{{ link_to('purpose','Reservation Purpose') }}</li>
         {{-- <li>{{ link_to('semester','Semester') }}</li> --}}
         <li>{{ link_to('unit','Unit') }}</li>
         <li>{{ link_to('software','Software') }}</li>
