@@ -15,13 +15,13 @@
 		<thead>
 			<th class="col-sm-1">ID</th>
 			<th class="col-sm-1">Title</th>
-			<th class="col-sm-1">First Name</th>
+			<th class="col-sm-2">First Name</th>
 			<th class="col-sm-1">Middle Name</th>
-			<th class="col-sm-1">Last Name</th>
+			<th class="col-sm-2">Last Name</th>
 			<th class="col-sm-1">Suffix</th>
 			<th class="col-sm-1">Contact Number</th>
 			<th class="col-sm-1">Email Address</th>
-			<th class="no-sort col-sm-1"></th>
+			<th class="no-sort col-sm-2"></th>
 		</thead>
 	</table>
 </div>
