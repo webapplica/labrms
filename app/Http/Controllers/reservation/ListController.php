@@ -22,11 +22,11 @@ class ListController extends Controller
 	public function create(Request $request)
 	{
 		// $items = Item::allowedOnReservation()->pluck('property_number', 'id');
-		$items = Inventory::with('item', 'type')
+		$items = Inventory::with('items', 'type')
 					->authorizedOnReservation()
 					->get();
 		$rooms = Room::pluck('name', 'id');
-		$purposes = Purpose::pluck('title', 'id');
+		$purposes = Purpose::pluck('title', 'id')->toArray() + ['No rows selected'];
 		$personnels =  Faculty::all();
 		$suggestedDate = Carbon::now()->addDays(3)->toFormattedDateString();
 		$defaultStartTime = Carbon::now()->format('h:iA');

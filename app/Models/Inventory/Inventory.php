@@ -151,7 +151,7 @@ class Inventory extends Model
      */
     public function scopeAuthorizedOnReservation($query)
     {
-        return $query->whereHas('item', function($query) {
+        return $query->whereHas('items', function($query) {
             $query->authorizedOnReservation();
         });
     }
