@@ -144,6 +144,19 @@ class Inventory extends Model
   // }
 
     /**
+     * Fetch all inventory which items are allowed on reservation
+     *
+     * @param Builder $query
+     * @return object
+     */
+    public function scopeAuthorizedOnReservation($query)
+    {
+        return $query->whereHas('item', function($query) {
+            $query->authorizedOnReservation();
+        });
+    }
+
+    /**
      * Returns relationship on items model
      *
      * @return void

@@ -236,6 +236,17 @@ class Item extends Model
 	}
 
 	/**
+	 * Returns list where reservation is allowed
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
+	public function scopeAuthorizedOnReservation($query)
+	{
+		return $query->where('for_reservation', '=', true);
+	}
+
+	/**
 	 * Generate code based on the format given
 	 *
 	 * @param object $inventory
