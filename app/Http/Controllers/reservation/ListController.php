@@ -26,7 +26,7 @@ class ListController extends Controller
 					->authorizedOnReservation()
 					->get();
 		$rooms = Room::pluck('name', 'id');
-		$purposes = Purpose::pluck('title', 'id')->toArray() + ['No rows selected'];
+		$purposes = ['No rows selected'] + Purpose::pluck('title', 'id')->toArray();
 		$personnels =  Faculty::all();
 		$suggestedDate = Carbon::now()->addDays(3)->toFormattedDateString();
 		$defaultStartTime = Carbon::now()->format('h:iA');
