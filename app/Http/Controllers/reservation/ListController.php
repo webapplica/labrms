@@ -22,7 +22,9 @@ class ListController extends Controller
 	public function create(Request $request)
 	{
 		// $items = Item::allowedOnReservation()->pluck('property_number', 'id');
-		$items = Inventory::all();
+		$items = Inventory::with('item', 'type')
+					->authorizedOnReservation()
+					->get();
 		$rooms = Room::pluck('name', 'id');
 		$purposes = Purpose::pluck('title', 'id');
 		$personnels =  Faculty::all();
