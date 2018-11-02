@@ -50,6 +50,7 @@
 				type="text" 
 				class="form-control"
 				name="time_start"
+				id="startTime"
 				value="{{ old('startTime') ?: $defaultStartTime }}" 
 				readonly 
 				style="background-color: white;" />
@@ -70,6 +71,7 @@
 					type="text" 
 					class="form-control"
 					name="return_time"
+					id="returnTime"
 					value="{{ old('returnTime') ?: $defaultReturnTime }}"
 					readonly 
 					style="background-color: white;" />

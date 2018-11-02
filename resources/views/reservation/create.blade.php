@@ -43,8 +43,8 @@
 		var reservationDate = $('#date');
 		var startTime = $('.startTime');
 		var endTime = $('.returnTime');
-		var startTimeInput = $('input[name=startTime]');
-		var returnTimeInput = $('input[name=returnTime]');
+		var startTimeInput = $('#startTime');
+		var returnTimeInput = $('#returnTime');
 		var requestButton = $('#request-btn');
 		var selectOption = $('.multi-select');
 
@@ -72,6 +72,22 @@
 				$('.removable-object').remove();
 			}
 		};
+		
+		// checks if the current time start is less than
+		// the end time
+		function checkIfTimeStartIsBeforeEndTime()
+		{
+			parsedStartTime = moment(startTimeInput.val(), 'hh:mm A');
+			parsedEndTime = moment(returnTimeInput.val(), 'hh:mm A');
+
+			if(! parsedStartTime.isBefore(parsedEndTime)) {
+				message.error(startTime.parent('div'), 'Time start must start before time end');
+			} 
+
+			else {
+				message.remove();
+			}
+		}
 
 		// toggles the select button and textarea on 
 		// check of checkbox corresponding to the form
@@ -105,9 +121,6 @@
 		    default: 'now',
             donetext: 'Select',
             twelvehour: true,
-            // init: function() {
-            // 	this.val( moment( this.val() ).format("hh:mmA") );
-            // },
             afterDone: function() {
 				checkIfTimeStartIsBeforeEndTime();
             },
@@ -120,29 +133,10 @@
 		    default: 'now',
             donetext: 'Select',
             twelvehour: true,
-            // init: function() {
-            // 	endTime.val(function () {
-			// 		return moment("{{ old('time_end') }}").add("1800000").format("hh:mm A");
-			// 	});
-            // },
             afterDone: function() {
 				checkIfTimeStartIsBeforeEndTime();
             },
 		});
-
-		function checkIfTimeStartIsBeforeEndTime()
-		{
-			parsedStartTime = moment(startTimeInput.val(), 'hh:mm A');
-			parsedEndTime = moment(returnTimeInput.val(), 'hh:mm A');
-
-			if(! parsedStartTime.isBefore(parsedEndTime)) {
-				message.error(startTime.parent('div'), 'Time ended must be greater than time started');
-			} 
-
-			else {
-				message.remove();
-			}
-		}
 
 		requestButton.on('click', function() {
 
