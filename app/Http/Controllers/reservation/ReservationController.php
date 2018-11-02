@@ -11,7 +11,7 @@ use App\Models\Reservation\Purpose;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
 
-class ListController extends Controller
+class ReservationController extends Controller
 {
 
 	/**

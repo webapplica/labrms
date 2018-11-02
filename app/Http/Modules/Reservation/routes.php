@@ -13,11 +13,11 @@ class Routes
 
             Route::prefix('reservation')->group(function () {
 
-                Route::get('/', 'ListController@index');
-                Route::post('/', 'ListController@store');
+                Route::get('/', 'ReservationController@index');
+                Route::post('/', 'ReservationController@store');
 
-                Route::get('create', 'ListController@create');
-                Route::get('{id}', 'ListController@show');
+                Route::get('create', 'ReservationController@create');
+                Route::get('{id}', 'ReservationController@show');
 
             //     Route::post('claim',[
             //         'as' => 'reservation.claim',
@@ -33,18 +33,6 @@ class Routes
             //         'as' => 'reservation.disapprove',
             //         'uses' => 'ReservationController@disapprove'
             //     ]);
-                
-            //     Route::prefix('items')->group(function() {
-            //         Route::get('list',[
-            //             'as' => 'reservation.items.list.index',
-            //             'uses' => 'ReservationItemsController@index'
-            //         ]);
-            
-            //         Route::post('list',[
-            //             'uses' => 'ReservationItemsController@update'
-            //         ]);
-            
-            //     });
 
             });
         });
