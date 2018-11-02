@@ -78,7 +78,7 @@
 		function checkIfTimeStartIsBeforeEndTime()
 		{
 			parsedStartTime = moment(startTimeInput.val(), 'hh:mm A');
-			parsedEndTime = moment(returnTimeInput.val(), 'hh:mm A');
+			parsedEndTime = moment(returnTimeInput.val(), 'hh:mm A'); 	
 
 			if(! parsedStartTime.isBefore(parsedEndTime)) {
 				message.error(startTime.parent('div'), 'Time start must start before time end');
