@@ -1,16 +1,17 @@
 <div class="form-group">
 	<div class="col-sm-3">
-	{{ Form::label('name', 'Faculty-in-charge') }}
+		{{ Form::label('faculty', 'Faculty-in-charge') }}
 	</div>
+
 	<div class="col-sm-9">
 		<select 
-			name="name" 
-			id="name" 
+			name="faculty" 
+			id="faculty" 
 			class="form-control">
 			@forelse($personnels as $person)
 				<option 
 					value="{{ $person->id }}" 
-					{{ $person->id == old('name') ? 'selected' : "" }}>
+					{{ $person->id == old('faculty') ? 'selected' : "" }}>
 					{{ $person->full_name }}
 				</option>
 			@empty
@@ -48,19 +49,14 @@
 			<input 
 				type="text" 
 				class="form-control"
-				name="startTime"
-				value="{{ old('startTime') ?: $defaultStartTime }}" />
+				name="time_start"
+				value="{{ old('startTime') ?: $defaultStartTime }}" 
+				readonly 
+				style="background-color: white;" />
 			<span class="input-group-addon">
 				<span class="glyphicon glyphicon-time"></span>
 			</span>
 		</div>
-		{{-- {{ Form::text('startTime', old('startTime'), [
-			'class'=>'form-control',
-			'placeholder'=>'Hour : Min',
-			'id' => 'start-time',
-			'readonly',
-			'style'=>'background-color: #ffffff;'
-		]) }} --}}
 	</div>
 </div>
 
@@ -73,19 +69,14 @@
 				<input 
 					type="text" 
 					class="form-control"
-					name="returnTime"
-					value="{{ old('returnTime') ?: $defaultReturnTime }}" />
+					name="return_time"
+					value="{{ old('returnTime') ?: $defaultReturnTime }}"
+					readonly 
+					style="background-color: white;" />
 			<span class="input-group-addon">
 				<span class="glyphicon glyphicon-time"></span>
 			</span>
 		</div>
-		{{-- {{ Form::text('returnTime', old('returnTime'), [
-			'class' => 'form-control background-white',
-			'placeholder' => 'Hour : Min',
-			'id' => 'returnTime',
-			'readonly',
-			'style' => 'background-color: #ffffff;'
-		]) }} --}}
 	</div>
 </div>
 

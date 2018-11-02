@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Reservation\Purpose;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReservationRequest\ReservationStoreRequest;
 
 class ReservationController extends Controller
 {
@@ -32,6 +33,19 @@ class ReservationController extends Controller
 		$defaultStartTime = Carbon::now()->format('h:iA');
 		$defaultReturnTime = Carbon::now()->addHours(3)->format('h:iA');
 
-		return view('reservation.create', compact('items', 'rooms', 'purposes', 'personnels', 'suggestedDate', 'defaultStartTime', 'defaultReturnTime'));
+		return view('reservation.create', compact(
+			'items', 'rooms', 'purposes', 'personnels', 'suggestedDate', 'defaultStartTime', 'defaultReturnTime'
+		));
+	}
+
+	/**
+	 * Store a newly created resource in storage.
+	 *
+	 * @return Response
+	 */
+	public function store(ReservationStoreRequest $request)
+	{
+		dd($request->all());
+		return redirect('reservation');
 	}
 }
