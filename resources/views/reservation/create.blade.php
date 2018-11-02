@@ -26,7 +26,7 @@
 				<div class="col-sm-12">
 				{{ Form::button('Request',[
 					'class'=>'btn btn-lg btn-primary btn-block',
-					'id'=>'request'
+					'id'=>'request-btn'
 				]) }}
 				</div>
 			</div>
