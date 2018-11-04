@@ -12,46 +12,86 @@
 
 <div class="form-group">
     {{ Form::label('systemunit','System Unit') }}
-    {{ Form::text('systemunit', old('systemunit'), [
-        'id' => 'systemunit',
-        'class' => 'form-control has-autocomplete',
-        'data-type' => 'system-unit',
-        'data-url' => url('item?type="System Unit"&&column=local_id'),
-        'placeholder' => 'This field accepts a local id for input',
-    ]) }}
+    <select 
+        id='items'
+        name="system_unit"
+        class='form-control multi-select'
+        data-live-search=true
+        >
+        @forelse($systemunits as $item)
+            <option
+                value="{{ $item->id }}"
+                {{ $item->id != old('system_unit') ? '' : 'selected'  }}
+                >
+                {{ $item->local_id  }}
+            </option>
+        @empty
+            
+        @endforelse
+    </select> 
 </div>
 
 <div class="form-group">
     {{ Form::label('monitor', 'Monitor') }}
-    {{ Form::text('monitor',old('monitor'), [
-        'id' => 'monitor',
-        'class' => 'form-control has-autocomplete',
-        'data-type' => 'monitor',
-        'data-url' => url('item?type=Monitor&&column=local_id'),
-        'placeholder' => 'This field accepts a local id for input',
-    ]) }}
+    <select 
+        id='items'
+        name="monitor"
+        class='form-control multi-select'
+        data-live-search=true
+        >
+        @forelse($monitors as $item)
+            <option
+                value="{{ $item->id }}"
+                {{ $item->id != old('monitor') ? '' : 'selected'  }}
+                >
+                {{ $item->local_id  }}
+            </option>
+        @empty
+            
+        @endforelse
+    </select> 
 </div>
 
 <div class="form-group">
     {{ Form::label('avr', 'AVR') }}
-    {{ Form::text('avr',old('avr'), [
-        'id' => 'avr',
-        'class' => 'form-control has-autocomplete',
-        'data-type' => 'avr',
-        'data-url' => url('item?type=Avr&&column=local_id'),
-        'placeholder' => 'This field accepts a local id for input.'
-    ]) }}
+    <select 
+        id='items'
+        name="avr"
+        class='form-control multi-select'
+        data-live-search=true
+        >
+        @forelse($avrs as $item)
+            <option
+                value="{{ $item->id }}"
+                {{ $item->id != old('avr') ? '' : 'selected'  }}
+                >
+                {{ $item->local_id  }}
+            </option>
+        @empty
+        
+        @endforelse
+    </select> 
 </div>
 
 <div class="form-group">
     {{ Form::label('keyboard','Keyboard') }}
-    {{ Form::text('keyboard', old('keyboard'), [
-        'id' => 'keyboard',
-        'class' => 'form-control has-autocomplete',
-        'data-type' => 'keyboard',
-        'data-url' => url('item?type=Keyboard&&column=local_id'),
-        'placeholder' => 'This field accepts a local id for input'
-    ]) }}
+    <select 
+        id='items'
+        name="keyboard"
+        class='form-control multi-select'
+        data-live-search=true
+        >
+        @forelse($keyboards as $item)
+            <option
+                value="{{ $item->id }}"
+                {{ $item->id != old('keyboard') ? '' : 'selected'  }}
+                >
+                {{ $item->local_id  }}
+            </option>
+        @empty
+        
+        @endforelse
+    </select> 
 </div>
 
 <div class="form-group">

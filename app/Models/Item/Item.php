@@ -7,8 +7,11 @@ use App\Models\Room\Room;
 use App\Models\Item\Type;
 use App\Models\Ticket\Ticket;
 use App\Models\Inventory\Inventory;
+use App\Http\Modules\Generator\Code;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Workstation\Workstation;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Modules\Generator\ListGenerator;
 
 class Item extends Model
 {
@@ -143,6 +146,16 @@ class Item extends Model
 		return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
 	}
 
+	public function type()
+	{
+		return $this->hasManyThrough(
+			Inventory::class, 
+			Type::class,
+			'id',
+			'itemtype_id'
+		);
+	}
+
 	/*
 	*
 	*	Foreign key referencing receipt table
@@ -221,7 +234,24 @@ class Item extends Model
 	{
 		return $query->whereHas('inventory', function($query) use ($name) {
 			$query->whereHas('type', function($query) use ($name) {
-				$query->where('name', '=', $name);
+				$query->name($name);
+			});
+		});
+	}
+
+	/**
+	 * Filters the current search result by type name
+	 * in the array provided
+	 *
+	 * @param Builder $query
+	 * @param int $arrayValues
+	 * @return object
+	 */
+	public function scopeNameOfTypeIn($query, array $arrayValues)
+	{
+		return $query->whereHas('inventory', function($query) use ($arrayValues) {
+			$query->whereHas('type', function($query) use ($arrayValues) {
+				$query->nameIn($arrayValues);
 			});
 		});
 	}
@@ -252,18 +282,50 @@ class Item extends Model
 	}
 
 	/**
+	 * Filter the query by items not yet assembled in workstation
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
+	public function scopeNotAssembledInWorkstation($query)
+	{
+		$query->whereNotIn('id', ListGenerator::makeArray(
+			Workstation::pluck('systemunit_id')->toArray(),
+			Workstation::pluck('monitor_id')->toArray(),
+			Workstation::pluck('keyboard_id')->toArray(), 
+			Workstation::pluck('mouse_id')->toArray(),
+			Workstation::pluck('avr_id')->toArray()
+		)->unique());
+	}
+	
+	/**
 	 * Generate code based on the format given
 	 *
-	 * @param object $inventory
-	 * @return void
+	 * @param Builder $inventory
+	 * @param integer $increments
+	 * @param integer $itemCount
+	 * @return string
 	 */
-	public function generateCode($inventory)
+	public function generateCode($inventory, $increments = 1, $itemCount = null)
 	{
 		$type = $inventory->itemtype_id;
-		$local_constant_id = config('app.local_id');
-		$local_id_count = Item::filterByTypeId($type)->count() + 1;
+		$lastItem = Item::filterByTypeId($type)->orderBy('id', 'desc')->first()->local_id;
+		$array = explode(
+			Code::DASH_SEPARATOR, 
+			$lastItem
+		);
 
-		return $local_constant_id . '-' . $type . '-' . $local_id_count;
+		$lastIdOfTheItem = array_values(array_slice($array, -1))[0];
+		$itemCount = $itemCount ? $itemCount : $lastIdOfTheItem;
+
+		// generate a code for the workstation name
+		// use a custom package designed specifically to
+		// generate a code
+		return Code::make([
+			config('app.local_id'),
+			$type,
+			$count + $increments,
+		], Code::DASH_SEPARATOR);
 	}
 
 	/**

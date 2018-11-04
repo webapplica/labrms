@@ -34,7 +34,7 @@ class AssembleWorkstation
 
 		// assign the values from the request class into the 
 		// specific variables
-		$systemunit = $request->systemunit;
+		$systemunit = $request->system_unit;
 		$monitor = $request->monitor;
 		$avr = $request->avr;
 		$keyboard = $request->keyboard;
@@ -58,21 +58,15 @@ class AssembleWorkstation
 		// use transaction in order to change the record properly
 		DB::beginTransaction();
 
-		// list all the items the workstation has
-		$items = Item::with('inventory', 'type')
-						->inLocalIds([
-							$systemunit, $monitor, $keyboard, $avr
-						])->get();
-
 		// create a record of workstation and store in variable workstation
 		// use the variable code and items. find the specific item for the 
 		// specific row and return the id for the said item
 		$workstation = Workstation::create([
 			'oskey' => $oskey,
-			'systemunit_id' => $items->where('local_id', $systemunit)->pluck('id')->first(),
-			'monitor_id' => $items->where('local_id', $monitor)->pluck('id')->first(),
-			'avr_id' => $items->where('local_id', $avr)->pluck('id')->first(),
-			'keyboard_id' => $items->where('local_id', $keyboard)->pluck('id')->first(),
+			'systemunit_id' => $systemunit,
+			'monitor_id' => $monitor,
+			'avr_id' => $avr,
+			'keyboard_id' => $keyboard,
 			'mouse_id' => null,
 			'name' => $code
 		]);
@@ -94,6 +88,11 @@ class AssembleWorkstation
 		
 		// linked the ticket to the item
 		$ticket->workstation()->attach($workstation->id);
+
+		// list all the items the workstation has
+		$items = Item::find([
+			$systemunit, $monitor, $keyboard, $avr
+		]);
 
 		// for each item, create an item ticket to record assembly on the said item
 		// and linked the ticket to the items

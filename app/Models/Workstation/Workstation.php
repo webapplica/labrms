@@ -28,83 +28,130 @@ class Workstation extends Model
 	// 	'Mouse' => 'exists:items,local_id'
 	// );
 
-	// protected $appends = [
-	// 	'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
-	// 	'location'
-	// ];
+	protected $appends = [
+		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
+		'location'
+	];
 
-	// public function getSystemUnitLocalAttribute()
-	// {
-	// 	$var = $this->systemunit;
-	// 	$var = isset($var->local_id) ? $var->local_id : "None";
-	// 	return $var;
-	// }
+	/**
+	 * Local id for system unit
+	 *
+	 * @return string
+	 */
+	public function getSystemUnitLocalAttribute()
+	{
+		return $this->systemunit->local_id ?: "None";
+	}
 
-	// public function getMouseLocalAttribute()
-	// {
-	// 	$var = $this->mouse;
-	// 	$var = isset($var->local_id) ? $var->local_id : "None";
+	/**
+	 * Local id for mouse
+	 *
+	 * @return string
+	 */
+	public function getMouseLocalAttribute()
+	{
+		return isset($this->mouse) ? $this->mouse->local_id : "None";
+	}
 
-	// 	return $var;
-	// }
+	/**
+	 * Local id for keyboard
+	 *
+	 * @return string
+	 */
+	public function getKeyboardLocalAttribute()
+	{
+		return isset($this->keyboard) ? $this->keyboard->local_id : "None";
+	}
 
-	// public function getKeyboardLocalAttribute()
-	// {
-	// 	$var = $this->keyboard;
-	// 	$var = isset($var->local_id) ? $var->local_id : "None";
-	// 	return $var;
-	// }
+	/**
+	 * Local id for avr
+	 *
+	 * @return string
+	 */
+	public function getAvrLocalAttribute()
+	{
+		return isset($this->avr) ? $this->avr->local_id : "None";
+	}
 
-	// public function getAvrLocalAttribute()
-	// {
-	// 	$var = $this->avr;
-	// 	$var = isset($var->local_id) ? $var->local_id : "None";
-	// 	return $var;
-	// }
+	/**
+	 * Local id for monitor
+	 *
+	 * @return string
+	 */
+	public function getMonitorLocalAttribute()
+	{
+		return isset($this->monitor) ? $this->monitor->local_id : "None";
+	}
 
-	// public function getMonitorLocalAttribute()
-	// {
-	// 	$var = $this->monitor;
-	// 	$var = isset($var->local_id) ? $var->local_id : "None";
-	// 	return isset($val) ? $val : "None";
-	// }
+	/**
+	 * Returns the location of workstation
+	 *
+	 * @return string
+	 */
+	public function getLocationAttribute()
+	{
+		return isset($this->room) ? $this->room->name : "None";
+	}
 
-	// public function getLocationAttribute()
-	// {
-	// 	$var = $this->room;
-	// 	$var = isset($var->name) ? $var->name : "None";
-	// 	return $var;
-	// }
+	/**
+	 * Links to the room tbale
+	 *
+	 * @return object
+	 */
+	public function room()
+	{
+		return $this->belongsTo(Room::class, 'room_id', 'id');
+	}
+	
+	/**
+	 * References system unit item table
+	 *
+	 * @return object
+	 */
+	public function systemunit()
+	{
+		return $this->belongsTo(Item::class, 'systemunit_id', 'id');
+	}
 
-	// public function room()
-	// {
-	// 	return $this->belongsTo(Room::class, 'room_id', 'id');
-	// }
+	/**
+	 * References monitor item table
+	 *
+	 * @return object
+	 */
+	public function monitor()
+	{
+		return $this->belongsTo(Item::class, 'monitor_id', 'id');
+	}
 
-	// public function systemunit()
-	// {
-	// 	return $this->belongsTo(Item::class, 'systemunit_id', 'id');
-	// }
+	/**
+	 * References keyboard item table
+	 *
+	 * @return object
+	 */
+	public function keyboard()
+	{
+		return $this->belongsTo(Item::class, 'keyboard_id', 'id');
+	}
 
-	// public function monitor()
-	// {
-	// 	return $this->belongsTo(Item::class, 'monitor_id', 'id');
-	// }
+	/**
+	 * References avr item table
+	 *
+	 * @return object
+	 */
+	public function avr()
+	{
+		return $this->belongsTo(Item::class, 'avr_id', 'id');
+	}
 
-	// public function keyboard()
-	// {
-	// 	return $this->belongsTo(Item::class, 'keyboard_id', 'id');
-	// }
-
-	// public function avr()
-	// {
-	// 	return $this->belongsTo(Item::class, 'avr_id', 'id');
-	// }
-
-	// public function mouse()
-	// {
-	// 	return $this->belongsTo(Item::class, 'mouse_id', 'id');
-	// }
+	/**
+	 * References mouse item table
+	 *
+	 * @return object
+	 */
+	public function mouse()
+	{
+		return $this->belongsTo(Item::class, 'mouse_id', 'id');
+	}
 
 	// public function softwares()
 	// {

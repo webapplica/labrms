@@ -40,14 +40,10 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-        // initialize the columns to be used for autocomplete functionality
-        // fetch the url from the data attribute of the said element
-        var targetForAutoComplete = $('.has-autocomplete');
-        var autocompleteUrl = targetForAutoComplete.data('url');
-        
-        // targets the specific column and triggers autocomplete functionality based
-        // on the data given by the user
-        targetForAutoComplete.autocomplete({ source: autocompleteUrl });
+        // targets multiple items for multi selecting   
+        // attach multiselect functionality to the element     
+		var selectOption = $('.multi-select');
+		selectOption.selectpicker();
 
     });
 </script>

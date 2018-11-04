@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 class Type extends Model 
 {
 
+	const SYSTEMUNIT = 'System Unit';
+	const MONITOR = 'Monitor';
+	const KEYBOARD = 'Keyboard';
+	const AVR = 'Avr';
+
 	protected $table = 'item_types';
 	protected $primaryKey = 'id';
 	public $timestamps = true;
@@ -78,10 +83,23 @@ class Type extends Model
 	 * @param  string $value 
 	 * @return object
 	 */
-	// public function scopeName($query, $value)
-	// {
-	// 	return $query->where('name', '=', $value);
-	// }
+	public function scopeName($query, $value)
+	{
+		return $query->where('name', '=', $value);
+	}
+
+	/**
+	 * filters search result by the type with the name in the
+	 * array provided
+	 * 
+	 * @param  object $query 
+	 * @param  string $value 
+	 * @return object
+	 */
+	public function scopeNameIn($query, array $value)
+	{
+		return $query->whereIn('name', $value);
+	}
 
 	/**
 	 * filters search result by the type with the category provided

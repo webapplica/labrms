@@ -121,6 +121,30 @@ class Inventory extends Model
   //   return ucwords($value);
   // }
 
+  /**
+   * Filters by type name
+   *
+   * @return void
+   */
+  public function scopeNameOfType($query, $value)
+  {
+      return $query->whereHas('type', function() use ($query, $value) {
+        $query->name($value);
+      });
+  }
+
+  /**
+   * Filters by type name
+   *
+   * @return void
+   */
+  public function scopeNameOfTypeIn($query, $value)
+  {
+      return $query->whereHas('type', function($query) use ($value) {
+        $query->nameIn($value);
+      });
+  }
+
   // public function scopeType($query,$id)
   // {
   //   return $query->where('itemtype_id','=',$id);

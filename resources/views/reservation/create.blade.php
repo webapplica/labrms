@@ -113,7 +113,7 @@
 			return moment(suggestedDate).format('MMM DD, YYYY');
 		});
 
-		selectOption.multiselect();
+		selectOption.selectpicker();
 
 		startTime.clockpicker({
 		    placement: 'bottom',
