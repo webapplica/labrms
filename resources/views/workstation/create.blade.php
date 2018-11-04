@@ -26,11 +26,15 @@
 
             @include('errors.alert')
 
-            {{ Form::open(['method' => 'post','route' => array('workstation.store')]) }}
+            <form
+                method="post"
+                action="{{ route('workstation.store') }}">
 
-                @include('workstation.partials.form')
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
 
-            {{ Form::close() }}
+                @include('workstation.partials.create_form')
+
+            </form>
         </div>      
     </div>
 </div>
