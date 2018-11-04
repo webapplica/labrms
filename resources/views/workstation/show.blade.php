@@ -11,13 +11,16 @@
 			<ul class="breadcrumb">
 				<li><a href="{{ url('workstation') }}">Workstation</a></li>
 				<li class="active">{{ $workstation->name }}</li>
-				<li class="active">Information</li>
 			</ul>
 
 			<table 
 				class="table table-bordered" 
 				id="history-table"
 				data-base-url="{{ url('workstation/' . $workstation->id) }}" 
+				data-update-parts-url="{{ url("workstation/$workstation->id/edit") }}"
+				data-deploy-url="{{ url("workstation/$workstation->id/deploy") }}"
+				data-transfer-url="{{ url("workstation/$workstation->id/transfer") }}"
+				data-disassemble-url="{{ url("workstation/$workstation->id/disassemble") }}"
 				style="width: 100%;">
 				<thead>
 					<tr rowspan=2>
@@ -94,7 +97,11 @@
 $(document).ready(function() {
 
 	var table = $('#history-table');
-	baseUrl = table.data('base-url');
+	var baseUrl = table.data('base-url');
+	var update_parts_url = table.data('update-parts-url');
+	var deploy_url = table.data('deploy-url');
+	var transfer_url = table.data('transfer-url');
+	var disassemble_url = table.data('disassemble-url');
 
 	var dataTable = table.DataTable( {
 		serverSide: true,
@@ -116,33 +123,37 @@ $(document).ready(function() {
         ],
     } );
 
-	$('div.toolbar').html(`
-		<button 
-			id="update" 
-			class="btn btn-sm btn-success" 
-			style="margin-right:5px; padding: 5px 10px;">
-			<span class="glyphicon glyphicon-wrench"></span>  Update Parts
-		</button>
-		<button 
-			id="deploy" 
-			class="btn btn-sm btn-default" 
-			style="margin-right:5px; padding: 5px 10px;">
-			<span class="glyphicon glyphicon-share-alt"></span>  Deploy
-		</button>
-		<button 
-			id="transfer" 
-			class="btn btn-sm btn-warning" 
-			style="margin-right:5px; padding: 5px 10px;">
-			<span class="glyphicon glyphicon-share"></span>  Transfer
-		</button>
-		<button 
-			id="delete" 
-			class="btn btn-sm btn-danger" 
-			data-loading-text="Loading..." 
-			style="margin-right:5px; padding: 5px 10px;">
-			<span class="glyphicon glyphicon-trash"></span> Condemn
-		</button>
-	`);
+	$('div.toolbar').append(
+
+		$('<a>', {
+			class: 'btn btn-sm btn-success',
+			text: 'Update Parts',
+			style: 'margin-right: 5px;',
+			href: update_parts_url
+		}).prepend( $('<span>', { class: 'glyphicon glyphicon-wrench', style: 'margin-right: 5px;'}) ),
+
+		$('<a>', {
+			class: 'btn btn-sm btn-default',
+			text: 'Deploy',
+			style: 'margin-right: 5px;',
+			href: deploy_url
+		}).prepend( $('<span>', { class: 'glyphicon glyphicon-share-alt', style: 'margin-right: 5px;'}) ),
+
+		$('<a>', {
+			class: 'btn btn-sm btn-warning',
+			text: 'Transfer',
+			style: 'margin-right: 5px;',
+			href: transfer_url
+		}).prepend( $('<span>', { class: 'glyphicon glyphicon-share', style: 'margin-right: 5px;'}) ),
+		
+		$('<a>', {
+			class: 'btn btn-sm btn-danger',
+			text: 'Disassemble',
+			style: 'margin-right: 5px;',
+			href: disassemble_url
+		}).prepend( $('<span>', { class: 'glyphicon glyphicon-trash', style: 'margin-right: 5px;'}) ),
+	);
+	
 })
 </script>
 @stop
