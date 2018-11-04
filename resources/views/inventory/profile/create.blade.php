@@ -15,7 +15,15 @@
 
 	@include('errors.alert')
 
-	{{ Form::open([ 'method' => 'post', 'url' => url('inventory/' . $inventory->id . '/profile'), 'id' => 'profile-form' ]) }}
+	<form	
+		method='post'
+		id='profile-form'
+		url="{{ url('inventory/' . $inventory->id . '/profile') }}"
+		data-confirmation-title="{{ __('profiling.confirmation_title') }}"
+		data-confirmation-message="{{ __('profiling.confirmation_message') }}"
+	>
+
+		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 	
 		<div class="form-group">
 			<p class="text-muted pull-right">
@@ -38,7 +46,7 @@
 				'id' => 'add-item-btn'
 			]) }}
 
-			{{ Form::submit('Profile', [
+			{{ Form::button('Profile', [
 				'class' => 'btn btn-md btn-primary',
 				'name' => 'Profile',
 				'id' => 'submit-btn',
@@ -46,7 +54,7 @@
 		</div>
 
 		<div class="clearfix"></div>
-	{{ Form::close() }}
+	</form>
 </div>
 @stop
 
@@ -57,6 +65,8 @@
 		var tbody = $('#items-table > tbody');
 		var addItemsButton = $('#add-item-btn');
 		var quantityToProfile = $('.profile-quantity');
+		var form = $('#profile-form');
+		var submitButton = $('#submit-btn');
 		
 		// append the following html entities on click of
 		// add items button
@@ -159,6 +169,32 @@
 			
 			quantityToProfile.text(childElementsLength);
 		}
+
+		
+		submitButton.on('click', function() {
+
+			// create a alert message
+			// before submitting the form
+			swal( {
+				title: form.data('confirmation-title'),
+				text: form.data('confirmation-message'),
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Yes, submit it!",
+				cancelButtonText: "No, cancel it!",
+				closeOnConfirm: false,
+				closeOnCancel: false
+			}, 
+
+			function(isConfirm) {
+				if (isConfirm) {
+					form.submit();
+				} else {
+					notify.error('Request cancelled', 'Cancelled');
+				}
+			} );
+		});
 
 	}(jQuery));
 </script>
