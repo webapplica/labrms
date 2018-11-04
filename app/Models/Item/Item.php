@@ -324,7 +324,7 @@ class Item extends Model
 		return Code::make([
 			config('app.local_id'),
 			$type,
-			$count + $increments,
+			$itemCount + $increments,
 		], Code::DASH_SEPARATOR);
 	}
 
