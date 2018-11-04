@@ -184,10 +184,15 @@ class Workstation extends Model
 		return $query->whereIn('property_number', $listOfPropertyNumbers);
 	}
 
-	// public function tickets()
-	// {
-	// 	return $this->belongsToMany(Ticket::class, 'workstation_ticket', 'workstation_id', 'ticket_id');
-	// }
+	/**
+	 * Links to ticket table
+	 *
+	 * @return object
+	 */
+	public function tickets()
+	{
+		return $this->belongsToMany(Ticket::class, 'workstation_ticket', 'workstation_id', 'ticket_id');
+	}
 
 	// public function scopeName($query, $value)
 	// {
