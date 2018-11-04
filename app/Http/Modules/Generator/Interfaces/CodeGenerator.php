@@ -12,5 +12,5 @@ interface CodeGenerator
      * @param array $args
      * @return string
      */
-    public function make(array $args, string $delimiter);
+    public static function make(array $args, string $delimiter);
 }

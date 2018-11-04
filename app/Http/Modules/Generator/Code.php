@@ -2,7 +2,7 @@
 
 namespace App\Http\Modules\Generator;
 
-use Interfaces\CodeGenerator;
+use App\Http\Modules\Generator\Interfaces\CodeGenerator;
 
 class Code implements CodeGenerator
 {
@@ -17,7 +17,7 @@ class Code implements CodeGenerator
      * @param array $args
      * @return string
      */
-    public function make(array $args, string $delimiter)
+    public static function make(array $args, string $delimiter)
     {
         return implode($delimiter, $args);
     }

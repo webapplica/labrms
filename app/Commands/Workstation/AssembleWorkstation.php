@@ -5,10 +5,13 @@ namespace App\Commands\Workstation;
 use Carbon\Carbon;
 use App\Models\Room\Room;
 use App\Models\Item\Item;
+use Illuminate\Http\Request;
+use App\Models\Ticket\Ticket;
+use Illuminate\Support\Facades\DB;
 use App\Http\Modules\Generator\Code;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Workstation\Workstation;
-use App\Modeles\Ticket\Type as TicketType;
+use App\Models\Ticket\Type as TicketType;
 
 class AssembleWorkstation
 {
@@ -20,16 +23,18 @@ class AssembleWorkstation
 		$this->request = $request;
 	}
 
-	public function handle()
+	public function handle(Ticket $ticket)
 	{
 		
 		// assign global request to a local request variable
 		// for handling easily
 		$request = $this->request;
+		$currentDate = Carbon::now()->toFormattedDateString();
+		$currentAuthenticatedUser = Auth::user()->firstname_first;
 
 		// assign the values from the request class into the 
 		// specific variables
-		$systemunit = $request->systemunit;
+		$systemunit = $request->system_unit;
 		$monitor = $request->monitor;
 		$avr = $request->avr;
 		$keyboard = $request->keyboard;
@@ -53,29 +58,25 @@ class AssembleWorkstation
 		// use transaction in order to change the record properly
 		DB::beginTransaction();
 
-		// list all the items the workstation has
-		$items = Item::with('inventory', 'type')
-						->inPropertyNumbers([
-							$systemunit, $monitor, $keyboard, $avr, $mouse
-						])->get();
-
 		// create a record of workstation and store in variable workstation
 		// use the variable code and items. find the specific item for the 
 		// specific row and return the id for the said item
 		$workstation = Workstation::create([
 			'oskey' => $oskey,
-			'systemunit_id' => $item->propertyNumber($systemunit)->pluck('id')->first(),
-			'monitor_id' => $item->propertyNumber($monitor)->pluck('id')->first(),
-			'avr_id' => $item->propertyNumber($avr)->pluck('id')->first(),
-			'keyboard_id' => $item->propertyNumber($keyboard)->pluck('id')->first(),
-			'mouse_id' => $item->localId($mouse)->pluck('id')->first(),
+			'systemunit_id' => $systemunit,
+			'monitor_id' => $monitor,
+			'avr_id' => $avr,
+			'keyboard_id' => $keyboard,
+			'mouse_id' => null,
 			'name' => $code
 		]);
+
+		$details = "Workstation $workstation->name assembled on $currentDate by $currentAuthenticatedUser. ";
 
 		// create a ticket to record the assembly in the workstation
 		$ticket = Ticket::create([
 			'title' => 'Item Profiling',
-			'details' => 'Workstsation ' . $item->local_id . ' assembled on ' . Carbon::now()->toFormattedDateString() . ' by '. Auth::user()->firstname_first . '. ',
+			'details' => $details,
 			'type_id' => TicketType::firstOrCreate([ 'name' => 'Action' ])->id,
 			'staff_id' => Auth::user()->id,
 			'user_id' => Auth::user()->id,
@@ -88,10 +89,17 @@ class AssembleWorkstation
 		// linked the ticket to the item
 		$ticket->workstation()->attach($workstation->id);
 
+		// list all the items the workstation has
+		$items = Item::find([
+			$systemunit, $monitor, $keyboard, $avr
+		]);
+
 		// for each item, create an item ticket to record assembly on the said item
 		// and linked the ticket to the items
 		foreach($items as $item)
 		{
+			$details = "Item $item->local_id assigned to $workstation->name on $currentDate by $currentAuthenticatedUser. ";
+			
 			// create a new ticket for each item on workstation
 			// sets the ticket =to closed
 			$ticket = Ticket::create([

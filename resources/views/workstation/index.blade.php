@@ -65,24 +65,12 @@
 	            { data: function(callback) {
 	            	return `
 						<a href="` + base_url + `/`+callback.id+`" class="btn btn-default btn-sm btn-block btn-stop-select"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>
-						<button id="update" class="btn btn-success" style="margin-right:5px;padding: 5px 10px;">
-							<span class="glyphicon glyphicon-wrench"></span>  Update Parts
-						</button>
-						<button id="deploy" class="btn btn-default" style="margin-right:5px;padding: 5px 10px;">
-							<span class="glyphicon glyphicon-share-alt"></span>  Deploy
-						</button>
-						<button id="transfer" class="btn btn-warning" style="margin-right:5px;padding: 5px 10px;">
-							<span class="glyphicon glyphicon-share"></span>  Transfer
-						</button>
-						<button id="delete" class="btn btn-danger" data-loading-text="Loading..." style="margin-right:5px;padding: 5px 10px;">
-							<span class="glyphicon glyphicon-trash"></span> Condemn
-						</button>
 					`
 	            } }
 	        ],
 	    } );
 
-	    $('#workstationTable').on('click', '.btn-stop-select', function(e){
+	    $('#workstationTable').on('click', '.btn-stop-select', function(e) {
 	    	e.stopPropagation();
 	    })
 

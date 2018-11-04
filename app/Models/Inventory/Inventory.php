@@ -49,7 +49,7 @@ class Inventory extends Model
   // ];
 
     protected $appends = [
-        'quantity', 'unprofiled', 'item_type_name', 'summarized_name',
+        'quantity', 'unprofiled', 'item_type_name', 'summarized_name', 'descriptive_name'
     ];
 
     /**
@@ -96,6 +96,16 @@ class Inventory extends Model
         return $this->brand . '-' . $this->model . '-' . $this->item_type_name;
     }
 
+    /**
+     * Returns the summary of inventory information
+     *
+     * @return void
+     */
+    public function getDescriptiveNameAttribute()
+    {
+        return $this->brand . '-' . $this->model . '-' . $this->item_type_name;
+    }
+
   // public function getBrandAttribute($value)
   // {
   //   return ucwords($value);
@@ -110,6 +120,30 @@ class Inventory extends Model
   // {
   //   return ucwords($value);
   // }
+
+  /**
+   * Filters by type name
+   *
+   * @return void
+   */
+  public function scopeNameOfType($query, $value)
+  {
+      return $query->whereHas('type', function() use ($query, $value) {
+        $query->name($value);
+      });
+  }
+
+  /**
+   * Filters by type name
+   *
+   * @return void
+   */
+  public function scopeNameOfTypeIn($query, $value)
+  {
+      return $query->whereHas('type', function($query) use ($value) {
+        $query->nameIn($value);
+      });
+  }
 
   // public function scopeType($query,$id)
   // {
@@ -132,6 +166,19 @@ class Inventory extends Model
   // {
   //   return $query->where('model','=',$model);
   // }
+
+    /**
+     * Fetch all inventory which items are allowed on reservation
+     *
+     * @param Builder $query
+     * @return object
+     */
+    public function scopeAuthorizedOnReservation($query)
+    {
+        return $query->whereHas('items', function($query) {
+            $query->authorizedOnReservation();
+        });
+    }
 
     /**
      * Returns relationship on items model

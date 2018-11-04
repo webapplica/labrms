@@ -14,5 +14,5 @@ return [
     */
     
     'required_field' => 'This field is required',
-
+    'no_longer_editable' => 'The information filled up will no longer be editable and is final',
 ];

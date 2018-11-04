@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Maintenance\Reservation;
 
 use Illuminate\Http\Request;
 use App\Models\Reservation\Purpose;
+use App\Http\Controllers\Controller;
+use App\Commands\Reservation\Purpose\AddPurpose;
+use App\Commands\Reservation\Purpose\UpdatePurpose;
 
 class PurposeController extends Controller {
 
@@ -18,7 +21,7 @@ class PurposeController extends Controller {
 			return datatables(Purpose::all())->toJson();
 		}
 
-		return view('purpose.index');
+		return view('maintenance.reservation.purpose.index');
 	}
 
 
@@ -29,7 +32,7 @@ class PurposeController extends Controller {
 	 */
 	public function create()
 	{
-		return view('purpose.create');
+		return view('maintenance.reservation.purpose.create');
 	}
 
 
@@ -53,7 +56,7 @@ class PurposeController extends Controller {
 	 */
 	public function show($id)
 	{
-		return view('purpose.show');
+		return view('maintenance.reservation.purpose.show');
 	}
 
 
@@ -66,7 +69,7 @@ class PurposeController extends Controller {
 	public function edit($id)
 	{
 		$purpose = Purpose::findOrFail($id);
-		return view('purpose.edit', compact('purpose'));
+		return view('maintenance.reservation.purpose.edit', compact('purpose'));
 	}
 
 

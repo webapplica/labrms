@@ -28,67 +28,7 @@
 
             {{ Form::open(['method' => 'post','route' => array('workstation.store')]) }}
 
-                <div class="form-group">
-                    {{ Form::label('os','OS License Key') }}
-
-                    {{ Form::text('os', isset($workstation->oskey) ? $workstation->oskey : old('os'), [
-                        'id' => 'os',
-                        'class' => 'form-control',
-                        'placeholder' => 'OS License Key'
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    {{ Form::label('systemunit','System Unit') }}
-                    {{ Form::text('systemunit', old('systemunit'), [
-                        'id' => 'systemunit',
-                        'class' => 'form-control',
-                        'placeholder' => 'This field accepts a local id for input',
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    {{ Form::label('monitor', 'Monitor') }}
-                    {{ Form::text('monitor',old('monitor'), [
-                        'id' => 'monitor',
-                        'class' => 'form-control',
-                        'placeholder' => 'This field accepts a local id for input',
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    {{ Form::label('avr', 'AVR') }}
-                    {{ Form::text('avr',old('avr'), [
-                        'id' => 'avr',
-                        'class' => 'form-control',
-                        'placeholder' => 'This field accepts a local id for input.'
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    {{ Form::label('keyboard','Keyboard') }}
-                    {{ Form::text('keyboard', old('keyboard'), [
-                        'id' => 'keyboard',
-                        'class' => 'form-control',
-                        'placeholder' => 'This field accepts a local id for input'
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    {{ Form::label('mouse', 'Mouse: ') }}
-                    {{ Form::checkbox('mouse', old('mouse'), [
-                        'id' => 'mouse',
-                    ]) }}
-                </div>
-
-                <div class="form-group">
-                    <button 
-                        class="btn btn-primary btn-lg btn-block" 
-                        name="create" 
-                        type="submit">
-                        <span class="glyphicon glyphicon-check"></span> Add
-                    </button>
-                </div>
+                @include('workstation.partials.form')
 
             {{ Form::close() }}
         </div>      
@@ -100,26 +40,10 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-        $('#keyboard').autocomplete({
-            source: "{{ url('get/item/profile/keyboard/propertynumber') }}"
-        });
-
-        $('#monitor').autocomplete({
-            source: "{{ url('get/item/profile/monitor/propertynumber') }}"
-        });
-
-        $('#systemunit').autocomplete({
-            source: "{{ url('get/item/profile/systemunit/propertynumber') }}"
-        });
-
-        $('#avr').autocomplete({
-            source: "{{ url('get/item/profile/avr/propertynumber') }}"
-
-        });
-
-        $('#mouse').autocomplete({
-            source: "{{ url('get/item/profile/mouse/propertynumber') }}"
-        });
+        // targets multiple items for multi selecting   
+        // attach multiselect functionality to the element     
+		var selectOption = $('.multi-select');
+		selectOption.selectpicker();
 
     });
 </script>

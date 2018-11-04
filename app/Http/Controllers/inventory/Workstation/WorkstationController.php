@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers\Inventory\Workstation;
 
+use App\Models\Item\Item;
+use App\Models\Item\Type;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Workstation\Workstation;
+use App\Http\Modules\Generator\ListGenerator;
+use App\Commands\Workstation\AssembleWorkstation;
+use App\Http\Requests\WorkstationRequest\WorkstationStoreRequest;
 
 class WorkstationController extends Controller 
 {
@@ -30,21 +36,38 @@ class WorkstationController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		return view('workstation.create');
-	}
+		
+		$systemunits = Item::nameOfType(Type::SYSTEMUNIT)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
 
+		$monitors = Item::nameOfType(Type::MONITOR)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		$keyboards = Item::nameOfType(Type::KEYBOARD)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		$avrs = Item::nameOfType(Type::AVR)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		return view('workstation.create', compact(
+			'systemunits', 'monitors', 'keyboards', 'avrs'
+		));
+	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 *
 	 * @return Response
 	 */
-	public function store(Request $request)
+	public function store(WorkstationStoreRequest $request)
 	{
 		$this->dispatch(new AssembleWorkstation($request));	
 		return redirect('workstation')->with('success-message', __('tasks.success'));
 	}
-
 
 	/**
 	 * Display the specified resource.
@@ -60,7 +83,7 @@ class WorkstationController extends Controller
 			return datatables($workstation->tickets)->toJson();
 		}
 
-		return view('workstation.show');
+		return view('workstation.show', compact('workstation'));
 	}
 
 	/**

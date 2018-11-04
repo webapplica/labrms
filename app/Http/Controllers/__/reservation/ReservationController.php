@@ -32,21 +32,6 @@ class ReservationController extends Controller
 	}
 
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create(Request $request)
-	{
-		$items = Item::enabledOnReservation()->pluck('property_number', 'id');
-		$rooms = Room::pluck('name', 'id');
-		$purposes = Purpose::pluck('title', 'id');
-		$faculties =  Faculty::all();
-
-		return view('reservation.create', compact('items', 'rooms', 'purposes', 'faculties'));
-	}
-
 
 	/**
 	 * Store a newly created resource in storage.

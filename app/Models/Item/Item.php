@@ -3,11 +3,15 @@
 namespace App\Models\Item;
 
 use Carbon\Carbon;
+use App\Models\Room\Room;
 use App\Models\Item\Type;
 use App\Models\Ticket\Ticket;
 use App\Models\Inventory\Inventory;
+use App\Http\Modules\Generator\Code;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Workstation\Workstation;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Modules\Generator\ListGenerator;
 
 class Item extends Model
 {
@@ -49,10 +53,10 @@ class Item extends Model
 	// 	'checked' => 'required|boolean',
 	// );
 
-	// public function scopeEnabledReservation($query)
-	// {
-	// 	$query->where('for_reservation', '=', 1);
-	// }
+	public function scopeAllowedOnReservation($query)
+	{
+		return $query->where('for_reservation', '=', 1);
+	}
 
 	// public function scopeDisabledReservation($query)
 	// {
@@ -83,8 +87,24 @@ class Item extends Model
 	];
 
 	protected $appends = [
-		'parsed_date_received', 'parsed_date_profiled', 'reservation_status'
+		'parsed_date_received', 'parsed_date_profiled', 'reservation_status',
+		'descriptive_name'
 	];
+
+	/**
+	 * Return parsed name for the name using the brand, model and type
+	 *
+	 * @return void
+	 */
+	public function getDescriptiveNameAttribute()
+	{
+		$brand = $this->inventory->brand;
+		$model = $this->inventory->model;
+		$type = $this->inventory->type->name;
+
+		return $brand . '-' . $model . '-' . $type;
+		
+	}
 
 	/**
 	 * Returns the status if the item is available for reservation
@@ -117,16 +137,6 @@ class Item extends Model
 	}
 
 	/**
-	 * Returns relationship to type table
-	 *
-	 * @return void
-	 */
-	public function type()
-	{
-		return $this->hasManyThrough(Type::class, Inventory::class, 'id', 'id');
-	}
-
-	/**
 	 * References inventory table
 	 *
 	 * @return void
@@ -134,6 +144,16 @@ class Item extends Model
 	public function inventory()
 	{
 		return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
+	}
+
+	public function type()
+	{
+		return $this->hasManyThrough(
+			Inventory::class, 
+			Type::class,
+			'id',
+			'itemtype_id'
+		);
 	}
 
 	/*
@@ -146,15 +166,15 @@ class Item extends Model
 	// 	return $this->belongsTo('App\Receipt','receipt_id','id');
 	// }
 
-	/*
-	*
-	*	Foreign key referencing room table
-	*
-	*/
-	// public function room()
-	// {
-	// 	return $this->belongsTo('App\Room', 'location','id');
-	// }
+	/**
+	 * References rooms table
+	 * 
+	 * @return object
+	 */
+	public function room()
+	{
+		return $this->belongsTo(Room::class, 'location', 'id');
+	}
 
 
 	/**
@@ -192,6 +212,51 @@ class Item extends Model
 	}
 
 	/**
+	 * Filters the result by local ids
+	 *
+	 * @param Builder $query
+	 * @param int $propertyNumber
+	 * @return object
+	 */
+	public function scopeInLocalIds($query, array $local_ids)
+	{
+		return $query->whereIn('local_id',  $local_ids);
+	}
+
+	/**
+	 * Filters the current search result by type name
+	 *
+	 * @param Builder $query
+	 * @param int $id
+	 * @return object
+	 */
+	public function scopeNameOfType($query, string $name)
+	{
+		return $query->whereHas('inventory', function($query) use ($name) {
+			$query->whereHas('type', function($query) use ($name) {
+				$query->name($name);
+			});
+		});
+	}
+
+	/**
+	 * Filters the current search result by type name
+	 * in the array provided
+	 *
+	 * @param Builder $query
+	 * @param int $arrayValues
+	 * @return object
+	 */
+	public function scopeNameOfTypeIn($query, array $arrayValues)
+	{
+		return $query->whereHas('inventory', function($query) use ($arrayValues) {
+			$query->whereHas('type', function($query) use ($arrayValues) {
+				$query->nameIn($arrayValues);
+			});
+		});
+	}
+
+	/**
 	 * Filters the current search result by id
 	 *
 	 * @param Builder $query
@@ -206,18 +271,61 @@ class Item extends Model
 	}
 
 	/**
+	 * Returns list where reservation is allowed
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
+	public function scopeAuthorizedOnReservation($query)
+	{
+		return $query->where('for_reservation', '=', true);
+	}
+
+	/**
+	 * Filter the query by items not yet assembled in workstation
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
+	public function scopeNotAssembledInWorkstation($query)
+	{
+		$query->whereNotIn('id', ListGenerator::makeArray(
+			Workstation::pluck('systemunit_id')->toArray(),
+			Workstation::pluck('monitor_id')->toArray(),
+			Workstation::pluck('keyboard_id')->toArray(), 
+			Workstation::pluck('mouse_id')->toArray(),
+			Workstation::pluck('avr_id')->toArray()
+		)->unique());
+	}
+	
+	/**
 	 * Generate code based on the format given
 	 *
-	 * @param object $inventory
-	 * @return void
+	 * @param Builder $inventory
+	 * @param integer $increments
+	 * @param integer $itemCount
+	 * @return string
 	 */
-	public function generateCode($inventory)
+	public function generateCode($inventory, $increments = 1, $itemCount = null)
 	{
 		$type = $inventory->itemtype_id;
-		$local_constant_id = config('app.local_id');
-		$local_id_count = Item::filterByTypeId($type)->count() + 1;
+		$lastItem = Item::filterByTypeId($type)->orderBy('id', 'desc')->first()->local_id;
+		$array = explode(
+			Code::DASH_SEPARATOR, 
+			$lastItem
+		);
 
-		return $local_constant_id . '-' . $type . '-' . $local_id_count;
+		$lastIdOfTheItem = array_values(array_slice($array, -1))[0];
+		$itemCount = $itemCount ? $itemCount : $lastIdOfTheItem;
+
+		// generate a code for the workstation name
+		// use a custom package designed specifically to
+		// generate a code
+		return Code::make([
+			config('app.local_id'),
+			$type,
+			$itemCount + $increments,
+		], Code::DASH_SEPARATOR);
 	}
 
 	/**

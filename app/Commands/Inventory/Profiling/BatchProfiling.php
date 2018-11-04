@@ -16,7 +16,8 @@ use App\Models\Ticket\Type as TicketType;
 class BatchProfiling
 {
     protected $request;
-    protected $id;
+	protected $id;
+	protected $incrementalId = 1;
 
 	public function __construct(Request $request, $id)
 	{
@@ -41,6 +42,7 @@ class BatchProfiling
 
 		DB::beginTransaction();
 		
+		if(count($property_number) == 0) return;
 		foreach($property_number as $key => $value) {
 
 			// create a new record of item in database

@@ -8,6 +8,20 @@ use App\Http\Controllers\Controller;
 
 class ItemController extends Controller
 {
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
+	public function index(Request $request)
+	{
+		if($request->ajax()) {
+            $column = $request->column;
+
+            return json_encode(Item::pluck( $column ));
+        }
+
+	}
 
     /**
      * Display the specified resource.
