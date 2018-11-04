@@ -76,11 +76,11 @@
 					</tr>
 
 					<tr>
-						<th>ID</th>
-						<th>Name</th>
-						<th>Details</th>
-						<th>Author</th>
-						<th>Status</th>
+						<th class="col-md-1">ID</th>
+						<th class="col-md-2">Name</th>
+						<th class="col-md-2">Details</th>
+						<th class="col-md-2">Author</th>
+						<th class="col-md-2">Status</th>
 					</tr>
 				</thead>
 			</table>
