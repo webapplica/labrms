@@ -94,8 +94,27 @@ class WorkstationController extends Controller
 	 */
 	public function edit(Request $request, $id)
 	{
-		$workstation = Workstation::findOrFail($id);
-		return view('workstation.edit');
+		$workstation = Workstation::with('systemunit', 'monitor', 'mouse', 'keyboard', 'avr')->findOrFail($id);
+		
+		$systemunits = Item::nameOfType(Type::SYSTEMUNIT)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		$monitors = Item::nameOfType(Type::MONITOR)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		$keyboards = Item::nameOfType(Type::KEYBOARD)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+
+		$avrs = Item::nameOfType(Type::AVR)
+						->notAssembledInWorkstation()
+						->select('id', 'local_id')->get();
+						
+		return view('workstation.edit', compact(
+			'workstation', 'systemunits', 'monitors', 'keyboards', 'avrs'
+		));
 	}
 
 	/**
