@@ -37,8 +37,8 @@ class Routes
             // Route::resource('schedule','LaboratoryScheduleController');
             // Route::resource('software/license','SoftwareLicenseController');
             Route::namespace('software')->group(function() {
-                Route::resource('software', 'SoftwareController');
                 Route::resource('software/type','TypeController');
+                Route::resource('software', 'SoftwareController');
             });
 
             // Route::resource('semester','SemesterController');
