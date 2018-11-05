@@ -38,9 +38,8 @@ class AssembleWorkstation
 		$monitor = $request->monitor;
 		$avr = $request->avr;
 		$keyboard = $request->keyboard;
-		$oskey = $request->os;
 		$mouse = $request->mouse;
-		$name = $request->name;
+		$license_key = $request->license_key;
 		
 		// check if the room exists and find the room with the 
 		// corresponding name
@@ -62,7 +61,7 @@ class AssembleWorkstation
 		// use the variable code and items. find the specific item for the 
 		// specific row and return the id for the said item
 		$workstation = Workstation::create([
-			'oskey' => $oskey,
+			'oskey' => $license_key,
 			'systemunit_id' => $systemunit,
 			'monitor_id' => $monitor,
 			'avr_id' => $avr,

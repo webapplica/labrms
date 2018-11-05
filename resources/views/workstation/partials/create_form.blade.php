@@ -4,6 +4,7 @@
     <label for="os">Operating System License Key</label>
     <input
         type="text"
+        name="license_key"
         class="form-control"
         placeholder="License Key"
         {{ isset($workstation->oskey) ? $workstation->oskey : old('os') }} />
