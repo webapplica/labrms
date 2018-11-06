@@ -30,7 +30,7 @@
                         class="btn btn-primary btn-lg btn-block" 
                         name="deploy-btn" 
                         type="submit">
-                        Deploy
+                        Transfer
                     </button>
                 </div>
 
