@@ -142,12 +142,3 @@
         name="mouse"
         {{ old('mouse') == true || isset($workstation->mouse) }} />
 </div>
-
-<div class="form-group">
-    <button 
-        class="btn btn-primary btn-lg btn-block" 
-        name="create" 
-        type="submit">
-        <span class="glyphicon glyphicon-check"></span> Add
-    </button>
-</div>

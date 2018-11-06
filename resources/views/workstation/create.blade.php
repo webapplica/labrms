@@ -34,6 +34,15 @@
 
                 @include('workstation.partials.create_form')
 
+                <div class="form-group">
+                    <button 
+                        class="btn btn-primary btn-lg btn-block" 
+                        name="create-btn" 
+                        type="submit">
+                        <span class="glyphicon glyphicon-check"></span> Add
+                    </button>
+                </div>
+
             </form>
         </div>      
     </div>
