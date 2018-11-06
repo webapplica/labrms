@@ -15,8 +15,7 @@ class Workstation extends Model
 	protected $primaryKey = 'id';
 	public $timestamps = false;
 	public $fillable = [
-		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 
-		'location'
+		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 'room_id'
 	];
 
 	// public static $rules = array(
@@ -29,8 +28,7 @@ class Workstation extends Model
 	// );
 
 	protected $appends = [
-		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
-		'location'
+		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local', 'location'
 	];
 
 	/**
