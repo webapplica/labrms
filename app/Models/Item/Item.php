@@ -309,14 +309,38 @@ class Item extends Model
 	public function generateCode($inventory, $increments = 1, $itemCount = null)
 	{
 		$type = $inventory->itemtype_id;
-		$lastItem = Item::filterByTypeId($type)->orderBy('id', 'desc')->first()->local_id;
-		$array = explode(
-			Code::DASH_SEPARATOR, 
-			$lastItem
-		);
 
-		$lastIdOfTheItem = array_values(array_slice($array, -1))[0];
-		$itemCount = $itemCount ? $itemCount : $lastIdOfTheItem;
+		// checks if the itemCount variable is initialized
+		// if its not initialize, use the last number from the
+		// last item profiled
+		if(! isset($itemCount)) {
+
+			// fetch the last item from the items table
+			$lastItem = Item::filterByTypeId($type)->orderBy('id', 'desc')->first();
+
+			// checks if the item table has a an item
+			// if there is an item, fetch the last row 
+			// in the converted array from the local id
+			if(count($lastItem) > 0) {
+				$lastItem = $lastItem->local_id;	
+
+				// converts the string in to array using
+				// the dash as separator
+				$array = explode(
+					Code::DASH_SEPARATOR, 
+					$lastItem
+				);
+				
+				// fetch the last value in the array
+				$itemCount = array_values(array_slice($array, -1))[0];
+			} 
+
+			// checks if the item table has a an item
+			// if there is no item, returns 0
+			else {
+				$itemCount = 0;
+			}
+		}
 
 		// generate a code for the workstation name
 		// use a custom package designed specifically to
