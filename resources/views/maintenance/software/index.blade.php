@@ -64,7 +64,7 @@
 							<input type="hidden" name="_token" value="` + csrf_token + `" />
 							<a href="` + viewLink + `" class="btn btn-default btn-md">View</a>
 							<a href="` + editLink + `" class="btn btn-info btn-md">Update</a>
-							<button type="submit" class="btn btn-danger btn-md">Update</button>
+							<button type="submit" class="btn btn-danger btn-md">Remove</button>
 						</form>
 					`;
 	          	} }
