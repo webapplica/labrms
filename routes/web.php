@@ -14,6 +14,9 @@
 Route::get('/', 'HomeController@dashboard');
 Route::post('/', 'HomeController@dashboard');
 
+Route::get('dashboard', 'HomeController@dashboard');
+Route::post('dashboard', 'HomeController@dashboard');
+
 /*
 |--------------------------------------------------------------------------
 | Route Groups
