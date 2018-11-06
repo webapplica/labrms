@@ -6,6 +6,7 @@ use App\Models\Room\Room;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Workstation\Workstation;
+use App\Commands\Workstation\TransferWorkstation;
 use App\Http\Requests\WorkstationRequest\WorkstationTransferRequest;
 
 class TransferController extends Controller

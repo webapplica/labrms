@@ -22,7 +22,6 @@
                 method="post"
                 action="{{ url('workstation/' . $workstation->id . '/transfer') }}">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                <input type="hidden" name="_method" value="PUT" />
                 
                 @include('workstation.partials.room.assignment_form')
 
