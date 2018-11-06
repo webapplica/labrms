@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Workstation\Workstation;
 use App\Http\Modules\Generator\ListGenerator;
+use App\Commands\Workstation\UpdateWorkstation;
 use App\Commands\Workstation\AssembleWorkstation;
 use App\Http\Requests\WorkstationRequest\WorkstationStoreRequest;
+use App\Http\Requests\WorkstationRequest\WorkstationUpdateRequest;
 
 class WorkstationController extends Controller 
 {
@@ -123,7 +125,7 @@ class WorkstationController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update(Request $request, $id)
+	public function update(WorkstationUpdateRequest $request, $id)
 	{
 		$this->dispatch(new UpdateWorkstation($request, $id));
 		return redirect('workstation')->with('success-message', __('tasks.success'));
