@@ -12,15 +12,18 @@ use App\Http\Modules\Generator\Code;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Workstation\Workstation;
 use App\Models\Ticket\Type as TicketType;
+use App\Http\Modules\Generator\ListGenerator;
 
-class AssembleWorkstation
+class UpdateWorkstation
 {
 
 	protected $request;
+	protected $id;
 
-	public function __construct(Request $request)
+	public function __construct(Request $request, $id)
 	{
 		$this->request = $request;
+		$this->id = $id;
 	}
 
 	public function handle(Ticket $ticket)
@@ -40,19 +43,6 @@ class AssembleWorkstation
 		$keyboard = $request->keyboard;
 		$mouse = $request->mouse;
 		$license_key = $request->license_key;
-		
-		// check if the room exists and find the room with the 
-		// corresponding name
-		$room = Room::name($request->location)->first();
-
-		// generate a code for the workstation name
-		// use a custom package designed specifically to
-		// generate a code
-		$code = Code::make([
-			config('app.workstation_id'),
-			isset($room->name) ? $room->name : 'TMP',
-			Workstation::count() + 1,
-		], Code::DASH_SEPARATOR);
 
 		// use transaction in order to change the record properly
 		DB::beginTransaction();
@@ -60,21 +50,21 @@ class AssembleWorkstation
 		// create a record of workstation and store in variable workstation
 		// use the variable code and items. find the specific item for the 
 		// specific row and return the id for the said item
-		$workstation = Workstation::create([
+		$workstation = Workstation::findOrFail($this->id);
+		$workstation->update([
 			'oskey' => $license_key,
 			'systemunit_id' => $systemunit,
 			'monitor_id' => $monitor,
 			'avr_id' => $avr,
 			'keyboard_id' => $keyboard,
 			'mouse_id' => null,
-			'name' => $code
 		]);
 
-		$details = "Workstation $workstation->name assembled on $currentDate by $currentAuthenticatedUser. ";
+		$details = "Workstation $workstation->name parts updated on $currentDate by $currentAuthenticatedUser. ";
 
-		// create a ticket to record the assembly in the workstation
+		// create a ticket to record the update of item in the workstation
 		$ticket = Ticket::create([
-			'title' => 'Item Profiling',
+			'title' => 'Workstation Part Update',
 			'details' => $details,
 			'type_id' => TicketType::firstOrCreate([ 'name' => 'Action' ])->id,
 			'staff_id' => Auth::user()->id,
@@ -88,11 +78,17 @@ class AssembleWorkstation
 		// linked the ticket to the item
 		$ticket->workstation()->attach($workstation->id);
 
-		// list all the items the workstation has
-		$items = Item::find([
+		// filters item not in the workstation items id which is
+		// system unit, monitor, avr, keyboard, and mouse
+		// and returns them as value here
+		$items = $this->filtersNotInArray(ListGenerator::makeArray(
 			$systemunit, $monitor, $keyboard, $avr
-		]);
+		)->unique(), $workstation);
 
+		// list all the items the workstation has
+		// and fetch them all from the database
+		$items = Item::findOrFail($items);
+		
 		// for each item, create an item ticket to record assembly on the said item
 		// and linked the ticket to the items
 		foreach($items as $item)
@@ -120,5 +116,27 @@ class AssembleWorkstation
 		// end the transaction, commit the query
 		// all the records will be added to the database
 		DB::commit();
+	}
+
+	/**
+	 * Checks if the first parameter is in the list given
+	 * in the second parameter and returns unique items
+	 *
+	 * @param array $items
+	 * @param array $workstations
+	 * @return array
+	 */
+	public function filtersNotInArray($items, $workstation)
+	{
+
+		return array_filter($items, function ($item) use ($workstation) {
+
+			// checks if the item is not in the array given
+			// returns true if the item is unique and not in the 
+			// workstation list
+			return ! in_array( $item, ListGenerator::makeArray(
+				$workstation->systemunit_id, $workstation->monitor_id, $workstation->keyboard_id, $workstation->mouse_id, $workstation->avr_id
+			)->unique()) ? true : false;
+		});
 	}
 }

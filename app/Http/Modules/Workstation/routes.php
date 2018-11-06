@@ -25,11 +25,12 @@ class Routes
             /**
              * Routes for the list of softwares the workstation has
              */
-            // Route::namespace('software')->group(function() {
-            //     Route::get('workstation/{workstation}/software', 'SoftwareController@index');
-            //     Route::post('workstation/{workstation}/software', 'SoftwareController@store');
+            Route::namespace('software')->group(function() {
+                Route::get('workstation/{id}/software', 'SoftwareController@get');
 
-            // });
+                Route::get('workstation/{id}/software/install', 'InstallationController@create');
+                Route::post('workstation/{id}/software/install', 'InstallationController@store');
+            });
 
             /**
              * Routes for the list of license the specific software of workstation has

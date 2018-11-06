@@ -15,8 +15,7 @@ class Workstation extends Model
 	protected $primaryKey = 'id';
 	public $timestamps = false;
 	public $fillable = [
-		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 
-		'location'
+		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 'room_id'
 	];
 
 	// public static $rules = array(
@@ -29,8 +28,7 @@ class Workstation extends Model
 	// );
 
 	protected $appends = [
-		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local',
-		'location'
+		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local', 'location'
 	];
 
 	/**
@@ -153,12 +151,17 @@ class Workstation extends Model
 		return $this->belongsTo(Item::class, 'mouse_id', 'id');
 	}
 
-	// public function softwares()
-	// {
-	// 	return $this->belongsToMany(Software::class, 'workstation_software', 'workstation_id', 'software_id')
-	// 			->withPivot('license_id')
-	// 			->withTimestamps();
-	// }
+	/**
+	 * References software table
+	 *
+	 * @return object
+	 */
+	public function softwares()
+	{
+		return $this->belongsToMany(
+			Software::class, 'workstation_software', 'workstation_id', 'software_id'
+		)->withPivot('license_id', 'created_at', 'updated_at')->withTimestamps();
+	}
 
 	/**
 	 * Filters the query by property number

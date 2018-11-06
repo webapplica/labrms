@@ -32,7 +32,7 @@ class WorkstationStoreRequest extends FormRequest
         ]);
 
         return [
-            'name' => 'nullable',
+            'license_key' => 'nullable|max:30',
             'system_unit' => 'required|exists:items,id|' . $uniqueOnWorkstationTable,
             'monitor' => 'nullable|exists:items,id|' . $uniqueOnWorkstationTable,
             'avr' => 'nullable|exists:items,id|' . $uniqueOnWorkstationTable,

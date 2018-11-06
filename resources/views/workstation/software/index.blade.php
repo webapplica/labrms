@@ -1,118 +1,84 @@
-@extends('layouts.master-blue')
-@section('title')
-Workstation
-@stop
-@section('navbar')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@include('layouts.navbar')
-@stop
-@section('style')
-<link rel="stylesheet" href="{{ url('css/style.css') }}"  />
-<style>
-	#page-body{
-		display: none;
-	}
+@extends('layouts.app')
 
-	a:hover{
-	  	text-decoration: none;
-	}
-</style>
-@stop
 @section('content')
 <div class="container-fluid" id="page-body">
-	@include('workstation.sidebar.default')
 	<div class="col-md-12" id="workstation-info">
-		<div class="panel panel-body  table-responsive">
-				<table class="table table-hover table-striped table-bordered" id="workstationTable">
-					<thead>
-						<th>ID</th>
-      					<th>Operating System Key</th>
-						<th>Software Installed</th>
-						<th class="no-sort"></th>
-					</thead>
-					<tbody>
-						@forelse($workstation as $workstation)
-						<tr>
-								<td class="col-sm-1">{{ $workstation->id }}</td>
-								<td class="col-sm-4">{{ $workstation->oskey }}</td>
-								<td class="col-sm-5"><a role="button" class="text-primary link" data-id="{{ $workstation->id }}">View Software Installed</a></td>
-								<td class="col-sm-2">
-									<div class="btn-group btn-group-justified">
-										<div class="btn-group">
-											<a type="button" class="btn btn-default" href="{{ url("workstation/software/$workstation->id/assign") }}">
-												<span class="glyphicon glyphicon-plus"></span> <span>Assign</span>
-											</a>
-										</div>
-										<div class="btn-group">
-											<a type="button" class="btn btn-danger" href="{{ url("workstation/software/$workstation->id/remove") }}">
-												<span class="glyphicon glyphicon-trash"></span> <span>Remove</span>
-											</a>
-										</div>
-									</div>
-								</td>
-						</tr>
-						@empty
-						@endforelse
-					</tbody>
-				</table>
+		<div class="panel panel-body table-responsive">
+            <legend>
+                <h3 class="text-muted">{{ _('Workstation') }}: {{ $workstation->name }}</h3>
+            </legend>
+
+            <ul class="breadcrumb">       
+                <li><a href="{{ url('workstation') }}">Workstation</a></li>
+                <li>
+					<a href="{{ url('workstation/' . $workstation->id) }}">
+						{{ $workstation->name }}</a>
+					</li>
+                <li class="active">Software</li>
+			</ul>
+			
+			<table 
+				class="table table-hover table-striped table-bordered" 
+				data-base-url="{{ url('workstation/' . $workstation->id . '/software') }}"
+				data-install-url="{{ url('workstation/' . $workstation->id . '/software/install') }}"
+				id="software-table">
+				<thead>
+					<th>Name</th>
+					<th>License Key</th>
+					<th>Date Installed</th>
+					<th class="no-sort"></th>
+				</thead>
+			</table>
 		</div>
 	</div>
 </div>
 @stop
-@section('script')
+
+@section('scripts-include')
 <script type="text/javascript">
-
 	$(document).ready(function() {
+		var table = $('#software-table');
+		var baseUrl = table.data('base-url');
+		var install = table.data('install-url');
 
-		@if( Session::has("success-message") )
-		  swal("Success!","{{ Session::pull('success-message') }}","success");
-		@endif
-		@if( Session::has("error-message") )
-		  swal("Oops...","{{ Session::pull('error-message') }}","error");
-		@endif
-
-    	$('#workstationTable').DataTable({
-			columnDefs:[
-			{ targets: 'no-sort', orderable: false },
-			],
-		});
-
-		$('.link').on('click',function(){
-			var id = $(this).data('id');
-			object = $(this);
-			if($(this).html() != 'View Software Installed')
-			{}
-			$.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-				type: 'get',
-				url: '{{ url("get/software/installed") }}' + '/' + id,
-				dataType: 'json',
-				beforeSend: function(){
-					swal('Requesting for information...','Please wait for a moment while softwares are being loaded','info');
-				},
-				success: function(response){
-					html = '<ul class="text-muted list-unstyled">';
-					for(ctr= 0; ctr < response.length;ctr++){
-						html += `<li>`+response[ctr].softwarename+` - `+response[ctr].key+`</li>`;
-					}
-
-					html += '</ul>';
-
-					if(response.length == 0){
-						html = "<ul class='text-muted list-unstyled'><li>None</li></ul>";
-					}
-
-					object.html(html);
-				},
-				complete: function(){
-					swal('Information Loaded','The information you require has been loaded to the table','success')
-				}
-			});
-		});
-
-		$('#page-body').show();
-  });
+    	var dataTable = table.DataTable( {
+	  		select: {
+	  			style: 'single'
+	  		},
+	    	columnDefs:[
+				{ targets: 'no-sort', orderable: false },
+	    	],
+		    language: {
+		        searchPlaceholder: "Search..."
+		    },
+	    	"dom": "<'row'<'col-sm-3'l><'col-sm-6'<'toolbar'>><'col-sm-3'f>>" +
+						    "<'row'<'col-sm-12'tr>>" +
+						    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+			"processing": true,
+	        ajax: baseUrl,
+	        columns: [
+	            { data: "name" },
+	            { data: "license_key" },
+	            { data: "pivot.created_at" },
+	            { data: function(callback) {
+	            	return `
+						<a 
+							href="` + baseUrl + `/`+callback.id + `" 
+							class="btn btn-default btn-sm btn-block btn-stop-select">
+							<span class="glyphicon glyphicon-eye-open"></span> View
+						</a>
+					`
+	            } }
+	        ],
+	    } );	 	
+		
+		$("div.toolbar").html(`
+			<a 
+				id="new" class="btn btn-sm btn-primary"
+				href="` + install + `">
+				Install
+			</a>
+		`);
+  	});
 </script>
 @stop

@@ -4,6 +4,7 @@
     <label for="os">Operating System License Key</label>
     <input
         type="text"
+        name="license_key"
         class="form-control"
         placeholder="License Key"
         {{ isset($workstation->oskey) ? $workstation->oskey : old('os') }} />
@@ -140,13 +141,4 @@
         id="mouse"
         name="mouse"
         {{ old('mouse') == true || isset($workstation->mouse) }} />
-</div>
-
-<div class="form-group">
-    <button 
-        class="btn btn-primary btn-lg btn-block" 
-        name="create" 
-        type="submit">
-        <span class="glyphicon glyphicon-check"></span> Add
-    </button>
 </div>
