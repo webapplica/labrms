@@ -4,6 +4,7 @@ namespace App\Models\Software;
 
 use App\Models\Room\Room;
 use App\Models\Software\License;
+use App\Models\Workstation\Workstation;
 use Illuminate\Database\Eloquent\Model;
 
 class Software extends Model
@@ -42,6 +43,19 @@ class Software extends Model
 	// 	'License Key' => 'min:3|max:100'
 	// ];
 
+	protected $appends = [
+		'license_key',
+	];
+
+	public function getLicenseKeyAttribute()
+	{
+		if(isset($this->pivot['license_id'])) {
+			return $this->licenses->where('id', $this->pivot['license_id'])->first()->key;
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns list of license types
 	 *
@@ -72,58 +86,22 @@ class Software extends Model
 				->withTimestamps();
 	}
 
-	// public function workstations()
-	// {
-	// 	return $this->belongsToMany('App\Workstation','workstation_software','software_id','workstation_id')
-	// 		->withPivot('license_id')
-	// 		->withTimestamps();
-	// }
+	/**
+	 * References workstation table
+	 *
+	 * @return object
+	 */
+	public function workstations()
+	{
+		return $this->belongsToMany(
+			Workstation::class, 'workstation_software', 'software_id', 'workstation_id'
+		)->withPivot('license_id')->withTimestamps();
+	}
 
 	// public function getSoftwareTypes()
 	// {
 	// 	$types = Software::$types;
 	// 	return compact($types);
-	// }
-
-	// public function install($id, $license = null)
-	// {
-	// 	$license_addons = [];
-		
-	// 	if(isset($license) && $license != "" && $license != null)
-	// 	{
-	// 		$otherFields = [
-	// 			'software_id' => $this->id,
-	// 			'usage' => 1
-	// 		];
-
-	// 		$license = SoftwareLicense::firstOrCreate([
-	// 			'key' => $license
-	// 		], $otherFields);
-
-	// 		$license_addons = [
-	// 			'license_id' => $license->id
-	// 		];
-	// 	}
-
-	// 	$this->workstations()->attach($id, $license_addons);
-
-	// 	$workstation = Workstation::find($id);
-
-	// 	$title = 'Software Installation';
-	// 	$staff_id = Auth::user()->id;
-	// 	$details = "$this->name installed on Workstation $workstation->name";
-
-	// 	$type = TicketType::firstOrCreate([
-	// 		'name' => 'Maintenance'
-	// 	]);
-
-	// 	$ticket = new Ticket;
-	// 	$ticket->type_id = $type->id;
-	// 	$ticket->title = $title;
-	// 	$ticket->details = $details;
-	// 	$ticket->staff_id = $staff_id;
-	// 	$ticket->status = 'Closed';
-	// 	$ticket->generate($workstation->systemunit->id);
 	// }
 
 	// public function uninstall($id)

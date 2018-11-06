@@ -151,12 +151,17 @@ class Workstation extends Model
 		return $this->belongsTo(Item::class, 'mouse_id', 'id');
 	}
 
-	// public function softwares()
-	// {
-	// 	return $this->belongsToMany(Software::class, 'workstation_software', 'workstation_id', 'software_id')
-	// 			->withPivot('license_id')
-	// 			->withTimestamps();
-	// }
+	/**
+	 * References software table
+	 *
+	 * @return object
+	 */
+	public function softwares()
+	{
+		return $this->belongsToMany(
+			Software::class, 'workstation_software', 'workstation_id', 'software_id'
+		)->withPivot('license_id', 'created_at', 'updated_at')->withTimestamps();
+	}
 
 	/**
 	 * Filters the query by property number
