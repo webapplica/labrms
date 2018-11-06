@@ -3,6 +3,7 @@
 namespace App\Models\Item;
 
 use Carbon\Carbon;
+use App\Models\Receipt;
 use App\Models\Room\Room;
 use App\Models\Item\Type;
 use App\Models\Ticket\Ticket;
@@ -19,6 +20,8 @@ class Item extends Model
 
 	const WORKING_STATUS = 'working';
 	const CONDEMN_STATUS = 'condemn';
+	const ALLOWED_ON_RESERVATION = 1;
+	const DISABLED_ON_RESERVATION = 1;
 	
 	protected $table = 'items';
 	protected $primaryKey = 'id';
@@ -52,33 +55,31 @@ class Item extends Model
 	// 	'id' => 'required|exists:items,id',
 	// 	'checked' => 'required|boolean',
 	// );
-
+	
+	/**
+	 * Filters the query where the reservation status
+	 * is allowed
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
 	public function scopeAllowedOnReservation($query)
 	{
-		return $query->where('for_reservation', '=', 1);
+		return $query->where('for_reservation', '=', self::ALLOWED_ON_RESERVATION);
 	}
 
-	// public function scopeDisabledReservation($query)
-	// {
-	// 	$query->where('for_reservation', '=', 0);
-	// }
-
-	// public function disableReservation()
-	// {
-	// 	$this->for_reservation = 0;
-	// 	$this->save();
-
-	// 	return $this;
-	// }
-
-	// public function enableReservation()
-	// {
-	// 	$this->for_reservation = 1;
-	// 	$this->save();
-
-	// 	return $this;
-	// }
-
+	/**
+	 * Filters the query where the reservation status
+	 * is not on
+	 *
+	 * @param Builder $query
+	 * @return object
+	 */
+	public function scopeDisabledReservation($query)
+	{
+		$query->where('for_reservation', '=', self::DISABLED_ON_RESERVATION);
+	}
+	
 	public static $category = [
 		'equipment',
 		'fixtures',
@@ -146,25 +147,28 @@ class Item extends Model
 		return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
 	}
 
+	/**
+	 * References type table connected from
+	 * the inventory table
+	 *
+	 * @return object
+	 */
 	public function type()
 	{
 		return $this->hasManyThrough(
-			Inventory::class, 
-			Type::class,
-			'id',
-			'itemtype_id'
+			Inventory::class, Type::class, 'id', 'itemtype_id'
 		);
 	}
-
-	/*
-	*
-	*	Foreign key referencing receipt table
-	*
-	*/
-	// public function receipt()
-	// {
-	// 	return $this->belongsTo('App\Receipt','receipt_id','id');
-	// }
+	
+	/**
+	 * References receipt table
+	 *
+	 * @return object
+	 */
+	public function receipt()
+	{
+		return $this->belongsTo(Receipt::class,'receipt_id', 'id');
+	}
 
 	/**
 	 * References rooms table
