@@ -21,6 +21,7 @@
 				data-deploy-url="{{ url("workstation/$workstation->id/deploy") }}"
 				data-transfer-url="{{ url("workstation/$workstation->id/transfer") }}"
 				data-disassemble-url="{{ url("workstation/$workstation->id/disassemble") }}"
+				data-software-installed-url="{{ url("workstation/$workstation->id/software") }}"
 				style="width: 100%;">
 				<thead>
 					<tr rowspan=2>
@@ -102,6 +103,7 @@ $(document).ready(function() {
 	var deploy_url = table.data('deploy-url');
 	var transfer_url = table.data('transfer-url');
 	var disassemble_url = table.data('disassemble-url');
+	var software_installed_url = table.data('software-installed-url')
 
 	var dataTable = table.DataTable( {
 		serverSide: true,
@@ -152,6 +154,13 @@ $(document).ready(function() {
 			style: 'margin-right: 5px;',
 			href: disassemble_url
 		}).prepend( $('<span>', { class: 'glyphicon glyphicon-trash', style: 'margin-right: 5px;'}) ),
+
+		$('<a>', {
+			class: 'btn btn-sm btn-link',
+			text: 'Software Installed',
+			style: 'margin-right: 5px;',
+			href: software_installed_url
+		}),
 	);
 	
 })
