@@ -90,11 +90,13 @@
 		<select 
 			id='items'
 			class='form-control multi-select'
+			name="items[]"
 			multiple
 			>
 			@forelse($items as $item)
 				<option
 					value="{{ $item->id }}"
+					{{ old('items') && in_array($item->id, old('items')) ? 'selected' : '' }}
 					>
 					{{ $item->descriptive_name }}
 				</option>
@@ -129,12 +131,15 @@
 
 		<div class="checkbox">
 			<label>
-				<input type="checkbox" name="contains" id="has-purpose-checkbox"> Not in the list?
+				<input 
+					type="checkbox" 
+					name="not_in_list" 
+					id="not-in-list-checkbox"> Not in the list?
 			</label>
 		</div>
 
-		{{ Form::textarea('description', old('description'), [
-			'id' => 'description-textarea',
+		{{ Form::textarea('alternative_explanation', old('alternative_explanation'), [
+			'id' => 'alternative_explanation',
 			'class' => 'form-control',
 			'placeholder' => 'Enter details here...',
 			'style' => 'display: none;'

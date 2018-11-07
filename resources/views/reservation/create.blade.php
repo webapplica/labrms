@@ -47,6 +47,9 @@
 		var returnTimeInput = $('#returnTime');
 		var requestButton = $('#request-btn');
 		var selectOption = $('.multi-select');
+		var notInListCheckbox = $('#not-in-list-checkbox');
+		var alternativeExplanationTextarea = $('#alternative_explanation');
+		var purposeSelectOption = $('#purpose-select');
 
 		var message = {
 			error: function (object, errorMessage) {
@@ -136,6 +139,23 @@
             afterDone: function() {
 				checkIfTimeStartIsBeforeEndTime();
             },
+		});
+
+		// toggles between purpose select option and
+		// textarea when the checkbox is ticked
+		// uses toggle function as textarea field is 
+		// initialized blank
+		notInListCheckbox.on('change', function(element) {
+
+			if (notInListCheckbox.is(':checked')) {
+				purposeSelectOption.hide(100);
+				alternativeExplanationTextarea.show(100);
+
+				return;
+			}
+
+			purposeSelectOption.show(100);
+			alternativeExplanationTextarea.hide(100);
 		});
 
 		requestButton.on('click', function() {
