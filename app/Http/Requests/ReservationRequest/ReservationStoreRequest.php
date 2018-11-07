@@ -24,10 +24,9 @@ class ReservationStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'items' => 'required',
             'location' => 'required|exists:rooms,id',
-            'time_start' => 'required|date',
-            'return_time' => 'required|date',
+            'time_start' => 'required|date_format:H:iA',
+            'return_time' => 'required|date_format:H:iA|after:time_start',
             'purpose' => 'required',
             'faculty' => 'nullable|exists:faculties,id'
         ];
