@@ -27,8 +27,9 @@ class ReservationStoreRequest extends FormRequest
             'location' => 'required|exists:rooms,id',
             'time_start' => 'required|date_format:H:iA',
             'return_time' => 'required|date_format:H:iA|after:time_start',
-            'purpose' => 'required',
-            'faculty' => 'nullable|exists:faculties,id'
+            'purpose' => 'required_without:not_in_list|exists:purposes,id',
+            'alternative_explanation' => 'required_with:not_in_list',
+            'faculty' => 'nullable|exists:faculties,id',
         ];
     }
 }
