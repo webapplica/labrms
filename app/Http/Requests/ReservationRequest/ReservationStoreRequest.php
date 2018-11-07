@@ -30,7 +30,7 @@ class ReservationStoreRequest extends FormRequest
             'time_start' => 'required|date_format:H:iA',
             'return_time' => 'required|date_format:H:iA|after:time_start',
             'purpose' => 'required_without:not_in_list|exists:purposes,id',
-            'alternative_explanation' => 'required_with:not_in_list',
+            'alternative_explanation' => 'required_with:not_in_list|max:256',
             'faculty' => 'nullable|exists:faculties,id',
             'items' => 'required|array',
             'items.*' => [
