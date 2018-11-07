@@ -19,6 +19,7 @@
     <link href="{{ asset('css/jquery-clockpicker.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/bootstrap-clockpicker.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/datepicker.min.css') }}" rel="stylesheet" />
 
     @yield('styles-prepend')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -59,6 +60,8 @@
     <script src="{{ asset('js/jquery-clockpicker.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-clockpicker.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
+    <script src="{{ asset('js/datepicker.min.js') }}"></script>
+    <script src="{{ asset('js/datepicker.en.js') }}"></script>
 
     {{-- notification functionality --}}
     <script type="text/javascript">
