@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\ReservationRequest;
 
+use Illuminate\Validation\Rule;
+use App\Models\Inventory\Inventory;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ReservationStoreRequest extends FormRequest
@@ -30,6 +32,12 @@ class ReservationStoreRequest extends FormRequest
             'purpose' => 'required_without:not_in_list|exists:purposes,id',
             'alternative_explanation' => 'required_with:not_in_list',
             'faculty' => 'nullable|exists:faculties,id',
+            'items' => 'required|array',
+            'items.*' => [
+                'required',
+                'string',
+                Rule::in(Inventory::pluck('id')->toArray()),
+            ],
         ];
     }
 }
