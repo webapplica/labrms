@@ -10,10 +10,27 @@ use Illuminate\Http\Request;
 use App\Models\Reservation\Purpose;
 use App\Models\Inventory\Inventory;
 use App\Http\Controllers\Controller;
+use App\Models\Reservation\Reservation;
+use App\Commands\Reservation\CreateReservation;
 use App\Http\Requests\ReservationRequest\ReservationStoreRequest;
 
 class ReservationController extends Controller
 {
+
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
+	public function index(Request $request, Reservation $reservation)
+	{
+		if($request->ajax()) {
+			$reservation = Reservation::all();
+			return datatables($reservation)->toJson();
+		}
+
+		return view('reservation.index');
+	}
 
 	/**
 	 * Show the form for creating a new resource.
@@ -22,7 +39,6 @@ class ReservationController extends Controller
 	 */
 	public function create(Request $request)
 	{
-		// $items = Item::allowedOnReservation()->pluck('property_number', 'id');
 		$items = Inventory::with('items', 'type')
 					->authorizedOnReservation()
 					->get();
@@ -45,7 +61,20 @@ class ReservationController extends Controller
 	 */
 	public function store(ReservationStoreRequest $request)
 	{
-		dd($request->all());
+		$this->dispatch(new CreateReservation($request));
 		return redirect('reservation');
+	}
+
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show(Request $request, $id)
+	{
+		$reservation = Reservation::findOrFail($id);
+		return view('reservation.show', compact('reservation'));
+
 	}
 }

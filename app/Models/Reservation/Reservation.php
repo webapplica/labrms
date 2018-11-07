@@ -2,28 +2,30 @@
 
 namespace App\Models\Reservation;
 
-use Auth;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Item\Item;
-// use App\Models\Events\Special;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Modules\Reservation\Conditionable;
 
 class Reservation extends Model
 {
 
+	use Conditionable;
+
+	const CANCELLED_STATUS = 'cancelled';
 	const CLAIMED_STATUS = 'claimed';
+	const APPROVED_STATUS = 'approved';
+	const DISAPPROVED_STATUS = 'disapproved';
+	const PENDING_STATUS = 'pending';
 
 	protected $table = 'reservations';
 	protected $primaryKey = 'id';
 	public $timestamps = true;
-
-	protected $dates = [ 
-		'timein', 'timeout' 
-	];
-	
+	protected $dates = ['start', 'end'];
 	public $fillable = [
-		'purpose', 'user_id', 'faculty_id', 'location', 'start', 'end', 'is_approved','is_disapproved', 'is_claimed', 'is_cancelled',
+		'purpose', 'user_id', 'faculty_id', 'location', 'start', 'end', 'is_approved','is_disapproved', 'is_claimed', 'is_cancelled', 'accountable', 'reservee'
 	];
 
 	// public static $rules = [
@@ -67,50 +69,94 @@ class Reservation extends Model
 		return $this->belongsToMany(Item::class, 'item_reservation', 'reservation_id', 'item_id'); 
 	}
 
+	/**
+	 * References room table
+	 *
+	 * @return void
+	 */
 	// public function room()
 	// {
-	// 	return $this->belongsToMany('App\Room','room_reservation','reservation_id','room_id');
+	// 	return $this->belongsToMany(,'room_reservation','reservation_id','room_id');
 	// }
+	
+	/**
+	 * References room table
+	 *
+	 * @return void
+	 */
+	public function room()
+	{
+		return $this->belongsTo(Reservation::class, 'location', 'name');
+	}
+	
+	/**
+	 * Additional columns when selecting
+	 *
+	 * @var array
+	 */
+	protected $appends = [
+		'parsed_date_and_time', 'status_name', 'parsed_date', 'parsed_start_time', 'parsed_end_time'
+	];
 
-	// public function room_location()
-	// {
-	// 	return $this->belongsTo('App\Room', 'location', 'id');
-	// }
+	/**
+	 * Return parsed date of reservation
+	 *
+	 * @return string
+	 */
+	public function getParsedDateAttribute()
+	{
+		return Carbon::parse($this->start)->toFormattedDateString();
+	}
 
-	// protected $appends = [
-	// 	'reservee_name', 'parsed_date_and_time', 'status_name', 'room_name'
-	// ];
+	/**
+	 * Return human readable start time of reservation
+	 *
+	 * @return string
+	 */
+	public function getParsedStartTimeAttribute()
+	{
+		return Carbon::parse($this->start)->format('h:i A');
+	}
 
-	// public function getRoomNameAttribute()
-	// {
-	// 	$room_name = $this->room_location->name;
-	// 	return $room_name;	
-	// }
+	/**
+	 * Return human readable end time of reservatoin
+	 *
+	 * @return string
+	 */
+	public function getParsedEndTimeAttribute()
+	{
+		return Carbon::parse($this->end)->format('h:i A');
+	}
 
-	// public function getStatusNameAttribute()
-	// {
-	// 	if( $this->is_disapproved ) {
-	// 		return 'disapproved';
-	// 	} else if( $this->is_cancelled ) {
-	// 		return 'cancelled';
-	// 	} else if( $this->is_claimed ) {
-	// 		return 'claimed';
-	// 	} else if ( $this->is_approved ) { 
-	// 		return 'approved';
-	// 	} else {
-	// 		return 'pending';
-	// 	}
-	// }
+	/**
+	 * Return the status name of the reservation
+	 *
+	 * @return string
+	 */
+	public function getStatusNameAttribute()
+	{
+		return $this->conditionAsLabel();
+	}
 
-	// public function getReserveeNameAttribute()
-	// {
-	// 	return  trim("{$this->user->lastname},{$this->user->firstname} {$this->user->middlename}");
-	// }
+	/**
+	 * Get the users full name attribute
+	 *
+	 * @return string
+	 */
+	public function getReserveeNameAttribute()
+	{
+		return $this->user->full_name;
+	}
 
-	// public function getParsedDateAndTimeAttribute()
-	// {
-	// 	return Carbon::parse($this->end)->toDayDateTimeString();
-	// }
+	/**
+	 * Returns a formatted created at
+	 *
+	 * @return string
+	 */
+	public function getParsedDateAndTimeAttribute()
+	{
+		return Carbon::parse($this->end)->format('M d Y h:sA');
+	}
 	
 	/**
 	 * Filter unclaimed reservation

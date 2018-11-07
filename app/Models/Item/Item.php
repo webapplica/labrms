@@ -9,6 +9,7 @@ use App\Models\Item\Type;
 use App\Models\Ticket\Ticket;
 use App\Models\Inventory\Inventory;
 use App\Http\Modules\Generator\Code;
+use App\Models\Reservation\Reservation;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Workstation\Workstation;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +32,28 @@ class Item extends Model
 		'local_id', 'property_number', 'serial_number', 'location', 'date_received', 'status',
 		'inventory_id', 'receipt_id', 'profiled_by', 'warranty', 'lent_at', 'lent_by', 'deployed_at',
 		'deployed_by', 'for_reservation'
+	];
+	
+	/**
+	 * Different category types for the item
+	 *
+	 * @var array
+	 */
+	public static $category = [
+		'equipment',
+		'fixtures',
+		'furniture',
+		'supplies'
+	];
+
+	/**
+	 * Added fields on select query
+	 *
+	 * @var array
+	 */
+	protected $appends = [
+		'parsed_date_received', 'parsed_date_profiled', 'reservation_status',
+		'descriptive_name'
 	];
 	
 	// public static $rules = array(
@@ -79,18 +102,64 @@ class Item extends Model
 	{
 		$query->where('for_reservation', '=', self::DISABLED_ON_RESERVATION);
 	}
-	
-	public static $category = [
-		'equipment',
-		'fixtures',
-		'furniture',
-		'supplies'
-	];
 
-	protected $appends = [
-		'parsed_date_received', 'parsed_date_profiled', 'reservation_status',
-		'descriptive_name'
-	];
+	/**
+	 * Filters the query by inventory id
+	 *
+	 * @param Builder $query
+	 * @param integer|array $id
+	 * @return object
+	 */
+	public function scopeInInventory($query, $id)
+	{
+
+		// if the id attribute is array
+		// use where in query to filter
+		// the result of the query
+		if(is_array($id)) {
+			return $query->whereIn('inventory_id', $id);
+		}
+
+		// use the default where to filter
+		// the result of the query
+		return $query->where('inventory_id', '=', $id);
+	}
+
+	/**
+	 * Filters the result where items is reserved
+	 * on the start and date supplied
+	 *
+	 * @param Builder $query
+	 * @param datetime $start
+	 * @param datetime $end
+	 * @return object
+	 */
+	public function scopeReservedOn($query, $start, $end)
+	{
+		return $query->whereHas('reservation', function($query) use ($start, $end) {
+			$query->whereBetween('start', [ $start, $end ])
+				->orWhereBetween('end', [ $start, $end ]);
+		});
+	}
+
+	/**
+	 * Filters the result where items is not yet reserved
+	 * on the start and date supplied
+	 *
+	 * @param Builder $query
+	 * @param datetime $start
+	 * @param datetime $end
+	 * @return object
+	 */
+	public function scopeNotReservedOn($query, $start, $end)
+	{
+		$items = Item::with('reservation')
+					->reservedOn($start, $end)
+					->pluck('id')
+					->toArray();
+					
+		return $query->whereNotIn('id', $items);
+	}
 
 	/**
 	 * Return parsed name for the name using the brand, model and type
@@ -135,6 +204,18 @@ class Item extends Model
 	public function getParsedDateProfiledAttribute()
 	{
 		return Carbon::parse($this->created_at)->toFormattedDateString();
+	}
+
+	/**
+	 * References reservation table
+	 *
+	 * @return void
+	 */
+	public function reservation()
+	{
+		return $this->belongsToMany(
+			Reservation::class, 'item_reservation', 'reservation_id', 'item_id'
+		);
 	}
 
 	/**
