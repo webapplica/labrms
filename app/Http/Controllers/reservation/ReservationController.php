@@ -64,4 +64,17 @@ class ReservationController extends Controller
 		$this->dispatch(new CreateReservation($request));
 		return redirect('reservation');
 	}
+
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show(Request $request, $id)
+	{
+		$reservation = Reservation::findOrFail($id);
+		return view('reservation.show', compact('reservation'));
+
+	}
 }
