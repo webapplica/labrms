@@ -49,6 +49,32 @@
                 <li>Faculty in-charge : {{ $reservation->accountable }}</li>
             </ul>
         </div> <!-- panel footer -->
+        <table 
+            class="table table-striped table-condensed table-bordered">
+            <thead>
+                <tr rowspan=2>
+                    <th colspan=3 class="text-center">Activities</th>
+                </tr>
+                <tr>
+                    <th>Title</th>
+                    <th>Details</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($reservation->activity as $activity)
+                    <tr>
+                        <td>{{ $activity->title }}</td>
+                        <td>{{ $activity->details }}</td>
+                        <td>{{ $activity->parsed_created_at }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan=3 class="text-center">No available rows</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div> <!-- panel -->
 </div> <!-- container -->
 @stop

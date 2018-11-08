@@ -37,4 +37,6 @@ return [
 
    'greetings' => 'Hi :name !',
    'items_list_note' => 'Listing all the items along with the suggested local id. If the specific item is already borrowed, you can choose to claim another available item with the same specification',
+
+   'cancel_header' => 'Cancelled Reservation',
 ]; 

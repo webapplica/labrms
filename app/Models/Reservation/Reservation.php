@@ -5,6 +5,7 @@ namespace App\Models\Reservation;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Item\Item;
+use App\Models\Reservation\Activity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Modules\Reservation\Conditionable;
@@ -87,6 +88,16 @@ class Reservation extends Model
 	public function room()
 	{
 		return $this->belongsTo(Reservation::class, 'location', 'name');
+	}
+
+	/**
+	 * References activity table
+	 *
+	 * @return object
+	 */
+	public function activity()
+	{
+		return $this->hasMany(Activity::class, 'reservation_id', 'id');
 	}
 	
 	/**
@@ -260,16 +271,22 @@ class Reservation extends Model
 	}
 
 	/**
-	 * Set current reservation as cancelled
+	 * Set the current reservation as cancelled
 	 *
-	 * @return instance
+	 * @param string $remarks
+	 * @return boolean
 	 */
-	public static function cancel($remarks)
+	public function cancelNow($remarks)
 	{
 		
 		$this->is_cancelled = Carbon::now();
-		$this->remarks = $remarks;
 		$this->save();
+
+		Activity::create([
+			'title' => __('reservation.cancel_header'),
+			'details' => $remarks,
+			'reservation_id' => $this->id,
+		]);
 		
 		return $this;
 	}

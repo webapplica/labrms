@@ -1,6 +1,13 @@
 
 @if($reservation->approval == 0)
     <span class="pull-right">
+        <a 
+            href="{{ url('reservation/' . $reservation->id . '/cancel') }}" 
+            id="cancel" 
+            class="btn btn-sm btn-default">
+            {{ _('Cancel') }}
+        </a>
+
         <button 
             data-id="`{{ $reservation->id }}`" 
             id="approve" 
