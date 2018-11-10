@@ -101,7 +101,7 @@ trait Conditionable
 		// checks if the current reservation is
 		// disapproved and returns equivalent message
 		if($this->isDisapproved()) {
-			return   __('reservation.disapproved_notice');
+			return   __('reservation.disapproved_notice', ['reason' => $this->remarks]);
 		} 
 		
 		// checks if the current reservation is

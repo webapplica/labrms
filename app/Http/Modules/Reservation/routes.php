@@ -22,6 +22,12 @@ class Routes
                 Route::get('{id}/cancel', 'CancellationController@create');
                 Route::post('{id}/cancel', 'CancellationController@store');
 
+                Route::get('{id}/approve', 'ApprovalController@create');
+                Route::post('{id}/approve', 'ApprovalController@store');
+
+                Route::get('{id}/disapprove', 'DisapprovalController@create');
+                Route::post('{id}/disapprove', 'DisapprovalController@store');
+
             //     Route::post('claim',[
             //         'as' => 'reservation.claim',
             //         'uses' => 'ReservationController@claim'

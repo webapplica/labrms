@@ -243,34 +243,6 @@ class Reservation extends Model
 	}
 
 	/**
-	 * Approve the current reservation instance
-	 *
-	 * @return instance
-	 */
-	public static function approve()
-	{
-		$this->is_approved = Carbon::now();
-		$this->save();
-
-		return $this;
-	}
-
-	/**
-	 * Disapprove the current reservation instance
-	 *
-	 * @param string $remarks
-	 * @return instance
-	 */
-	public static function disapprove(string $remarks)
-	{
-		$this->is_disapproved = Carbon::now();
-		$this->remarks = $remarks;
-		$this->save();
-		
-		return $this;
-	}
-
-	/**
 	 * Set the current reservation as cancelled
 	 *
 	 * @param string $remarks
@@ -284,6 +256,48 @@ class Reservation extends Model
 
 		Activity::create([
 			'title' => __('reservation.cancel_header'),
+			'details' => $remarks,
+			'reservation_id' => $this->id,
+		]);
+		
+		return $this;
+	}
+
+	/**
+	 * Set the current reservation as cancelled
+	 *
+	 * @param string $remarks
+	 * @return boolean
+	 */
+	public function disapprove($remarks)
+	{
+		
+		$this->is_disapproved = Carbon::now();
+		$this->save();
+
+		Activity::create([
+			'title' => __('reservation.disapproval_header', ['reason' => $remarks]),
+			'details' => $remarks,
+			'reservation_id' => $this->id,
+		]);
+		
+		return $this;
+	}
+
+	/**
+	 * Set the current reservation as cancelled
+	 *
+	 * @param string $remarks
+	 * @return boolean
+	 */
+	public function approve($remarks)
+	{
+		
+		$this->is_approved = Carbon::now();
+		$this->save();
+
+		Activity::create([
+			'title' => __('reservation.approval_header'),
 			'details' => $remarks,
 			'reservation_id' => $this->id,
 		]);
