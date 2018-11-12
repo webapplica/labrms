@@ -50,6 +50,9 @@ class Routes
              * Workstation actions routing methods
              */
             Route::prefix('workstation')->group(function() {
+                Route::get('{id}/action/create', 'ActionController@get');
+                Route::post('{id}/action', 'ActionController@store');
+
                 Route::get('{id}/deploy', 'DeploymentController@get');
                 Route::post('{id}/deploy', 'DeploymentController@store');
 

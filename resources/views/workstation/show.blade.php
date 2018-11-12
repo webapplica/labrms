@@ -17,6 +17,7 @@
 				class="table table-bordered" 
 				id="history-table"
 				data-base-url="{{ url('workstation/' . $workstation->id) }}" 
+				data-create-action-url="{{ url("workstation/$workstation->id/action/create") }}"
 				data-update-parts-url="{{ url("workstation/$workstation->id/edit") }}"
 				data-deploy-url="{{ url("workstation/$workstation->id/deploy") }}"
 				data-transfer-url="{{ url("workstation/$workstation->id/transfer") }}"
@@ -79,6 +80,14 @@
 						</td>
 					</tr>
 
+					<tr rowspan=2>
+						<td colspan=3>
+							{{ _('Status') }}:
+							<span style="font-weight: normal;">{{ $workstation->status }}</span>
+						</td>
+						<td colspan=3></td>
+					</tr>
+
 					<tr>
 						<th class="col-md-1">ID</th>
 						<th class="col-md-2">Name</th>
@@ -99,11 +108,12 @@ $(document).ready(function() {
 
 	var table = $('#history-table');
 	var baseUrl = table.data('base-url');
+	var create_action_url = table.data('create-action-url');
 	var update_parts_url = table.data('update-parts-url');
 	var deploy_url = table.data('deploy-url');
 	var transfer_url = table.data('transfer-url');
 	var disassemble_url = table.data('disassemble-url');
-	var software_installed_url = table.data('software-installed-url')
+	var software_installed_url = table.data('software-installed-url');
 
 	var dataTable = table.DataTable( {
 		serverSide: true,
@@ -128,8 +138,15 @@ $(document).ready(function() {
 	$('div.toolbar').append(
 
 		$('<a>', {
+			class: 'btn btn-sm btn-primary',
+			text: 'Action',
+			style: 'margin-right: 5px;',
+			href: create_action_url
+		}).prepend( $('<span>', { class: 'glyphicon glyphicon-pencil', style: 'margin-right: 5px;'}) ),
+
+		$('<a>', {
 			class: 'btn btn-sm btn-success',
-			text: 'Update Parts',
+			text: 'Update',
 			style: 'margin-right: 5px;',
 			href: update_parts_url
 		}).prepend( $('<span>', { class: 'glyphicon glyphicon-wrench', style: 'margin-right: 5px;'}) ),
@@ -157,7 +174,7 @@ $(document).ready(function() {
 
 		$('<a>', {
 			class: 'btn btn-sm btn-link',
-			text: 'Software Installed',
+			text: 'Softwares',
 			style: 'margin-right: 5px;',
 			href: software_installed_url
 		}),
