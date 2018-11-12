@@ -6,6 +6,7 @@ use App\Models\Room\Room;
 use App\Models\Item\Item;
 use App\Models\Ticket\Ticket;
 use App\Models\Software\Software;
+use App\Http\Modules\Generator\Code;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Modules\Generator\ListGenerator;
 
@@ -262,6 +263,12 @@ class Workstation extends Model
 		return $collection;
 	}
 
+	/**
+	 * Checks if the workstation is under maintenance
+	 * returns true else returns false if not
+	 *
+	 * @return boolean
+	 */
 	public function isUnderMaintenance()
 	{
 		// loops through each part of the workstation
@@ -274,6 +281,26 @@ class Workstation extends Model
 		}
 
 		return false;
+	}
+
+	/**
+	 * Generates workstation name from the given room
+	 *
+	 * @return void
+	 */
+	public function generateName($roomName = null)
+	{
+
+		// generate a code for the workstation name
+		// use a custom package designed specifically to
+		// generate a code
+		$code = Code::make([
+			config('app.workstation_id'),
+			isset($roomName) ? $roomName : 'TMP',
+			Workstation::count() + 1,
+		], Code::DASH_SEPARATOR);
+
+		return $code;
 	}
 
     
