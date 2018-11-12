@@ -10,7 +10,7 @@
 
 			<ul class="breadcrumb">
 				<li><a href="{{ url('workstation') }}">Workstation</a></li>
-				<li><a href="{{ url('workstation/' . $workstation->id) }}">{{ $workstation->name }}</a></li>
+				<li><a href="{{ url('workstation/' . $workstation->id . '/software') }}">{{ $workstation->name }}</a></li>
 				<li class="active">{{ __('Uninstall') }}</li>
             </ul>
             
