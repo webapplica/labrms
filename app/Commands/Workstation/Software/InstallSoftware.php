@@ -72,6 +72,9 @@ class InstallSoftware
 			'author' => Auth::user()->firstname_first,
 		]);
 
+		// link the ticket to the workstation
+		$ticket->workstation()->attach($workstation->id);
+
         // finish the transaction
         // execute the whole query and insert the 
         // record in the database

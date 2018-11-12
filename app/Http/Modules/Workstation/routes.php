@@ -26,10 +26,15 @@ class Routes
              * Routes for the list of softwares the workstation has
              */
             Route::namespace('software')->group(function() {
-                Route::get('workstation/{id}/software', 'SoftwareController@get');
+                Route::get('workstation/{id}/software', 'SoftwareController@index');
 
                 Route::get('workstation/{id}/software/install', 'InstallationController@create');
                 Route::post('workstation/{id}/software/install', 'InstallationController@store');
+
+                // Route::get('workstation/{workstation}/software/{software}', 'SoftwareController@show');
+
+                Route::get('workstation/{workstation}/software/{software}/uninstall', 'UninstallController@showForm');
+                Route::post('workstation/{workstation}/software/{software}/uninstall', 'UninstallController@uninstall');
             });
 
             /**

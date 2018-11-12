@@ -63,9 +63,8 @@
 	            { data: function(callback) {
 	            	return `
 						<a 
-							href="` + baseUrl + `/`+callback.id + `" 
-							class="btn btn-default btn-sm btn-block btn-stop-select">
-							<span class="glyphicon glyphicon-eye-open"></span> View
+							href="` + baseUrl + `/`+callback.id + `/uninstall" 
+							class="btn btn-danger btn-sm">Uninstall
 						</a>
 					`
 	            } }
