@@ -22,15 +22,11 @@ class Workstation extends Model
 		'oskey', 'mouse', 'keyboard_id', 'systemunit_id', 'monitor_id', 'avr_id', 'name', 'room_id'
 	];
 
-	// public static $rules = array(
-	// 	'License Key' => 'min:2|max:50',
-	// 	'AVR' => 'exists:items,property_number',
-	// 	'Monitor' => 'exists:items,property_number',
-	// 	'System Unit' => 'required|exists:items,property_number',
-	// 	'Keyboard' => 'exists:items,property_number',
-	// 	'Mouse' => 'exists:items,local_id'
-	// );
-
+	/**
+	 * Additional queries for workstation module
+	 *
+	 * @var array
+	 */
 	protected $appends = [
 		'system_unit_local', 'monitor_local', 'keyboard_local', 'avr_local', 'mouse_local', 'location', 
 		'status'
@@ -251,16 +247,13 @@ class Workstation extends Model
 	 */
 	public function parts()
 	{
-		
-		$collection = collect([
-			'system unit' => $this->systemunit,
-			'monitor' => $this->monitor,
-			'mouse' => $this->mouse,
-			'keyboard' => $this->keyboard,
-			'avr' => $this->avr,
-		]);
+		is_null($this->systemunit) ?: $parts['systemunit'] = $this->systemunit;
+		is_null($this->monitor) ?: $parts['monitor'] = $this->monitor;
+		is_null($this->mouse) ?: $parts['mouse'] = $this->mouse;
+		is_null($this->keyboard) ?: $parts['keyboard'] = $this->keyboard;
+		is_null($this->avr) ?: $parts['avr'] = $this->avr;
 
-		return $collection;
+		return collect(isset($parts) ? $parts : []);
 	}
 
 	/**

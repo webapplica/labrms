@@ -63,6 +63,14 @@ class AddAction
 		]);
 
 		$ticket->workstation()->attach($workstation->id);
+		
+		// check if the parts is greater than zero then
+		// attach the ticket to the list of item part of workstation
+		if (count($workstation->parts()->pluck('id')->toArray()) > 0) {
+			$ticket->item()->attach(
+				$workstation->parts()->pluck('id')->toArray()
+			);
+		}
 
 		// end the transaction, commit the query
 		// all the records will be added to the database
