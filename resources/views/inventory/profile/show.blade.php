@@ -20,18 +20,14 @@
         <a 
             href="{{ url('item/' . $item->id . '/edit') }}" 
             class="btn btn-sm btn-primary">
-            Information Update</a>
+            Basic Information</a>
         <a 
             href="{{ url('item/' . $item->id . '/activity/add') }}" class="btn btn-sm btn-default">
             Add Activity</a>
         <a 
-            href="{{ url('item/' . $item->id . '/activity/status-update') }}" 
-            class="btn btn-sm btn-warning">
-            Status Update</a>
-        <a 
             href="{{ url('item/' . $item->id . '/activity/reservation-update') }}" 
             class="btn btn-sm btn-success">
-            Reservation Status Update</a>
+            Reservation Status</a>
         <a 
             href="{{ url('item/' . $item->id . '/activity/condemn') }}" 
             class="btn btn-sm btn-danger">

@@ -21,6 +21,7 @@ class Item extends Model
 
 	const WORKING_STATUS = 'working';
 	const CONDEMN_STATUS = 'condemn';
+	const UNDERMAINTENANCE_STATUS = 'undermaintenance';
 	const ALLOWED_ON_RESERVATION = 1;
 	const DISABLED_ON_RESERVATION = 1;
 	
@@ -55,29 +56,6 @@ class Item extends Model
 		'parsed_date_received', 'parsed_date_profiled', 'reservation_status',
 		'descriptive_name'
 	];
-	
-	// public static $rules = array(
-	// 	'University Property Number' => 'min:5|max:100|unique:items,local_id',
-	// 	'Property Number' => 'min:5|max:100|unique:items,property_number',
-	// 	'Serial Number' => 'required|min:5|max:100|unique:items,serial_number',
-	// 	'Location' =>'required',
-	// 	'Date Received' =>'required|date',
-	// 	'Status' =>'required|min:5|max:50'
-
-	// );
-	
-	// public static $updateRules = array(
-	// 	'Property Number' => 'min:5|max:100',
-	// 	'Serial Number' => 'min:5|max:100',
-	// 	'Location' =>'',
-	// 	'Date Received' =>'date',
-	// 	'Status' =>'min:5|max:50'
-	// );
-
-	// public static $updateForReservationRules = array(
-	// 	'id' => 'required|exists:items,id',
-	// 	'checked' => 'required|boolean',
-	// );
 	
 	/**
 	 * Filters the query where the reservation status
@@ -455,5 +433,41 @@ class Item extends Model
 	public function getCondemnStatus()
 	{
 		return self::CONDEMN_STATUS;
+	}
+
+	/**
+	 * Returns the status for undermaintenance
+	 *
+	 * @return string
+	 */
+	public function getUnderMaintenanceStatus()
+	{
+		return self::UNDERMAINTENANCE_STATUS;
+	}
+
+	/**
+	 * Sets the status to undermaintenance if the value passed is
+	 * true else set the status to working
+	 *
+	 * @param boolean $status
+	 * @return void
+	 */
+	public function maintenance($status = true)
+	{
+		$this->status = $status ? self::UNDERMAINTENANCE_STATUS : self::WORKING_STATUS;
+		$this->save();
+
+		return $this;
+	}
+
+	/**
+	 * Checks if the status for the item is
+	 * under maintenance
+	 *
+	 * @return boolean
+	 */
+	public function isUnderMaintenance()
+	{
+		return $this->status == self::UNDERMAINTENANCE_STATUS;
 	}
 }

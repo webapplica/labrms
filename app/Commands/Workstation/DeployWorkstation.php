@@ -4,11 +4,9 @@ namespace App\Commands\Workstation;
 
 use Carbon\Carbon;
 use App\Models\Room\Room;
-use App\Models\Item\Item;
 use Illuminate\Http\Request;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Facades\DB;
-use App\Http\Modules\Generator\Code;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Workstation\Workstation;
 use App\Models\Ticket\Type as TicketType;
@@ -43,7 +41,8 @@ class DeployWorkstation
 		// specific row and return the id for the said item
 		$workstation = Workstation::findOrFail($this->id);
 		$workstation->update([
-			'room_id' => $room->id 
+			'name' => $workstation->generateName($room->name),
+			'room_id' => $room->id, 
 		]);
 
 		$details = "Workstation $workstation->name deployed on $room->name $currentDate by $currentAuthenticatedUser. ";

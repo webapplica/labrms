@@ -1,19 +1,25 @@
 
 @if($reservation->approval == 0)
     <span class="pull-right">
-        <button 
-            data-id="`{{ $reservation->id }}`" 
+        <a 
+            href="{{ url('reservation/' . $reservation->id . '/cancel') }}" 
+            id="cancel" 
+            class="btn btn-sm btn-default">
+            {{ _('Cancel') }}
+        </a>
+        
+        <a 
+            href="{{ url('reservation/' . $reservation->id . '/approve') }}" 
             id="approve" 
             class="btn btn-sm btn-success">
             {{ _('Approve') }}
-        </button>
+        </a>
 
-        <button 
+        <a 
+            href="{{ url('reservation/' . $reservation->id . '/disapprove') }}" 
             id="disapprove" 
-            data-id="`{{ $reservation->id }}`" 
-            data-reason="`{{ $reservation->remark }}"  
             class="btn btn-sm btn-danger">
             {{ _('Disapprove') }}
-        </button>
+        </a>
     </span>
 @endif

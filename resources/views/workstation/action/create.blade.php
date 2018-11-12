@@ -1,28 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-<div 
-	class="container-fluid col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 panel panel-body">
+<div class="container-fluid col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6 panel panel-body panel-padding">
 
 	<legend>
-		<h3 class="text-muted">Item: {{ $item->local_id }}</h3>
+		<h3 class="text-muted">Workstation {{ $workstation->name }}</h3>
 	</legend>
 
 	<ul class="breadcrumb">
-		<li><a href="{{ url('item') }}">Item</a></li>
-		<li><a href="{{ url('item/' . $item->id) }}">{{ $item->local_id }}</a></li>
+		<li><a href="{{ url('workstation') }}">Workstation</a></li>
+		<li><a href="{{ url('workstation/' . $workstation->id) }}">{{ $workstation->name }}</a></li>
 		<li class="active">Action</li>
 	</ul>
 		      
 	@include('errors.alert')
 
-    {{ Form::open(['method' => 'post', 'url' => url('item/' . $item->id . '/activity/add'),  'id' => 'item-form']) }}
+    {{ Form::open(['method' => 'post', 'url' => url('workstation/' . $workstation->id . '/action'),  'id' => 'workstation-form']) }}
     
         <div class="form-group">
             <input 
                 type="checkbox"
                 name="maintenance"
-                {{ old('maintenance') || $item->isUnderMaintenance() ? 'checked' : '' }}
+                {{ old('maintenance') || $workstation->isUnderMaintenance() ? 'checked' : '' }}
                 /> {{ __('Undermaintenance?') }}
 
         </div>

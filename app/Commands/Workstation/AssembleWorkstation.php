@@ -8,7 +8,6 @@ use App\Models\Item\Item;
 use Illuminate\Http\Request;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Facades\DB;
-use App\Http\Modules\Generator\Code;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Workstation\Workstation;
 use App\Models\Ticket\Type as TicketType;
@@ -23,7 +22,7 @@ class AssembleWorkstation
 		$this->request = $request;
 	}
 
-	public function handle(Ticket $ticket)
+	public function handle(Ticket $ticket, Workstation $workstation)
 	{
 		
 		// assign global request to a local request variable
@@ -45,15 +44,6 @@ class AssembleWorkstation
 		// corresponding name
 		$room = Room::name($request->location)->first();
 
-		// generate a code for the workstation name
-		// use a custom package designed specifically to
-		// generate a code
-		$code = Code::make([
-			config('app.workstation_id'),
-			isset($room->name) ? $room->name : 'TMP',
-			Workstation::count() + 1,
-		], Code::DASH_SEPARATOR);
-
 		// use transaction in order to change the record properly
 		DB::beginTransaction();
 
@@ -67,7 +57,7 @@ class AssembleWorkstation
 			'avr_id' => $avr,
 			'keyboard_id' => $keyboard,
 			'mouse_id' => null,
-			'name' => $code
+			'name' => $workstation->generateName($room->name ?? null),
 		]);
 
 		$details = "Workstation $workstation->name assembled on $currentDate by $currentAuthenticatedUser. ";
