@@ -50,7 +50,8 @@ class Software extends Model
 	public function getLicenseKeyAttribute()
 	{
 		if(isset($this->pivot['license_id'])) {
-			return $this->licenses->where('id', $this->pivot['license_id'])->first()->key;
+			$license = $this->licenses->where('id', $this->pivot['license_id'])->first();
+			return isset($license) ? $license->key : null;
 		}
 
 		return null;
