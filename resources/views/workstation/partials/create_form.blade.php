@@ -7,7 +7,7 @@
         name="license_key"
         class="form-control"
         placeholder="License Key"
-        {{ isset($workstation->oskey) ? $workstation->oskey : old('os') }} />
+        value="{{ isset($workstation->oskey) ? $workstation->oskey : old('os') }}" />
 </div>
 
 <div class="form-group">
