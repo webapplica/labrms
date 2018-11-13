@@ -24,7 +24,7 @@
 
         <div class="form-group">
             <label for=start>Start of the Academic Year</label>
-            {{ Form::text('start', old('start'), [
+            {{ Form::text('startOfYear', old('startOfYear'), [
                 'class' => 'form-control',
                 'id' => 'start-of-year',
                 'style' => 'background-color: white;',
@@ -35,7 +35,7 @@
 
         <div class="form-group">
             <label for=start>End of the Academic Year</label>
-            {{ Form::text('end', old('end'), [
+            {{ Form::text('endOfYear', old('endOfYear'), [
                 'class' => 'form-control',
                 'id' => 'end-of-year',
                 'style' => 'background-color: white;',

@@ -33,7 +33,7 @@ class AcademicYearController extends Controller
      */
     public function create()
     {
-        $currentDate = Carbon::now()->addYear(1);
+        $currentDate = Carbon::now();
         $endDate = Carbon::now()->addMonths(6);
         return view('maintenance.academicyear.create', compact('currentDate', 'endDate'));
     }
@@ -46,7 +46,7 @@ class AcademicYearController extends Controller
      */
     public function store(Request $request)
     {
-        $this->dispatch(new AddAcademicYear());
+        $this->dispatch(new AddAcademicYear($request));
         return redirect('academicyear')->with('success-message', __('tasks.success'));
     }
 
@@ -71,7 +71,7 @@ class AcademicYearController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->dispatch(new UpdateAcademicYear());
+        $this->dispatch(new UpdateAcademicYear($request, $id));
         return redirect('academicyear')->with('success-message', __('tasks.success'));
     }
 
