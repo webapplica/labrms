@@ -11,7 +11,7 @@
     <!-- dropdown items -->
     <ul class="dropdown-menu">
         <!-- maintenance tab -->
-        {{-- <li>{{ link_to('academicyear','Academic Year') }}</li> --}}
+        <li>{{ link_to('academicyear','Academic Year') }}</li>
         {{-- <li>{{ link_to('maintenance/activity','Maintenance Activities') }}</li> --}}
         {{-- <li>{{ link_to('event','Event') }}</li> --}}
         <li>{{ link_to('faculty','Faculty') }}</li>
@@ -46,7 +46,6 @@
             <ul class="dropdown-menu">
                 <li>{{ link_to('reservation','List') }}</li>
                 <li>{{ link_to('reservation/create','Create') }}</li>
-                {{-- <li>{{ link_to('reservation/items/list','Items') }}</li> --}}
             </ul> <!-- end of dropdown items -->
         </li> <!-- end of reservation dropdown tab -->
 
