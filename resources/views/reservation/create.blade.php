@@ -113,7 +113,7 @@
 
 		reservationDate.val(function() {
 			suggestedDate = form.data('suggested-date');
-			return moment(suggestedDate).format('MMM DD, YYYY');
+			return moment(suggestedDate).format('MMMM DD, YYYY');
 		});
 
 		selectOption.selectpicker();

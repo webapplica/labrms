@@ -142,3 +142,13 @@
         name="mouse"
         {{ old('mouse') == true || isset($workstation->mouse) }} />
 </div>
+
+<div class="form-group">
+    <label for="ip-address">IP Address</label>
+    <input
+        type="text"
+        name="ip_address"
+        class="form-control"
+        placeholder="192.168.0.0"
+        value="{{ isset($workstation->ip_address) ? $workstation->ip_address : old('ip_address') }}" />
+</div>

@@ -39,6 +39,7 @@ class WorkstationUpdateRequest extends FormRequest
             'monitor' => 'nullable|exists:items,id|' . $uniqueOnWorkstationTable,
             'avr' => 'nullable|exists:items,id|' . $uniqueOnWorkstationTable,
             'keyboard' => 'nullable|exists:items,id|' . $uniqueOnWorkstationTable,
+            'ip_address' => 'nullable|max:256',
         ];
     }
 

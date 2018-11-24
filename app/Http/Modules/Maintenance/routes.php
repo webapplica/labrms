@@ -11,7 +11,10 @@ class Routes
 
         Route::namespace('maintenance')->middleware(['auth', 'role.staff'])->group(function() {
 
-            // Route::resource('academicyear','AcademicYearController');
+            Route::namespace('scheduling')->group(function() {
+                Route::resource('academicyear','AcademicYearController');
+            });
+            
             // Route::resource('event','SpecialEventController');
             Route::resource('faculty','FacultyController', ['except' => array('show')]);
             // Route::resource('inventory/software','SoftwareInventoryController');

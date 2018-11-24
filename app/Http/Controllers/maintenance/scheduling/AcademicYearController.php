@@ -1,9 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance;
+namespace App\Http\Controllers\Maintenance\Scheduling;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Scheduling\AcademicYear;
+use App\Commands\AcademicYear\AddAcademicYear;
+use App\Commands\AcademicYear\UpdateAcademicYear;
+use App\Commands\AcademicYear\RemoveAcademicYear;
 
 class AcademicYearController extends Controller
 {
@@ -18,7 +23,7 @@ class AcademicYearController extends Controller
             return datatables(AcademicYear::all())->toJson();
         }
 
-        return view('academicyear.index');
+        return view('maintenance.academicyear.index');
     }
 
     /**
@@ -28,7 +33,9 @@ class AcademicYearController extends Controller
      */
     public function create()
     {
-        return view('academicyear.create');
+        $currentDate = Carbon::now();
+        $endDate = Carbon::now()->addMonths(6);
+        return view('maintenance.academicyear.create', compact('currentDate', 'endDate'));
     }
 
     /**
@@ -39,8 +46,20 @@ class AcademicYearController extends Controller
      */
     public function store(Request $request)
     {
-        $this->dispatch(new AddAcademicYear());
+        $this->dispatch(new AddAcademicYear($request));
         return redirect('academicyear')->with('success-message', __('tasks.success'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $type = AcademicYear::findOrFail($id);
+        return view('maintenance.academicyear.edit', compact('academicyear'));
     }
 
     /**
@@ -50,9 +69,9 @@ class AcademicYearController extends Controller
      * @param  \App\AcademicYear  $academicYear
      * @return \Illuminate\Http\Response
      */
-    public function update($id)
+    public function update(Request $request, $id)
     {
-        $this->dispatch(new UpdateAcademicYear());
+        $this->dispatch(new UpdateAcademicYear($request, $id));
         return redirect('academicyear')->with('success-message', __('tasks.success'));
     }
 
@@ -62,9 +81,9 @@ class AcademicYearController extends Controller
      * @param  \App\AcademicYear  $academicYear
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        AcademicYear::findOrFail($id)->delete();
+        $this->dispatch(new RemoveAcademicYear($request, $id));
         return redirect('academicyear')->with('success-message', __('tasks.success'));
     }
 }

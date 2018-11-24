@@ -38,6 +38,7 @@ class AssembleWorkstation
 		$avr = $request->avr;
 		$keyboard = $request->keyboard;
 		$mouse = $request->mouse;
+		$ip_address = $request->ip_address;
 		$license_key = $request->license_key;
 		
 		// check if the room exists and find the room with the 
@@ -56,6 +57,7 @@ class AssembleWorkstation
 			'monitor_id' => $monitor,
 			'avr_id' => $avr,
 			'keyboard_id' => $keyboard,
+			'ip_address' => $ip_address,
 			'mouse_id' => null,
 			'name' => $workstation->generateName($room->name ?? null),
 		]);

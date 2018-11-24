@@ -22,6 +22,7 @@
 					<th>Keyboard</th>
 					<th>Mouse</th>
 					<th>Location</th>
+					<th>IP Address</th>
 					<th class="no-sort"></th>
 				</thead>
 			</table>
@@ -62,6 +63,7 @@
 	            { data: "keyboard_local" },
 	            { data: "mouse_local" },
 	            { data: 'location' },
+	            { data: 'ip_address' },
 	            { data: function(callback) {
 	            	return `
 						<a href="` + base_url + `/`+callback.id+`" class="btn btn-default btn-sm btn-block btn-stop-select"><span class="glyphicon glyphicon-eye-open"></span> 	View</a>
