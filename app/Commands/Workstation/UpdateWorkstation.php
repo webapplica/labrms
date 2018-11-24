@@ -42,6 +42,7 @@ class UpdateWorkstation
 		$avr = $request->avr;
 		$keyboard = $request->keyboard;
 		$mouse = $request->mouse;
+		$ip_address = $request->ip_address;
 		$license_key = $request->license_key;
 
 		// use transaction in order to change the record properly
@@ -57,6 +58,7 @@ class UpdateWorkstation
 			'monitor_id' => $monitor,
 			'avr_id' => $avr,
 			'keyboard_id' => $keyboard,
+			'ip_address' => $ip_address,
 			'mouse_id' => null,
 		]);
 
